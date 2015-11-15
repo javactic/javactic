@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="javadoc">
+    <target name="javadoc">
+        <javadoc access="public" author="true" 
+        	classpath="/home/mvh/.m2/repository/com/javaslang/javaslang/2.0.0-beta/javaslang-2.0.0-beta.jar" 
+        	destdir="doc" 
+        	doctitle="Slangactic API"
+        	windowtitle="Slangactic API"
+        	nodeprecated="false" 
+        	nodeprecatedlist="false" 
+        	noindex="false" 
+        	nonavbar="false" 
+        	notree="false" 
+        	source="1.8" 
+        	sourcepath="src/main/java" 
+        	stylesheetfile="stylesheet.css"
+        	splitindex="true" 
+        	use="true" 
+        	version="true">
+            <link href="http://javaslang.com/javadoc/2.0.0-beta/"/>
+            <link href="https://docs.oracle.com/javase/8/docs/api/"/>
+        </javadoc>
+    </target>
+</project>
