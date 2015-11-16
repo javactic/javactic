@@ -948,8 +948,7 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
      * @param op
      * @return
      */
-    default <B> Every<B> scanLeft(B z,
-            BiFunction<? super B, ? super T, ? extends B> op) {
+    default <B> Every<B> scanLeft(B z, BiFunction<? super B, ? super T, ? extends B> op) {
         return niy(); // TODO
     }
 
@@ -962,8 +961,7 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
      * @param op
      * @return
      */
-    default <B> Every<B> scanRight(B z,
-            BiFunction<? super T, ? super B, ? extends B> op) {
+    default <B> Every<B> scanRight(B z, BiFunction<? super T, ? super B, ? extends B> op) {
         return niy(); // TODO
     }
 
@@ -1013,8 +1011,7 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
      * @param f
      * @return
      */
-    default <U extends Comparable<? super U>> Every<T> sortBy(
-            Function<? super T, ? extends U> f) {
+    default <U extends Comparable<? super U>> Every<T> sortBy(Function<? super T, ? extends U> f) {
         return fromNonEmptySeq(toVector().sortBy(f));
     }
 
@@ -1027,8 +1024,7 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
      * @param f
      * @return
      */
-    default <U> Every<T> sortBy(Comparator<? super U> c,
-            Function<? super T, ? extends U> f) {
+    default <U> Every<T> sortBy(Comparator<? super U> c, Function<? super T, ? extends U> f) {
         return fromNonEmptySeq(toVector().sortBy(c, f));
     }
 
@@ -1154,8 +1150,7 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
      * @param f
      * @return
      */
-    default <K, V> java.util.Map<K, V> toJavaMap(
-            Function<? super T, ? extends Tuple2<? extends K, ? extends V>> f) {
+    default <K, V> java.util.Map<K, V> toJavaMap(Function<? super T, ? extends Tuple2<? extends K, ? extends V>> f) {
         return toVector().toJavaMap(f);
     }
 
@@ -1167,8 +1162,7 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
      * @param f
      * @return
      */
-    default <K, V> Map<K, V> toMap(
-            Function<? super T, ? extends Tuple2<? extends K, ? extends V>> f) {
+    default <K, V> Map<K, V> toMap(Function<? super T, ? extends Tuple2<? extends K, ? extends V>> f) {
         return toVector().toMap(f);
     }
 
@@ -1258,8 +1252,7 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
      * @param unzipper
      * @return
      */
-    default <L, M, R> Tuple3<Every<L>, Every<M>, Every<R>> unzip3(
-            Function<? super T, Tuple3<? extends L, ? extends M, ? extends R>> unzipper) {
+    default <L, M, R> Tuple3<Every<L>, Every<M>, Every<R>> unzip3(Function<? super T, Tuple3<? extends L, ? extends M, ? extends R>> unzipper) {
         Tuple3<Vector<L>, Vector<M>, Vector<R>> unzipped = toVector().unzip3(unzipper);
         return Tuple.of(fromNonEmptySeq(unzipped._1),
                         fromNonEmptySeq(unzipped._2), 
@@ -1274,11 +1267,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
      * @param unzipper
      * @return
      */
-    default <L, R> Tuple2<Every<L>, Every<R>> unzip(
-            Function<? super T, Tuple2<? extends L, ? extends R>> unzipper) {
+    default <L, R> Tuple2<Every<L>, Every<R>> unzip(Function<? super T, Tuple2<? extends L, ? extends R>> unzipper) {
         Tuple2<Vector<L>, Vector<R>> unzipped = toVector().unzip(unzipper);
-        return Tuple.of(fromNonEmptySeq(unzipped._1),
-                fromNonEmptySeq(unzipped._2));
+        return Tuple.of(fromNonEmptySeq(unzipped._1), fromNonEmptySeq(unzipped._2));
     }
 
     /**
@@ -1305,8 +1296,7 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
      * @param otherElem
      * @return
      */
-    default <B> Every<Tuple2<T, B>> zipAll(Iterable<B> other, T thisElem,
-            B otherElem) {
+    default <B> Every<Tuple2<T, B>> zipAll(Iterable<B> other, T thisElem, B otherElem) {
         return fromNonEmptySeq(toVector().zipAll(other, thisElem, otherElem));
     }
 
