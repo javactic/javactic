@@ -354,9 +354,8 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
         toVector().forEach(action);
     }
 
-    @SuppressWarnings("unchecked")
     default <B> Every<B> flatten() {
-        return (Every<B>) fromNonEmptySeq(toVector().flatten());
+        return fromNonEmptySeq(toVector().<B>flatten());
         // TODO test
     }
     
@@ -683,11 +682,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
      * @param f
      * @param c
      * @return
-     * TODO: order of arguments?
      */
-    default <U> T maxBy(Function<? super T, ? extends U> f, Comparator<? super U> c) {
-        return toVector().map(t -> Tuple.of(t, f.apply(t)))
-                .maxBy((p1, p2) -> c.compare(p1._2, p2._2)).get()._1;
+    default <U extends Comparable<? super U>> T maxBy(Function<? super T, ? extends U> f) {
+        return toVector().maxBy(f).get();
     }
 
     /**
@@ -719,11 +716,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
      * @param f
      * @param c
      * @return
-     * TODO: order of arguments?
      */
-    default <U> T minBy(Function<? super T, ? extends U> f, Comparator<? super U> c) {
-        return toVector().map(t -> Tuple.of(t, f.apply(t)))
-                .minBy((p1, p2) -> c.compare(p1._2, p2._2)).get()._1;
+    default <U extends Comparable<? super U>> T minBy(Function<? super T, ? extends U> f) {
+        return toVector().minBy(f).get();
     }
 
     /**
