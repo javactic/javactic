@@ -28,6 +28,7 @@ import java.util.function.ToIntFunction;
 
 import javaslang.Tuple;
 import javaslang.Tuple2;
+import javaslang.Tuple3;
 import javaslang.collection.Array;
 import javaslang.collection.Iterator;
 import javaslang.collection.List;
@@ -42,8 +43,9 @@ import javaslang.control.Option;
 public interface Every<T> extends IntFunction<T>, Iterable<T> {
 
     /**
+     * --. 
      * 
-     * c. <pre class="stHighlighted">Scalactic: def toVector: Vector[T] </pre>
+     * <pre class="stHighlighted">Scalactic: def toVector: Vector[T] </pre>
      * 
      * @return
      */
@@ -53,14 +55,21 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
         return a > 0 && a < length();
     }
 
+    /**
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def toIterator: Iterator[T] </pre>
+     * 
+     * @return
+     */
     @Override
     default Iterator<T> iterator() {
         return toVector().iterator();
     }
 
-    @SafeVarargs
+	@SafeVarargs
     public static <T> Every<T> of(T first, T... rest) {
-        return of(first, Vector.of(rest));
+        return of(first, Vector.ofAll(rest));
     }
 
     public static <T> Every<T> of(T first, Seq<? extends T> rest) {
@@ -71,7 +80,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def ++[U &gt;: T](other: GenTraversableOnce[U]): Every[U] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def ++[U &gt;: T](other: GenTraversableOnce[U]): Every[U] </pre>
      * @param iterable
      * @return
      */
@@ -84,7 +95,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def ++[U &gt;: T](other: Every[U]): Many[U] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def ++[U &gt;: T](other: Every[U]): Many[U] </pre>
      * @param other
      * @return
      */
@@ -94,7 +107,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def :+[U &gt;: T](element: U): Many[U] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def :+[U &gt;: T](element: U): Many[U] </pre>
      * @param element
      * @return
      */
@@ -104,7 +119,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def +:[U &gt;: T](element: U): Many[U] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def +:[U &gt;: T](element: U): Many[U] </pre>
      * @param element
      * @return
      */
@@ -114,7 +131,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def addString(sb: StringBuilder, start: String, sep: String, end: String): StringBuilder </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def addString(sb: StringBuilder, start: String, sep: String, end: String): StringBuilder </pre>
      * @param sb
      * @param start
      * @param sep
@@ -134,7 +153,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def addString(sb: StringBuilder, sep: String): StringBuilder </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def addString(sb: StringBuilder, sep: String): StringBuilder </pre>
      * @param sb
      * @param sep
      * @return
@@ -144,7 +165,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def addString(sb: StringBuilder): StringBuilder </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def addString(sb: StringBuilder): StringBuilder </pre>
      * @param sb
      * @return
      */
@@ -153,7 +176,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def contains(elem: Any): Boolean </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def contains(elem: Any): Boolean </pre>
      * @param elem
      * @return
      */
@@ -162,16 +187,10 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
     
     /**
-     * c. <pre class="stHighlighted">Scalactic: def containsSlice[B](that: Every[B]): Boolean </pre>
-     * @param that
-     * @return
-     */
-    default boolean containsSlice(Every<? extends T> that) {
-        return containsSlice(that.toVector());
-    }
-
-    /**
-     * c. <pre class="stHighlighted">Scalactic: def containsSlice[B](that: GenSeq[B]): Boolean </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def containsSlice[B](that: GenSeq[B]): Boolean <br>
+     * Scalactic: def containsSlice[B](that: Every[B]): Boolean</pre>
      * 
      * @param that
      * @return
@@ -181,7 +200,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def copyToArray[U &gt;: T](arr: Array[U], start: Int, len: Int): Unit </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def copyToArray[U &gt;: T](arr: Array[U], start: Int, len: Int): Unit </pre>
      * @param target
      * @param start
      * @param length
@@ -197,7 +218,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def copyToArray[U &gt;: T](arr: Array[U], start: Int): Unit </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def copyToArray[U &gt;: T](arr: Array[U], start: Int): Unit </pre>
      * @param target
      * @param start
      */
@@ -206,7 +229,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def copyToArray[U &gt;: T](arr: Array[U]): Unit </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def copyToArray[U &gt;: T](arr: Array[U]): Unit </pre>
      * @param target
      */
     default void copyToArray(T[] target) {
@@ -214,28 +239,22 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def corresponds[B](that: Every[B])(p: (T, B) =&gt; Boolean): Boolean </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def corresponds[B](that: GenSeq[B])(p: (T, B) =&gt; Boolean): Boolean <br>
+     * Scalactic: def corresponds[B](that: Every[B])(p: (T, B) =&gt; Boolean): Boolean </pre>
      * @param that
      * @param predicate
      * @return
      */
-    default <B> boolean corresponds(Every<B> that, BiPredicate<T, B> predicate) {
-        return corresponds(that.toVector(), predicate);
-    }
-
-    /**
-     * c. <pre class="stHighlighted">Scalactic: def corresponds[B](that: GenSeq[B])(p: (T, B) =&gt; Boolean): Boolean </pre>
-     * @param that
-     * @param predicate
-     * @return
-     */
-    default <B> boolean corresponds(Iterable<B> that,
-            BiPredicate<T, B> predicate) {
+    default <B> boolean corresponds(Iterable<B> that, BiPredicate<T, B> predicate) {
         return toVector().corresponds(that, predicate);
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def count(p: (T) =&gt; Boolean): Int </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def count(p: (T) =&gt; Boolean): Int </pre>
      * @param predicate
      * @return
      */
@@ -244,7 +263,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def exists(p: (T) =&gt; Boolean): Boolean </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def exists(p: (T) =&gt; Boolean): Boolean </pre>
      * @param predicate
      * @return
      */
@@ -253,7 +274,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def find(p: (T) =&gt; Boolean): Option[T] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def find(p: (T) =&gt; Boolean): Option[T] </pre>
      * @param predicate
      * @return
      */
@@ -270,14 +293,18 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def apply(idx: Int): T </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def apply(idx: Int): T </pre>
      */
     default T apply(int index) {
         return toVector().get(index);
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def applyOrElse[A1 &lt;: Int, B1 &gt;: T](x: A1, default: (A1) =&gt; B1): B1 </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def applyOrElse[A1 &lt;: Int, B1 &gt;: T](x: A1, default: (A1) =&gt; B1): B1 </pre>
      * @param index
      * @param def
      * @return
@@ -287,7 +314,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def compose[A](g: (A) =&gt; Int): (A) =&gt; T </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def compose[A](g: (A) =&gt; Int): (A) =&gt; T </pre>
      * @param g
      * @return
      */
@@ -296,7 +325,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def distinct: Every[T] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def distinct: Every[T] </pre>
      * @return
      */
     default Every<T> distinct() {
@@ -304,7 +335,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def forall(p: (T) =&gt; Boolean): Boolean </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def forall(p: (T) =&gt; Boolean): Boolean </pre>
      * @param p
      * @return
      */
@@ -313,7 +346,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def foreach(f: (T) =&gt; Unit): Unit </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def foreach(f: (T) =&gt; Unit): Unit </pre>
      */
     default void forEach(Consumer<? super T> action) {
         toVector().forEach(action);
@@ -327,7 +362,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     
     
     /**
-     * c. <pre class="stHighlighted">Scalactic: def fold[U &gt;: T](z: U)(op: (U, U) =&gt; U): U </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def fold[U &gt;: T](z: U)(op: (U, U) =&gt; U): U </pre>
      * @param z
      * @param op
      * @return
@@ -337,7 +374,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def foldLeft[B](z: B)(op: (B, T) =&gt; B): B </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def foldLeft[B](z: B)(op: (B, T) =&gt; B): B </pre>
      * @param z
      * @param op
      * @return
@@ -347,7 +386,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def foldRight[B](z: B)(op: (T, B) =&gt; B): B </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def foldRight[B](z: B)(op: (T, B) =&gt; B): B </pre>
      * @param z
      * @param op
      * @return
@@ -357,17 +398,21 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def groupBy[K](f: (T) =&gt; K): Map[K, Every[T]] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def groupBy[K](f: (T) =&gt; K): Map[K, Every[T]] </pre>
      * @param f
      * @return
      */
     default <K> Map<K, Every<T>> groupBy(Function<? super T, ? extends K> f) {
         return toVector().groupBy(f)
-                .map((k, v) -> new Map.Entry<K, Every<T>>(k, Every.of(v.head(), v.tail())));
+                .map((k, v) -> Tuple.of(k, Every.of(v.head(), v.tail())));
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def grouped(size: Int): Iterator[Every[T]] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def grouped(size: Int): Iterator[Every[T]] </pre>
      * @param size
      * @return
      */
@@ -376,7 +421,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def head: T </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def head: T </pre>
      * @return
      */
     default T head() {
@@ -384,7 +431,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def headOption: Option[T] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def headOption: Option[T] </pre>
      * @return
      */
     default Option<T> headOption() {
@@ -392,7 +441,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def indexOf[U &gt;: T](elem: U): Int </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def indexOf[U &gt;: T](elem: U): Int </pre>
      * @param elem
      * @return
      */
@@ -401,7 +452,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def indexOf[U &gt;: T](elem: U, from: Int): Int </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def indexOf[U &gt;: T](elem: U, from: Int): Int </pre>
      * @param elem
      * @param from
      * @return
@@ -411,46 +464,36 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def indexOfSlice[U &gt;: T](that: Every[U]): Int </pre>
-     * @param that
-     * @return
-     */
-    default int indexOfSlice(Every<T> that) {
-        return niy(); //TODO
-    }
-
-    /**
-     * c. <pre class="stHighlighted">Scalactic: def indexOfSlice[U &gt;: T](that: Every[U], end: Int): Int </pre>
-     * @param that
-     * @param end
-     * @return
-     */
-    default int indexOfSlice(Every<T> that, int end) {
-        return niy(); //TODO
-    }
-
-    /**
-     * c. <pre class="stHighlighted">Scalactic: def indexOfSlice[U &gt;: T](that: GenSeq[U]): Int </pre>
+     * --.
+     * 
+     * <pre class="stHighlighted">Scalactic: def indexOfSlice[U &gt;: T](that: GenSeq[U]): Int <br> 
+     * Scalactic: def indexOfSlice[U &gt;: T](that: Every[U]): Int </pre>
+     * 
      * @param that
      * @return
      */
     default int indexOfSlice(Iterable<T> that) {
-        return niy(); //TODO
+        return toVector().indexOfSlice(that);
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def indexOfSlice[U &gt;: T](that: GenSeq[U], end: Int): Int </pre>
+     * --.
+     * 
+     * <pre class="stHighlighted">Scalactic: def indexOfSlice[U &gt;: T](that: GenSeq[U], end: Int): Int <br>
+     * Scalactic: def indexOfSlice[U &gt;: T](that: Every[U], end: Int): Int</pre>
      * @param that
-     * @param end
+     * @param from
      * @return
      */
-    default int indexOfSlice(Iterable<T> that, int end) {
-        return niy(); //TODO
+    default int indexOfSlice(Iterable<T> that, int from) {
+        return toVector().indexOfSlice(that, from);
     }
     
     
     /**
-     * c. <pre class="stHighlighted">Scalactic: def indexWhere(p: (T) =&gt; Boolean): Int </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def indexWhere(p: (T) =&gt; Boolean): Int </pre>
      * @param p
      * @return
      */
@@ -459,7 +502,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def indexWhere(p: (T) =&gt; Boolean, from: Int): Int </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def indexWhere(p: (T) =&gt; Boolean, from: Int): Int </pre>
      * @param p
      * @param from
      * @return
@@ -473,7 +518,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def last: T </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def last: T </pre>
      * @return
      */
     default T last() {
@@ -481,7 +528,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def lastOption: Option[T] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def lastOption: Option[T] </pre>
      * @return
      */
     default Option<T> lastOption() {
@@ -489,7 +538,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def lastIndexOf[U &gt;: T](elem: U): Int </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def lastIndexOf[U &gt;: T](elem: U): Int </pre>
      * @param elem
      * @return
      */
@@ -498,7 +549,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def lastIndexOf[U &gt;: T](elem: U, end: Int): Int </pre>
+     * --.
+     *  
+     * <pre class="stHighlighted">Scalactic: def lastIndexOf[U &gt;: T](elem: U, end: Int): Int </pre>
      * @param elem
      * @param end
      * @return
@@ -508,45 +561,34 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
     
     /**
-     * c. <pre class="stHighlighted">Scalactic: def lastIndexOfSlice[U &gt;: T](that: Every[U]): Int </pre>
-     * @param that
-     * @return
-     */
-    default int lastIndexOfSlice(Every<T> that) {
-        return niy(); //TODO
-    }
-
-    /**
-     * c. <pre class="stHighlighted">Scalactic: def lastIndexOfSlice[U &gt;: T](that: Every[U], end: Int): Int </pre>
-     * @param that
-     * @param end
-     * @return
-     */
-    default int lastIndexOfSlice(Every<T> that, int end) {
-        return niy(); //TODO
-    }
-
-    /**
-     * c. <pre class="stHighlighted">Scalactic: def lastIndexOfSlice[U &gt;: T](that: GenSeq[U]): Int </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def lastIndexOfSlice[U &gt;: T](that: GenSeq[U]): Int <br>
+     * Scalactic: def lastIndexOfSlice[U &gt;: T](that: Every[U]): Int </pre>
      * @param that
      * @return
      */
     default int lastIndexOfSlice(Iterable<T> that) {
-        return niy(); //TODO
+        return toVector().lastIndexOfSlice(that);
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def lastIndexOfSlice[U &gt;: T](that: GenSeq[U], end: Int): Int </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def lastIndexOfSlice[U &gt;: T](that: GenSeq[U], end: Int): Int <br>
+     * Scalactic: def lastIndexOfSlice[U &gt;: T](that: Every[U], end: Int): Int</pre>
      * @param that
      * @param end
      * @return
      */
     default int lastIndexOfSlice(Iterable<T> that, int end) {
-        return niy(); //TODO
+        return toVector().lastIndexOfSlice(that, end);
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def lastIndexWhere(p: (T) =&gt; Boolean): Int </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def lastIndexWhere(p: (T) =&gt; Boolean): Int </pre>
      * @param p
      * @return
      */
@@ -555,7 +597,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def lastIndexWhere(p: (T) =&gt; Boolean, end: Int): Int </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def lastIndexWhere(p: (T) =&gt; Boolean, end: Int): Int </pre>
      * @param p
      * @param end
      * @return
@@ -570,7 +614,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def size: Int </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def size: Int </pre>
      * @return
      */
     default int size() {
@@ -578,7 +624,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def length: Int </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def length: Int </pre>
      * @return
      */
     default int length() {
@@ -586,7 +634,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def lengthCompare(len: Int): Int </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def lengthCompare(len: Int): Int </pre>
      * @param len
      * @return
      */
@@ -595,7 +645,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def map[U](f: (T) =&gt; U): Every[U] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def map[U](f: (T) =&gt; U): Every[U] </pre>
      * @param f
      * @return
      */
@@ -604,7 +656,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def max[U &gt;: T](implicit cmp: Ordering[U]): T </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def max[U &gt;: T](implicit cmp: Ordering[U]): T </pre>
      * @return
      * TODO: should this method exist?
      */
@@ -613,7 +667,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def maxBy[U](f: (T) =&gt; U)(implicit cmp: Ordering[U]): T </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def maxBy[U](f: (T) =&gt; U)(implicit cmp: Ordering[U]): T </pre>
      * @param c
      * @return
      */
@@ -622,7 +678,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def maxBy[U](f: (T) =&gt; U)(implicit cmp: Ordering[U]): T </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def maxBy[U](f: (T) =&gt; U)(implicit cmp: Ordering[U]): T </pre>
      * @param f
      * @param c
      * @return
@@ -634,7 +692,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def min[U &gt;: T](implicit cmp: Ordering[U]): T </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def min[U &gt;: T](implicit cmp: Ordering[U]): T </pre>
      * @return
      * TODO: should this method exist?
      */
@@ -643,7 +703,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def minBy[U](f: (T) =&gt; U)(implicit cmp: Ordering[U]): T </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def minBy[U](f: (T) =&gt; U)(implicit cmp: Ordering[U]): T </pre>
      * @param c
      * @return
      */
@@ -652,7 +714,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def minBy[U](f: (T) =&gt; U)(implicit cmp: Ordering[U]): T </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def minBy[U](f: (T) =&gt; U)(implicit cmp: Ordering[U]): T </pre>
      * @param f
      * @param c
      * @return
@@ -664,7 +728,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def padTo[U &gt;: T](len: Int, elem: U): Every[U] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def padTo[U &gt;: T](len: Int, elem: U): Every[U] </pre>
      * @param len
      * @param elem
      * @return
@@ -674,19 +740,22 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def patch[U &gt;: T](from: Int, that: Every[U], replaced: Int): Every[U] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def patch[U &gt;: T](from: Int, that: Every[U], replaced: Int): Every[U] </pre>
      * @param from
      * @param that
      * @param replaced
      * @return
      */
     default Every<T> patch(int from, Every<? extends T> that, int replaced) {
-        return fromNonEmptySeq(toVector()
-                .patch(from, that.toVector(), replaced));
+        return fromNonEmptySeq(toVector().patch(from, that.toVector(), replaced));
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def reduce[U &gt;: T](op: (U, U) =&gt; U): U </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def reduce[U &gt;: T](op: (U, U) =&gt; U): U </pre>
      * @param op
      * @return
      */
@@ -695,7 +764,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def reduceOption[U &gt;: T](op: (U, U) =&gt; U): Option[U] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def reduceOption[U &gt;: T](op: (U, U) =&gt; U): Option[U] </pre>
      * @param op
      * @return
      */
@@ -704,7 +775,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def reduceLeft[U &gt;: T](op: (U, T) =&gt; U): U </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def reduceLeft[U &gt;: T](op: (U, T) =&gt; U): U </pre>
      * @param op
      * @return
      */
@@ -713,7 +786,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def reduceLeftOption[U &gt;: T](op: (U, T) =&gt; U): Option[U] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def reduceLeftOption[U &gt;: T](op: (U, T) =&gt; U): Option[U] </pre>
      * @param op
      * @return
      */
@@ -722,7 +797,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def reduceRight[U &gt;: T](op: (T, U) =&gt; U): U </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def reduceRight[U &gt;: T](op: (T, U) =&gt; U): U </pre>
      * @param op
      * @return
      */
@@ -731,7 +808,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def reduceRightOption[U &gt;: T](op: (T, U) =&gt; U): Option[U] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def reduceRightOption[U &gt;: T](op: (T, U) =&gt; U): Option[U] </pre>
      * @param op
      * @return
      */
@@ -740,7 +819,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def reverse: Every[T] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def reverse: Every[T] </pre>
      * @return
      */
     default Every<T> reverse() {
@@ -748,7 +829,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def reverseIterator: Iterator[T] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def reverseIterator: Iterator[T] </pre>
      * @return
      */
     default Iterator<T> reverseIterator() {
@@ -768,27 +851,22 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def reverseMap[U](f: (T) =&gt; U): Every[U] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def reverseMap[U](f: (T) =&gt; U): Every[U] </pre>
      * @param f
      * @return
      */
     default <U> Every<U> reverseMap(Function<T, U> f) {
         Vector<U> v = reverseIterator().map(f).toVector();
-        return Every.of(v.head(), v.tail());
+        return fromNonEmptySeq(v);
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def sameElements[U &gt;: T](that: Every[U]): Boolean </pre>
+     * --.
      * 
-     * @param that
-     * @return
-     */
-    default boolean sameElements(Every<? super T> that) {
-        return toVector().eq(that.toVector());
-    }
-
-    /**
-     * c. <pre class="stHighlighted">Scalactic: def sameElements[U &gt;: T](that: GenIterable[U]): Boolean </pre>
+     * <pre class="stHighlighted">Scalactic: def sameElements[U &gt;: T](that: GenIterable[U]): Boolean <br>
+     * Scalactic: def sameElements[U &gt;: T](that: Every[U]): Boolean </pre>
      * @param that
      * @return
      */
@@ -797,16 +875,10 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def endsWith[B](that: Every[B]): Boolean </pre>
-     * @param that
-     * @return
-     */
-    default <B> boolean endsWith(Every<B> that) {
-        return niy(); // TODO
-    }
-
-    /**
-     * c. <pre class="stHighlighted">Scalactic: def endsWith[B](that: GenSeq[B]): Boolean </pre>
+     * Not implemented yet.
+     * 
+     * <pre class="stHighlighted">Scalactic: def endsWith[B](that: GenSeq[B]): Boolean <br>
+     * Scalactic: def endsWith[B](that: Every[B]): Boolean </pre>
      * @param that
      * @return
      */
@@ -815,7 +887,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def flatMap[U](f: (T) =&gt; Every[U]): Every[U] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def flatMap[U](f: (T) =&gt; Every[U]): Every[U] </pre>
      * 
      * @param function
      * @return
@@ -825,20 +899,25 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
         for (T t : toVector()) {
             buf = buf.appendAll(function.apply(t).toVector());
         }
-        return Every.of(buf.head(), buf.tail());
+        return fromNonEmptySeq(buf);
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def permutations: Iterator[Every[T]] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def permutations: Iterator[Every[T]] </pre>
      * 
      * @return
      */
     default Iterator<Every<T>> permutations() {
-        return niy(); // TODO
+        Vector<Vector<T>> vv = toVector().permutations();
+        return vv.map(v -> fromNonEmptySeq(v)).iterator();
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def prefixLength(p: (T) =&gt; Boolean): Int </pre>
+     * Not implemented yet.
+     * 
+     * <pre class="stHighlighted">Scalactic: def prefixLength(p: (T) =&gt; Boolean): Int </pre>
      * 
      * @param p
      * @return
@@ -848,7 +927,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def scan[U &gt;: T](z: U)(op: (U, U) =&gt; U): Every[U] </pre>
+     * Not implemented yet.
+     * 
+     * <pre class="stHighlighted">Scalactic: def scan[U &gt;: T](z: U)(op: (U, U) =&gt; U): Every[U] </pre>
      * 
      * @param z
      * @param op
@@ -859,7 +940,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def scanLeft[B](z: B)(op: (B, T) =&gt; B): Every[B] </pre>
+     * Not implemented yet.
+     * 
+     * <pre class="stHighlighted">Scalactic: def scanLeft[B](z: B)(op: (B, T) =&gt; B): Every[B] </pre>
      * 
      * @param z
      * @param op
@@ -871,7 +954,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def scanRight[B](z: B)(op: (T, B) =&gt; B): Every[B] </pre>
+     * Not implemented yet.
+     * 
+     * <pre class="stHighlighted">Scalactic: def scanRight[B](z: B)(op: (T, B) =&gt; B): Every[B] </pre>
      * 
      * @param z
      * @param op
@@ -883,7 +968,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def segmentLength(p: (T) =&gt; Boolean, from: Int): Int </pre>
+     * Not implemented yet.
+     * 
+     * <pre class="stHighlighted">Scalactic: def segmentLength(p: (T) =&gt; Boolean, from: Int): Int </pre>
      * 
      * @param p
      * @param from
@@ -894,7 +981,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def sliding(size: Int): Iterator[Every[T]] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def sliding(size: Int): Iterator[Every[T]] </pre>
      * 
      * @param size
      * @return
@@ -904,7 +993,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def sliding(size: Int, step: Int): Iterator[Every[T]] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def sliding(size: Int, step: Int): Iterator[Every[T]] </pre>
      * 
      * @param size
      * @param step
@@ -915,7 +1006,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def sortBy[U](f: (T) =&gt; U)(implicit ord: Ordering[U]): Every[T] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def sortBy[U](f: (T) =&gt; U)(implicit ord: Ordering[U]): Every[T] </pre>
      * 
      * @param f
      * @return
@@ -926,7 +1019,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def sortBy[U](f: (T) =&gt; U)(implicit ord: Ordering[U]): Every[T] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def sortBy[U](f: (T) =&gt; U)(implicit ord: Ordering[U]): Every[T] </pre>
      * 
      * @param c
      * @param f
@@ -938,7 +1033,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def sortWith(lt: (T, T) =&gt; Boolean): Every[T] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def sortWith(lt: (T, T) =&gt; Boolean): Every[T] </pre>
      * 
      * @param lt
      * @return
@@ -955,7 +1052,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def sorted[U &gt;: T](implicit ord: Ordering[U]): Every[U] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def sorted[U &gt;: T](implicit ord: Ordering[U]): Every[U] </pre>
      * 
      * @return
      */
@@ -964,7 +1063,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def sorted[U &gt;: T](implicit ord: Ordering[U]): Every[U] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def sorted[U &gt;: T](implicit ord: Ordering[U]): Every[U] </pre>
      * 
      * @param c
      * @return
@@ -974,28 +1075,10 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def startsWith[B](that: Every[B]): Boolean </pre>
+     * --.
      * 
-     * @param that
-     * @return
-     */
-    default <B extends T> boolean startsWith(Every<B> that) {
-        return toVector().startsWith(that.toVector());
-    }
-
-    /**
-     * c. <pre class="stHighlighted">Scalactic: def startsWith[B](that: Every[B], offset: Int): Boolean </pre>
-     * 
-     * @param that
-     * @param offset
-     * @return
-     */
-    default <B extends T> boolean startsWith(Every<B> that, int offset) {
-        return toVector().startsWith(that.toVector(), offset);
-    }
-
-    /**
-     * c. <pre class="stHighlighted">Scalactic: def startsWith[B](that: GenSeq[B]): Boolean </pre>
+     * <pre class="stHighlighted">Scalactic: def startsWith[B](that: GenSeq[B]): Boolean <br>
+     * Scalactic: def startsWith[B](that: Every[B]): Boolean</pre>
      * 
      * @param that
      * @return
@@ -1005,7 +1088,10 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def startsWith[B](that: GenSeq[B], offset: Int): Boolean </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def startsWith[B](that: GenSeq[B], offset: Int): Boolean <br>
+     * Scalactic: def startsWith[B](that: Every[B], offset: Int): Boolean</pre>
      * 
      * @param that
      * @param offset
@@ -1016,7 +1102,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def toArray[U &gt;: T](implicit classTag: ClassTag[U]): Array[U] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def toArray[U &gt;: T](implicit classTag: ClassTag[U]): Array[U] </pre>
      * 
      * @param componentType
      * @return
@@ -1026,7 +1114,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def toArray[U &gt;: T](implicit classTag: ClassTag[U]): Array[U] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def toArray[U &gt;: T](implicit classTag: ClassTag[U]): Array[U] </pre>
      * 
      * @return
      */
@@ -1035,7 +1125,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def toList: List[T] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def toList: List[T] </pre>
      * 
      * @return
      */
@@ -1044,7 +1136,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def toList: List[T] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def toList: List[T] </pre>
      * 
      * @return
      */
@@ -1053,7 +1147,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def toMap[K, V](implicit ev: &lt;:&lt;[T, (K, V)]): Map[K, V] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def toMap[K, V](implicit ev: &lt;:&lt;[T, (K, V)]): Map[K, V] </pre>
      * 
      * @param f
      * @return
@@ -1064,7 +1160,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def toMap[K, V](implicit ev: &lt;:&lt;[T, (K, V)]): Map[K, V] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def toMap[K, V](implicit ev: &lt;:&lt;[T, (K, V)]): Map[K, V] </pre>
      * 
      * @param f
      * @return
@@ -1075,7 +1173,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def toSet[U &gt;: T]: Set[U] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def toSet[U &gt;: T]: Set[U] </pre>
      * 
      * @return
      */
@@ -1084,7 +1184,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def toSet[U &gt;: T]: Set[U] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def toSet[U &gt;: T]: Set[U] </pre>
      * 
      * @return
      */
@@ -1093,7 +1195,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def toStream: Stream[T] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def toStream: Stream[T] </pre>
      * 
      * @return
      */
@@ -1102,7 +1206,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def toStream: Stream[T] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def toStream: Stream[T] </pre>
      * 
      * @return
      */
@@ -1111,25 +1217,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def toIterable: Iterable[T] </pre>
+     * --. 
      * 
-     * @return
-     */
-    default Iterable<T> toIterable() {
-        return toVector();
-    }
-
-    /**
-     * c. <pre class="stHighlighted">Scalactic: def toIterator: Iterator[T] </pre>
-     * 
-     * @return
-     */
-    default Iterator<T> toIterator() {
-        return niy(); // TODO
-    }
-
-    /**
-     * c. <pre class="stHighlighted">Scalactic: def toSeq: Seq[T] </pre>
+     * <pre class="stHighlighted">Scalactic: def toSeq: Seq[T] </pre>
      * 
      * @return
      */
@@ -1138,7 +1228,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def toTraversable: Traversable[T] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def toTraversable: Traversable[T] </pre>
      * 
      * @return
      */
@@ -1147,7 +1239,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def union[U &gt;: T](that: Every[U]): Every[U] </pre>
+     * Not implemented yet.
+     * 
+     * <pre class="stHighlighted">Scalactic: def union[U &gt;: T](that: Every[U]): Every[U] </pre>
      * 
      * @param that
      * @return
@@ -1157,7 +1251,25 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def unzip[L, R](implicit asPair: (T) =&gt; (L, R)): (Every[L], Every[R]) </pre>
+     * --.
+     * 
+     * <pre class="stHighlighted">Scalactic: def Every[U] unzip3[L, M, R](implicit asTriple: (T) =&gt; (L, M, R)): (Every[L], Every[M], Every[R])</pre>
+     * 
+     * @param unzipper
+     * @return
+     */
+    default <L, M, R> Tuple3<Every<L>, Every<M>, Every<R>> unzip3(
+            Function<? super T, Tuple3<? extends L, ? extends M, ? extends R>> unzipper) {
+        Tuple3<Vector<L>, Vector<M>, Vector<R>> unzipped = toVector().unzip3(unzipper);
+        return Tuple.of(fromNonEmptySeq(unzipped._1),
+                        fromNonEmptySeq(unzipped._2), 
+                        fromNonEmptySeq(unzipped._3));
+    }
+
+    /**
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def unzip[L, R](implicit asPair: (T) =&gt; (L, R)): (Every[L], Every[R]) </pre>
      * 
      * @param unzipper
      * @return
@@ -1170,7 +1282,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def updated[U &gt;: T](idx: Int, elem: U): Every[U] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def updated[U &gt;: T](idx: Int, elem: U): Every[U] </pre>
      * 
      * @param index
      * @param elem
@@ -1181,8 +1295,10 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def zipAll[O, U &gt;: T](other: Iterable[O], thisElem: U, otherElem: O): </pre>
-     * Every[(U, O)]
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def zipAll[O, U &gt;: T](other: Iterable[O], thisElem: U, otherElem: O): Every[(U, O)]</pre>
+     * 
      * 
      * @param other
      * @param thisElem
@@ -1195,7 +1311,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def zipWithIndex: Every[(T, Int)] </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def zipWithIndex: Every[(T, Int)] </pre>
      * 
      * @return
      */
@@ -1204,7 +1322,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def product[U &gt;: T](implicit num: Numeric[U]): U </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def product[U &gt;: T](implicit num: Numeric[U]): U </pre>
      * 
      * @return
      */
@@ -1213,7 +1333,9 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
     }
 
     /**
-     * c. <pre class="stHighlighted">Scalactic: def sum[U &gt;: T](implicit num: Numeric[U]): U </pre>
+     * --. 
+     * 
+     * <pre class="stHighlighted">Scalactic: def sum[U &gt;: T](implicit num: Numeric[U]): U </pre>
      * 
      * @return
      */
@@ -1221,11 +1343,46 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
         return toVector().sum();
     }
 
+    /**
+     * --.
+     * 
+     * <pre class="stHighlighted">Scalactic: def mkString: String</pre>
+     * 
+     * @return
+     */
+    default String mkString(){
+        return toVector().mkString();
+    }
+    
+    /**
+     * --.
+     * 
+     * <pre class="stHighlighted">Scalactic: def mkString(sep: String): String</pre>
+     * 
+     * @param delimiter
+     * @return
+     */
+    default String mkString(CharSequence delimiter){
+        return toVector().mkString(delimiter);
+    }
+    
+    /**
+     * --.
+     * 
+     * <pre class="stHighlighted">Scalactic: def mkString(start: String, sep: String, end: String): String</pre>
+     * 
+     * @param prefix
+     * @param delimiter
+     * @param suffix
+     * @return
+     */
+    default String mkString(CharSequence prefix, CharSequence delimiter, CharSequence suffix) {
+        return toVector().mkString(prefix, delimiter, suffix);
+    }
+    
     /*
-     * transpose[U](implicit ev: <:<[T, Every[U]]): Every[Every[U]] union[U >:
-     * T](that: GenSeq[U])(implicit cbf: CanBuildFrom[Vector[T], U, Vector[U]]):
-     * Every[U] unzip3[L, M, R](implicit asTriple: (T) =&gt; (L, M, R)): (Every[L],
-     * Every[M], Every[R])
+     * transpose[U](implicit ev: <:<[T, Every[U]]): Every[Every[U]] 
+     * union[U >: T](that: GenSeq[U])(implicit cbf: CanBuildFrom[Vector[T], U, Vector[U]]):
      */
 
     // ----------------------------------------------------------------------------------

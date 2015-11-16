@@ -25,7 +25,7 @@ public class AccumulationTest {
 	
 	@Test
 	public void testCombined() {
-		Vector<Or<String, Every<String>>> vec = Vector.of(Or.good("A"), Or.good("B"));
+		Vector<Or<String, Every<String>>> vec = Vector.ofAll(Or.good("A"), Or.good("B"));
 		Or<Vector<String>, Every<String>> result = Accumulation.combined(vec, Vector.collector());
 		assertTrue(result.isGood());
 		assertEquals("A", result.get().head());
@@ -39,7 +39,7 @@ public class AccumulationTest {
 	
 	@Test
 	public void testValidatedBy() {
-		Vector<Integer> vec = Vector.of(1,2,3);
+		Vector<Integer> vec = Vector.ofAll(1,2,3);
 		Function<Integer, Or<Integer, Every<String>>> f = i -> {
 			if(i < 10) return Or.good(i);
 			else return Or.bad(One.of("wasn't under 10"));

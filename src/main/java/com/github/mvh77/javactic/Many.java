@@ -22,7 +22,7 @@ public class Many<T> implements Every<T> {
 	
 	@SafeVarargs
 	public static <T> Many<T> of(T first, T second, T... rest) {
-		return new Many<>(first, Vector.of(rest).prepend(second));
+		return new Many<T>(first, Vector.ofAll(rest).prepend(second));
 	}
 	
 	Many(T first, Seq<? extends T> rest) {

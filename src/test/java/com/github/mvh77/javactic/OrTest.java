@@ -229,11 +229,11 @@ public class OrTest {
 		assertEquals(Try.of(() -> "good"), Good.of("good").toTry());
 		assertEquals(
 				"foo", 
-				Bad.of("foo").toTry().getCause().getCause().getMessage());
+				Bad.of("foo").toTry().getCause().getMessage());
 		
 		assertEquals(
 				new RuntimeException().getClass(), 
-				Bad.of(new RuntimeException()).toTry().getCause().getCause().getClass());
+				Bad.of(new RuntimeException()).toTry().getCause().getClass());
 		
 	}
 	

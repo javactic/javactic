@@ -17,7 +17,7 @@
         	splitindex="true" 
         	use="true" 
         	version="true">
-            <link href="http://javaslang.com/javadoc/2.0.0-beta/"/>
+            <link href="http://javaslang.com/javadoc/2.0.0-RC1/"/>
             <link href="https://docs.oracle.com/javase/8/docs/api/"/>
         </javadoc>
     </target>
