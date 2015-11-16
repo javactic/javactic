@@ -405,8 +405,7 @@ public interface Every<T> extends IntFunction<T>, Iterable<T> {
      * @return
      */
     default <K> Map<K, Every<T>> groupBy(Function<? super T, ? extends K> f) {
-        return toVector().groupBy(f)
-                .map((k, v) -> Tuple.of(k, Every.of(v.head(), v.tail())));
+        return toVector().groupBy(f).map((k, v) -> Tuple.of(k, fromNonEmptySeq(v)));
     }
 
     /**
