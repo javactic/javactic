@@ -3,7 +3,7 @@
     <target name="javadoc">
         <javadoc access="public" author="true" 
         	classpath="/home/mvh/.m2/repository/com/javaslang/javaslang/2.0.0-beta/javaslang-2.0.0-beta.jar" 
-        	destdir="doc" 
+        	destdir="../../Documents/javactic/javadoc/" 
         	doctitle="Javactic API"
         	windowtitle="Javactic API"
         	nodeprecated="false" 
