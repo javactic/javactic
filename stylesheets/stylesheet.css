@@ -101,7 +101,7 @@ a:hover {
 
 @media screen and (min-width: 64em) {
 	.project-name {
-		font-size: 3.25rem;
+		font-size: 3.75rem;
 		color: darkred;
 	}
 }
