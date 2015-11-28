@@ -1,4 +1,11 @@
-/*
+/**
+ *    ___                       _   _      
+ *   |_  |                     | | (_)     
+ *     | | __ ___   ____ _  ___| |_ _  ___ 
+ *     | |/ _` \ \ / / _` |/ __| __| |/ __|
+ * /\__/ / (_| |\ V / (_| | (__| |_| | (__   -2015-
+ * \____/ \__,_| \_/ \__,_|\___|\__|_|\___|
+ *                                          
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -10,9 +17,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ **/
 package com.github.javactic;
 
+import java.util.NoSuchElementException;
 
 /**
  * Represents the result of a <em>validation</em>, either the object {@link Pass} if the validation 
@@ -24,11 +32,11 @@ package com.github.javactic;
  * </p>
  *
  * <pre>{@code
- * Validation&lt;String&gt; isRound(int i) {
+ * Validation<String> isRound(int i) {
  *   return (i % 10 == 0) ? Pass.instance() : Fail.of(i + " was not a round number");
  * }
  * 
- * Validation&lt;String&gt; isDivBy3(int i) {
+ * Validation<String> isDivBy3(int i) {
  *   return (i % 3 == 0) ? Pass.instance() : Fail.of(i + " was not divisible by 3");
  * }}</pre>
  *
@@ -39,7 +47,7 @@ package com.github.javactic;
  * </p>
  *
  * <pre>{@code
- * Or.&lt;Integer, String&gt;good(123).filter(this::isRound).filter(this::isDivBy3);
+ * Or.<Integer, String>good(123).filter(this::isRound).filter(this::isDivBy3);
  * // Result: Bad(123 was not a round number)
  * }}</pre>
  *
@@ -57,7 +65,7 @@ package com.github.javactic;
  * }</pre>
  *
  * <p>
- * Note: You can think of <code>Validation</code> as an &ldquo;<code>Option</code> with attitude,&rdquo; where <code>Pass</code> is 
+ * Note: You can think of <code>Validation</code> as an "<code>Option</code> with attitude," where <code>Pass</code> is 
  * a <code>None</code> that indicates validation success and <code>Fail</code> is a <code>Some</code> whose value describes 
  * the validation failure.
  * </p>
@@ -66,17 +74,46 @@ package com.github.javactic;
  */
 public interface Validation<E> {
 
-	public static <E> Validation<E> pass() {
+    /**
+     * Returns the {@link Pass} instance.
+     * @param <E> the type of a failed validation.
+     * @return the {@link Pass} instance.
+     */
+	public static <E> Pass<E> pass() {
 		return Pass.instance();
 	}
 	
-	public static <E> Validation<E> fail(E reason) {
+	/**
+	 * Creates a {@link Fail} with the given reason.
+	 * @param <E> the type of a failed validation.
+	 * @param reason reason for failure
+	 * @return a new {@link Fail} object.
+	 */
+	public static <E> Fail<E> fail(E reason) {
 		return Fail.of(reason);
 	}
 	
+    /**
+     * Ands this Validation with another, passed, Validation.
+     * 
+     * @param other
+     *            the other validation
+     * @return a validation that is a {@link Fail} or a {@link Pass} according
+     *         to the truth-functional operator of logical conjunction
+     */
 	public abstract Validation<E> and(Validation<E> other);
 	
+	/**
+	 * @return true if this is a {@link Pass}
+	 */
 	abstract boolean isPass();
+	/**
+	 * @return true if this is a {@link Fail}
+	 */
 	abstract boolean isFail();
+	
+	/**
+	 * @return the failure reason this is a {@link Fail} or throws a {@link NoSuchElementException} if this is a {@link Pass}
+	 */
 	abstract E getError();
 }

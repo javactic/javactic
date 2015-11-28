@@ -1,4 +1,11 @@
-/*
+/**
+ *    ___                       _   _      
+ *   |_  |                     | | (_)     
+ *     | | __ ___   ____ _  ___| |_ _  ___ 
+ *     | |/ _` \ \ / / _` |/ __| __| |/ __|
+ * /\__/ / (_| |\ V / (_| | (__| |_| | (__   -2015-
+ * \____/ \__,_| \_/ \__,_|\___|\__|_|\___|
+ *                                          
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -10,7 +17,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ **/
 package com.github.javactic;
 
 import java.util.NoSuchElementException;
@@ -26,6 +33,18 @@ import javaslang.control.Right;
 import javaslang.control.Success;
 import javaslang.control.Try;
 
+/**
+ * Contains a "good" value.
+ * 
+ * You can decide what "good" means, but it is expected Good will be commonly
+ * used to hold valid results for processes that may fail with an error instead
+ * of producing a valid result.
+ * 
+ * @author mvh
+ *
+ * @param <G> the good type of the Or
+ * @param <B> the bad type of the Or
+ */
 public class Good<G,B> implements Or<G,B> {
 	
 	private final G value;

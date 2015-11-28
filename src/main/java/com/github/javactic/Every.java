@@ -1,4 +1,11 @@
-/*
+/**
+ *    ___                       _   _      
+ *   |_  |                     | | (_)     
+ *     | | __ ___   ____ _  ___| |_ _  ___ 
+ *     | |/ _` \ \ / / _` |/ __| __| |/ __|
+ * /\__/ / (_| |\ V / (_| | (__| |_| | (__   -2015-
+ * \____/ \__,_| \_/ \__,_|\___|\__|_|\___|
+ *                                          
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -10,7 +17,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ **/
 package com.github.javactic;
 
 import static com.github.javactic.Helper.fromNonEmptySeq;
@@ -42,6 +49,24 @@ import javaslang.collection.Traversable;
 import javaslang.collection.Vector;
 import javaslang.control.Option;
 
+/**
+ * An ordered, immutable, non-empty collection of elements. Class Every has two
+ * and only two subtypes: {@link One} and {@link Many}. A One contains exactly
+ * one element. A Many contains two or more elements. Thus no way exists for an
+ * Every to contain zero elements.
+ * 
+ * <h1>Motivation for Everys</h1>
+ * 
+ * Although Every is a general-purpose, non-empty ordered collection, it was
+ * motivated by the desire to enable easy accumulation of errors in {@link Or}s.
+ * Please refer to the original documentation for the
+ * <a href="http://www.scalactic.org/">Scalactic</a> library on
+ * <a href="http://www.scalactic.org/user_guide/OrAndEvery">Ors and Everys</a>.
+ * 
+ * @author mvh
+ *
+ * @param <T> the type of the Every
+ */
 public interface Every<T> extends Iterable<T>, IntFunction<T> {
 
     /**
@@ -119,8 +144,10 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      * Scalactic: def ++[U &gt;: T](other: GenTraversableOnce[U]): Every[U]
      * </pre>
      * 
-     * @param iterable the Iterable to append
-     * @return a new Every that contains all the elements of this Every followed by all elements of other.
+     * @param iterable
+     *            the Iterable to append
+     * @return a new Every that contains all the elements of this Every followed
+     *         by all elements of other.
      */
     default Every<T> appendAll(Iterable<? extends T> iterable) {
         if (!iterable.iterator().hasNext())
@@ -138,8 +165,10 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      * Scalactic: def ++[U &gt;: T](other: Every[U]): Many[U]
      * </pre>
      * 
-     * @param other the Every to append
-     * @return a new Many that contains all the elements of this Every followed by all elements of other.
+     * @param other
+     *            the Every to append
+     * @return a new Many that contains all the elements of this Every followed
+     *         by all elements of other.
      */
     default Many<T> appendAll(Every<? extends T> other) {
         Vector<T> all = toVector().appendAll(other.toVector());
@@ -153,8 +182,10 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      * Scalactic: def :+[U &gt;: T](element: U): Many[U]
      * </pre>
      * 
-     * @param element the element to append to this Every
-     * @return a new Every consisting of all elements of this Every followed by element.
+     * @param element
+     *            the element to append to this Every
+     * @return a new Every consisting of all elements of this Every followed by
+     *         element.
      */
     default Many<T> append(T element) {
         Vector<T> all = toVector().append(element);
@@ -485,8 +516,10 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      * Scalactic: def compose[A](g: (A) =&gt; Int): (A) =&gt; T
      * </pre>
      * 
-     * @param <A> the type to which function g can be applied
-     * @param g a function from A to Int
+     * @param <A>
+     *            the type to which function g can be applied
+     * @param g
+     *            a function from A to Int
      * @return a new function f such that f(x) == apply(g(x))
      */
     default <A> Function<A, T> compose(ToIntFunction<A> g) {
@@ -545,7 +578,9 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      * <pre class="stHighlighted">
      * Scalactic: def flatten[B](implicit ev: &lt;:&lt;[T, Every[B]]): Every[B]
      * </pre>
-     * @param <B> the type of the new Every
+     * 
+     * @param <B>
+     *            the type of the new Every
      * @return a new Every resulting from concatenating all nested Everys.
      */
     default <B> Every<B> flatten() {
@@ -582,7 +617,8 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      * Scalactic: def foldLeft[B](z: B)(op: (B, T) =&gt; B): B
      * </pre>
      * 
-     * @param <B> the type of the new Every
+     * @param <B>
+     *            the type of the new Every
      * @param z
      *            the start value.
      * @param op
@@ -602,7 +638,8 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      * Scalactic: def foldRight[B](z: B)(op: (T, B) =&gt; B): B
      * </pre>
      * 
-     * @param <B> the type of the new Every
+     * @param <B>
+     *            the type of the new Every
      * @param z
      *            the start value
      * @param op
@@ -682,7 +719,8 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      * Scalactic: def indexOf[U &gt;: T](elem: U): Int
      * </pre>
      * 
-     * @param <U> the type of the searched element.
+     * @param <U>
+     *            the type of the searched element.
      * @param elem
      *            the element value to search for.
      * @return the index of the first element of this Every that is equal (as
@@ -700,7 +738,8 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      * Scalactic: def indexOf[U &gt;: T](elem: U, from: Int): Int
      * </pre>
      * 
-     * @param <U> type of the searched element.
+     * @param <U>
+     *            type of the searched element.
      * @param elem
      *            the element value to search for.
      * @param from
@@ -844,8 +883,8 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      *            the element value to search for.
      * @param end
      *            the end index.
-     * @return the index &gt;= end of the last element of this Every that is equal
-     *         (as determined by ==) to elem, or -1, if none exists.
+     * @return the index &gt;= end of the last element of this Every that is
+     *         equal (as determined by ==) to elem, or -1, if none exists.
      */
     default int lastIndexOf(T elem, int end) {
         return toVector().lastIndexOf(elem, end);
@@ -919,8 +958,8 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      *            the predicate used to test elements.
      * @param end
      *            the end index
-     * @return the index &gt;= end of the last element of this Every that satisfies
-     *         the predicate p, or -1, if none exists.
+     * @return the index &gt;= end of the last element of this Every that
+     *         satisfies the predicate p, or -1, if none exists.
      */
     default int lastIndexWhere(Predicate<? super T> p, int end) {
         int e = Math.min(end, length());
@@ -1032,7 +1071,8 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      * Scalactic: def maxBy[U](f: (T) =&gt; U)(implicit cmp: Ordering[U]): T
      * </pre>
      * 
-     * @param <U> the comparable type returned by the function f
+     * @param <U>
+     *            the comparable type returned by the function f
      * @param f
      *            the mapping function
      * @return the largest result of applying the given function to every
@@ -1079,7 +1119,8 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      * Scalactic: def minBy[U](f: (T) =&gt; U)(implicit cmp: Ordering[U]): T
      * </pre>
      * 
-     * @param <U> comparable type returned by function f.
+     * @param <U>
+     *            comparable type returned by function f.
      * @param f
      *            the mapping function
      * @return the smallest result of applying the given function to every
@@ -1111,7 +1152,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
 
     /**
      * Produces a new Every where a slice of elements in this Every is replaced
-     * by another Every
+     * by another Every.
      * 
      * <pre class="stHighlighted">
      * Scalactic: def patch[U &gt;: T](from: Int, that: Every[U], replaced: Int): Every[U]
@@ -1469,8 +1510,8 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
     }
 
     /**
-     * Groups elements in fixed size blocks by passing a “sliding window” over
-     * them (as opposed to partitioning them, as is done in grouped.)
+     * Groups elements in fixed size blocks by passing a "sliding window" over
+     * them (as opposed to partitioning them, as is done in grouped).
      * 
      * <pre class="stHighlighted">
      * Scalactic: def sliding(size: Int): Iterator[Every[T]]
@@ -1487,7 +1528,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
     }
 
     /**
-     * Groups elements in fixed size blocks by passing a “sliding window” over
+     * Groups elements in fixed size blocks by passing a "sliding window" over
      * them (as opposed to partitioning them, as is done in grouped.), moving
      * the sliding window by a given step each time.
      * 
@@ -1584,7 +1625,8 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      * 
      * @return an Every consisting of the elements of this Every sorted
      *         according to their natural order.
-     * @throws ClassCastException if this elements are not Comparable
+     * @throws ClassCastException
+     *             if this elements are not Comparable
      */
     default Every<T> sorted() throws ClassCastException {
         return fromNonEmptySeq(toVector().sort());
@@ -1614,7 +1656,8 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      * Scalactic: def startsWith[B](that: Every[B]): Boolean
      * </pre>
      * 
-     * @param <B> the type of the iterable.
+     * @param <B>
+     *            the type of the iterable.
      * @param that
      *            the Iterable to test
      * @return true if this collection has that as a prefix, false otherwise.
@@ -1632,7 +1675,8 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      * Scalactic: def startsWith[B](that: Every[B], offset: Int): Boolean
      * </pre>
      *
-     * @param <B> the type of the iterable.
+     * @param <B>
+     *            the type of the iterable.
      * @param that
      *            the Iterable slice to look for in this Every
      * @param offset
@@ -1706,8 +1750,10 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      * Scalactic: def toMap[K, V](implicit ev: &lt;:&lt;[T, (K, V)]): Map[K, V]
      * </pre>
      * 
-     * @param <K> type of the maps key
-     * @param <V> type of the maps value
+     * @param <K>
+     *            type of the maps key
+     * @param <V>
+     *            type of the maps value
      * @param f
      *            a function that maps an element to a key/value pair
      *            represented by Tuple2
@@ -1718,14 +1764,16 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
     }
 
     /**
-     * Converts this Every to a {@link Map}
+     * Converts this Every to a {@link Map}.
      * 
      * <pre class="stHighlighted">
      * Scalactic: def toMap[K, V](implicit ev: &lt;:&lt;[T, (K, V)]): Map[K, V]
      * </pre>
      * 
-     * @param <K> type of the maps key
-     * @param <V> type of the maps value
+     * @param <K>
+     *            type of the maps key
+     * @param <V>
+     *            type of the maps value
      * @param f
      *            a function that maps an element to a key/value pair
      *            represented by Tuple2
@@ -1906,7 +1954,8 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      * Scalactic: def zipAll[O, U &gt;: T](other: Iterable[O], thisElem: U, otherElem: O): Every[(U, O)]
      * </pre>
      * 
-     * @param <B> type of the iterable to zip with
+     * @param <B>
+     *            type of the iterable to zip with
      * @param other
      *            the Iterable providing the second half of each result pair
      * @param thisElem
@@ -2041,8 +2090,9 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
     }
 
     /*
-     * transpose[U](implicit ev: &lt;:&lt;[T, Every[U]]): Every[Every[U]] union[U >:
-     * T](that: GenSeq[U])(implicit cbf: CanBuildFrom[Vector[T], U, Vector[U]]):
+     * transpose[U](implicit ev: &lt;:&lt;[T, Every[U]]): Every[Every[U]]
+     * union[U >: T](that: GenSeq[U])(implicit cbf: CanBuildFrom[Vector[T], U,
+     * Vector[U]]):
      */
 
     // ----------------------------------------------------------------------------------

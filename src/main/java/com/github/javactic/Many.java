@@ -1,4 +1,11 @@
-/*
+/**
+ *    ___                       _   _      
+ *   |_  |                     | | (_)     
+ *     | | __ ___   ____ _  ___| |_ _  ___ 
+ *     | |/ _` \ \ / / _` |/ __| __| |/ __|
+ * /\__/ / (_| |\ V / (_| | (__| |_| | (__   -2015-
+ * \____/ \__,_| \_/ \__,_|\___|\__|_|\___|
+ *                                          
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -10,13 +17,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ **/
 package com.github.javactic;
 
 import javaslang.collection.Seq;
 import javaslang.collection.Vector;
 
-public class Many<T> implements Every<T> {
+/**
+ * An {@link Every} that contains two or more elements. 
+ * 
+ * @author mvh
+ *
+ * @param <T> the type of the many
+ */
+public final class Many<T> implements Every<T> {
 
     private final Vector<T> elements;
 	

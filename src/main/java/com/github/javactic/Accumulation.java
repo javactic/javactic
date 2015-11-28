@@ -1,4 +1,11 @@
-/*
+/**
+ *    ___                       _   _      
+ *   |_  |                     | | (_)     
+ *     | | __ ___   ____ _  ___| |_ _  ___ 
+ *     | |/ _` \ \ / / _` |/ __| __| |/ __|
+ * /\__/ / (_| |\ V / (_| | (__| |_| | (__   -2015-
+ * \____/ \__,_| \_/ \__,_|\___|\__|_|\___|
+ *                                          
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -10,7 +17,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ **/
 package com.github.javactic;
 
 import java.util.function.BiFunction;
@@ -34,6 +41,23 @@ import javaslang.Tuple7;
 import javaslang.Tuple8;
 import javaslang.collection.Vector;
 
+/**
+ * Provides mechanisms that enable errors to be accumulated in "accumulating
+ * Ors," {@link Or}s whose Bad type is an {@link Every}.
+ * 
+ * The mechanisms are:
+ * <ul>
+ * <li>Passing accumulating Ors to withGood methods</li>
+ * <li>Invoking combined on a container of accumulating Ors</li>
+ * <li>Invoking validatedBy on a container of any type, passing in a function
+ * from that type to an accumulating Or</li>
+ * <li>Invoking zip on an accumulating Or</li>
+ * <li>Invoking when on an accumulating Or</li>
+ * </ul>
+ * 
+ * @author mvh
+ *
+ */
 public final class Accumulation {
 	
 	private Accumulation() {}

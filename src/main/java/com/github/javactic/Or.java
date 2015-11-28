@@ -1,4 +1,11 @@
-/*
+/**
+ *    ___                       _   _      
+ *   |_  |                     | | (_)     
+ *     | | __ ___   ____ _  ___| |_ _  ___ 
+ *     | |/ _` \ \ / / _` |/ __| __| |/ __|
+ * /\__/ / (_| |\ V / (_| | (__| |_| | (__   -2015-
+ * \____/ \__,_| \_/ \__,_|\___|\__|_|\___|
+ *                                          
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -10,7 +17,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ **/
 package com.github.javactic;
 
 import java.util.NoSuchElementException;
@@ -30,6 +37,29 @@ import javaslang.control.Some;
 import javaslang.control.Success;
 import javaslang.control.Try;
 
+/**
+ * Represents a value that is one of two possible types, with one type being
+ * "good" and the other "bad."
+ * 
+ * An Or will either be a "good" value wrapped in an instance of {@link Good} or
+ * a "bad" value wrapped in an instance of {@link Bad}.
+ * 
+ * <h1>Motivation for Or</h1>
+ * 
+ * Please refer to the original documentation for the
+ * <a href="http://www.scalactic.org/">Scalactic</a> library on
+ * <a href="http://www.scalactic.org/user_guide/OrAndEvery">Ors and Everys</a>
+ * as well as the corresponding
+ * <a href="http://doc.scalatest.org/2.2.4/index.html#org.scalactic.Or">Scaladoc
+ * </a>.
+ * 
+ * @author mvh
+ *
+ * @param <G>
+ *            the good type of the Or
+ * @param <B>
+ *            the bad type of the Or
+ */
 public interface Or<G, B> {
 
     /**
@@ -398,7 +428,7 @@ public interface Or<G, B> {
     void forEach(Consumer<G> gc, Consumer<B> bc);
 
     /**
-     * Indicates whether this {@link Or} is a {@link Good}
+     * Indicates whether this {@link Or} is a {@link Good}.
      * 
      * <pre class="stHighlighted">Scalactic: def isGood: Boolean </pre>
      *
@@ -407,7 +437,7 @@ public interface Or<G, B> {
     boolean isGood();
 
     /**
-     * Indicates whether this {@link Or} is a {@link Bad}
+     * Indicates whether this {@link Or} is a {@link Bad}.
      * 
      * <pre class="stHighlighted">Scalactic: def isBad: Boolean </pre>
      *
