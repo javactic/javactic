@@ -98,7 +98,6 @@ public interface Or<G, B> {
      * <span class="jCode">accumulating</span> method does not change. For example, if you invoke <span class="jCode">accumulating</span> on an
      * <span class="jCode">Or&lt;Int,One&lt;ErrorMessage&gt;&gt;</span> you will be rewarded with an 
      * <span class="jCode">Or&lt;Int,One&lt;One&lt;ErrorMessage&gt;&gt;&gt;</span>.
-     * <p>
      *
      * <pre class="stHighlighted"> Scalactic: def accumulating: Or[G, One[B]] </pre>
      * 
@@ -110,7 +109,6 @@ public interface Or<G, B> {
     /**
      * Maps the given function to this {@link Or}'s value if it is a {@link Good} or returns <span class="jCode">this</span>
      * if it is a {@link Bad}.
-     * <p>
      * 
      * <pre class="stHighlighted">Scalactic: def map[H](f: (G) =&gt; H): Or[H, B] </pre>
      *
@@ -124,7 +122,6 @@ public interface Or<G, B> {
     /**
      * Maps the given function to this {@link Or}'s value if it is a {@link Bad} or returns <span class="jCode">this</span>
      * if it is a {@link Good}.
-     * <p>
      * 
      * <pre class="stHighlighted">Scalactic: def badMap[C](f: (B) =&gt; C): Or[G, C] </pre>
      *
@@ -142,7 +139,6 @@ public interface Or<G, B> {
      * <p>
      * Note: The <span class="jCode">exists</span> method will return the same result as {@link #forAll} if this {@link Or}
      * is a {@link Good}, but the opposite result if this {@link Or} is a {@link Bad}.
-     * <p>
      * 
      * <pre class="stHighlighted">Scalactic: def exists(p: (G) =&gt; Boolean): Boolean </pre>
      *
@@ -161,7 +157,6 @@ public interface Or<G, B> {
      * <p>
      * For examples of <span class="jCode">filter</span> used in <span class="jCode">for</span> expressions, see the main documentation for interface
      * {@link Validation}.
-     * <p>
      * 
      * <pre class="stHighlighted">Scalactic: def filter[C &gt;: B](f: (G) =&gt; Validation[C]): Or[G, C] </pre>
      *
@@ -174,7 +169,6 @@ public interface Or<G, B> {
     /**
      * Returns the given function applied to the value contained in this {@link Or} if it is a {@link Good},
      * or returns <span class="jCode">this</span> if it is a {@link Bad}.
-     * <p>
      * 
      * <pre class="stHighlighted">Scalactic: def flatMap[H, C &gt;: B](f: (G) =&gt; Or[H, C]): Or[H, C] </pre>
      *
@@ -188,7 +182,6 @@ public interface Or<G, B> {
     /**
      * Folds this {@link Or} into a value of type <span class="jCode">V</span> by applying the given <span class="jCode">gf</span> function if
      * this is a {@link Good} else the given <span class="jCode">bf</span> function if this is a {@link Bad}.
-     * <p>
      * 
      * <pre class="stHighlighted">Scalactic: def fold[V](gf: (G) =&gt; V, bf: (B) =&gt; V): V </pre>
      *
@@ -209,7 +202,6 @@ public interface Or<G, B> {
      * <p>
      * Note: The {@link #forAll} method will return the same result as {@link #exists} if this {@link Or}
      * is a {@link Good}, but the opposite result if this {@link Or} is a {@link Bad}.
-     * <p>
      * 
      * <pre class="stHighlighted">Scalactic: def forall(f: (G) =&gt; Boolean): Boolean </pre>
      *
@@ -223,7 +215,6 @@ public interface Or<G, B> {
     /**
      * Applies the given function <span class="jCode">action</span> to the contained value if this {@link Or} is a {@link Good}; does nothing
      * if this {@link Or} is a {@link Bad}.
-     * <p>
      * 
      * <pre class="stHighlighted">Scalactic: def foreach(f: (G) =&gt; Unit): Unit </pre>
      *
@@ -234,7 +225,6 @@ public interface Or<G, B> {
     /**
      * Returns the {@link Or}'s value if it is a {@link Good} or throws {@link NoSuchElementException} if
      * it is a {@link Bad}.
-     * <p>
      * 
      * <pre class="stHighlighted">Scalactic: def get: G </pre>
      *
@@ -254,7 +244,6 @@ public interface Or<G, B> {
 
     /**
      * Returns, if this {@link Or} is {@link Good}, this {@link Good}'s value; otherwise returns <span class="jCode">default</span>.
-     * <p>
      * 
      * <pre class="stHighlighted">Scalactic: def getOrElse[H &gt;: G](default: =&gt; H): H </pre>
      *
@@ -266,7 +255,6 @@ public interface Or<G, B> {
     /**
      * Returns, if this {@link Or} is {@link Good}, this {@link Good}'s value; otherwise returns the
      * result of evaluating <span class="jCode">default</span>.
-     * <p>
      * 
      * <pre class="stHighlighted">Scalactic: def getOrElse[H &gt;: G](default: =&gt; H): H </pre>
      *
@@ -279,7 +267,6 @@ public interface Or<G, B> {
     /**
      * Returns this {@link Or} if it is a {@link Good}, otherwise returns the result of evaluating the passed
      * <span class="jCode">alt</span>.
-     * <p>
      * 
      * <pre class="stHighlighted">Scalactic: def orElse[H &gt;: G, C &gt;: B](alternative: =&gt; Or[H, C]): Or[H, C] </pre>
      *
@@ -292,7 +279,6 @@ public interface Or<G, B> {
     /**
      * Maps the given function to this {@link Or}'s value if it is a {@link Bad}, transforming it into a
      * {@link Good}, or returns <span class="jCode">this</span> if it is already a {@link Good}.
-     * <p>
      * 
      * <pre class="stHighlighted">Scalactic: def recover[H &gt;: G](f: (B) =&gt; H): Or[H, B] </pre>
      *
@@ -305,7 +291,6 @@ public interface Or<G, B> {
     /**
      * Maps the given function to this {@link Or}'s value if it is a {@link Bad}, returning the result, or
      * returns <span class="jCode">this</span> if it is already a {@link Good}.
-     * <p>
      * 
      * <pre class="stHighlighted">Scalactic: def recoverWith[H &gt;: G, C](f: (B) =&gt; Or[H, C]): Or[H, C] </pre>
      *
@@ -319,7 +304,6 @@ public interface Or<G, B> {
     /**
      * Returns an {@link Or} with the {@link Good} and {@link Bad} types swapped: {@link Bad}
      * becomes {@link Good} and {@link Good} becomes {@link Bad}.
-     * <p>
      * 
      * <pre class="stHighlighted">Scalactic: def swap: Or[B, G] </pre>
      *
@@ -337,7 +321,6 @@ public interface Or<G, B> {
     /**
      * Returns a {@link Some} containing the {@link Good} value, if this {@link Or} is a
      * {@link Good}, else {@link None}.
-     * <p>
      * 
      * <pre class="stHighlighted">Scalactic: def toOption: Option[G] </pre>
      *
@@ -356,7 +339,6 @@ public interface Or<G, B> {
      * <span class="jCode">Or&lt;Int,ErrorMessage&gt;</span> for example, the result will be an <span class="jCode">Either&lt;ErrorMessage,Int&gt;</span>. 
      * The reason is that the convention for {@link Either} is that {@link Left} is used for <span class="jCode">bad</span>
      * values and {@link Right} is used for <span class="jCode">good</span> ones.
-     * <p>
      * 
      * <pre class="stHighlighted">Scalactic: def toEither: Either[B, G] </pre>
      *
@@ -373,7 +355,6 @@ public interface Or<G, B> {
      * Note: If the {@link Bad} type of this {@link Or} is not a subclass of {@link Throwable} 
      * (or {@link Throwable} itself) the cause of the {@link Failure} will be a {@link IllegalArgumentException}
      * containing as message the string value of the {@link Bad}.
-     * <p>
      * 
      * <pre class="stHighlighted">Scalactic: def toTry(implicit ev: &lt;:&lt;[B, Throwable]): Try[G] </pre>
      *
@@ -397,7 +378,6 @@ public interface Or<G, B> {
      * Transforms this {@link Or} by applying the function <span class="jCode">gf</span> to this {@link Or}'s
      * {@link Good} value if it is a {@link Good}, or by applying <span class="jCode">bf</span> to this {@link Or}'s
      * {@link Bad} value if it is a {@link Bad}.
-     * <p>
      * 
      * <pre class="stHighlighted">Scalactic: def transform[H, C](gf: (G) =&gt; Or[H, C], bf: (B) =&gt; Or[H, C]): Or[H, C] </pre>
      *
@@ -419,7 +399,6 @@ public interface Or<G, B> {
 
     /**
      * Indicates whether this {@link Or} is a {@link Good}
-     * <p>
      * 
      * <pre class="stHighlighted">Scalactic: def isGood: Boolean </pre>
      *
@@ -429,7 +408,6 @@ public interface Or<G, B> {
 
     /**
      * Indicates whether this {@link Or} is a {@link Bad}
-     * <p>
      * 
      * <pre class="stHighlighted">Scalactic: def isBad: Boolean </pre>
      *

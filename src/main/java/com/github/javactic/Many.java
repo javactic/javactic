@@ -18,7 +18,7 @@ import javaslang.collection.Vector;
 
 public class Many<T> implements Every<T> {
 
-	private final Vector<T> elements;
+    private final Vector<T> elements;
 	
 	@SafeVarargs
 	public static <T> Many<T> of(T first, T second, T... rest) {
@@ -51,6 +51,5 @@ public class Many<T> implements Every<T> {
 	public Vector<T> toVector() {
 		return elements;
 	}
-
 
 }
