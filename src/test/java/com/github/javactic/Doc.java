@@ -1,10 +1,5 @@
 package com.github.javactic;
 
-import javaslang.Tuple;
-import javaslang.Tuple2;
-import javaslang.control.Either;
-import javaslang.control.Either.RightProjection;
-
 public class Doc {
 
     static class Person {
@@ -106,15 +101,15 @@ parsePerson("", "")
     
     static Or<String, One<String>> parseName(String input) {
         String trimmed = input.trim();
-        return (!trimmed.isEmpty()) ? Or.good(trimmed) : Or.bad(One.of("\"" + input + "\" is not a valid name"));
+        return (!trimmed.isEmpty()) ? Good.of(trimmed) : Bad.ofOne("'" + input + "' is not a valid name");
     }
     
     static Or<Integer, One<String>> parseAge(String input) {
         try {
             int age = Integer.parseInt(input.trim());
-            return (age >= 0) ? Or.good(age) : Or.bad(One.of("\"" + age + "\" is not a valid age")); 
+            return (age >= 0) ? Good.of(age) : Bad.ofOne("'" + age + "' is not a valid age"); 
         } catch (NumberFormatException e) {
-            return Or.bad(One.of("\"" + input + "\" is not a valid integer"));
+            return Bad.ofOne("'" + input + "' is not a valid integer");
         }
     }
     
@@ -124,6 +119,11 @@ parsePerson("", "")
         return Accumulation.withGood(name, age, (n, a) -> new Person(n, a));
     }
 
+    static Or<String, One<String>> parseString(String input) {
+        String trimmed = input.trim();
+        return (!trimmed.isEmpty()) ? Good.of(trimmed) : Bad.ofOne("'" + input + "' is not a valid name");
+    }
+    
     public static void main(String[] args) {
 
         System.out.println(parsePerson("Bridget Jones", "29"));

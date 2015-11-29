@@ -23,7 +23,7 @@ package com.github.javactic;
 import javaslang.collection.IndexedSeq;
 
 class Helper {
-
+    
 	static <E> Every<E> fromNonEmptySeq(IndexedSeq<E> seq) {
 		return Every.of(seq.head(), seq.tail());
 	}
@@ -31,4 +31,5 @@ class Helper {
 	static <X> X niy() {
 		throw new UnsupportedOperationException("until basetype implements required functionality");
 	}
+	
 }
