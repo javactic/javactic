@@ -128,20 +128,17 @@ parsePerson("", "")
     }
     
     public static void main(String[] args) {
-List<Or<Integer, One<String>>> list = 
-        List.ofAll(parseAge("29"), parseAge("30"), parseAge("31"));
-Accumulation.combined(list, List.collector());
+List<String> list = List.ofAll("29", "30", "31");
+Accumulation.validatedBy(list, Doc::parseAge, List.collector());
     // Result: Good(List(29, 30, 31))
 
-List<Or<Integer, One<String>>> list2 = 
-        List.ofAll(parseAge("29"), parseAge("-30"), parseAge("31"));
-Accumulation.combined(list2, List.collector());
-    // Result: Bad(One("-30" is not a valid age))
+ List<String> list2 = List.ofAll("29", "-30", "31");
+ Accumulation.validatedBy(list2, Doc::parseAge, List.collector());
+ // Result: Bad(One("-30" is not a valid age))
 
-List<Or<Integer, One<String>>> list3 = 
-        List.ofAll(parseAge("29"), parseAge("-30"), parseAge("-31"));
-Accumulation.combined(list3, List.collector());
-    // Result: Bad(Many("-30" is not a valid age, "-31" is not a valid age))
+ List<String> list3 = List.ofAll("29", "-30", "-31");
+ Accumulation.validatedBy(list3, Doc::parseAge, List.collector());
+ // Result: Bad(Many("-30" is not a valid age, "-31" is not a valid age))
     }
 
 }
