@@ -126,11 +126,22 @@ parsePerson("", "")
     
     public static void main(String[] args) {
 
-        System.out.println(parsePerson("Bridget Jones", "29"));
-        System.out.println(parsePerson("Bridget Jones", ""));
-        System.out.println(parsePerson("Bridget Jones", "-29"));
-        System.out.println(parsePerson("", ""));
-        
+One.of(1);
+Many.of(1, 3);
+Many.of(1, 2, 3);
+
+Every.of(1);
+Every.of(1, 2);
+Every.of(1, 2, 3);
+
+Many.of(1, 2, 3).map(i -> i + 1);                   // Result: Many(2, 3, 4)
+One.of(1).map(i -> i + 1);                          // Result: One(2)
+Every.of(1, 2, 3).containsSlice(Every.of(2, 3));    // Result: true
+Every.of(1, 2, 3).containsSlice(Every.of(3, 4));    // Result: false
+Every.of(-1, -2, 3, 4, 5).minBy(i -> Math.abs(i));  // Result: -1
+
+Every.of(1, 2, 3).toSeq().filter(i -> i < 10); // Result: Vector(1, 2, 3)
+Every.of(1, 2, 3).toSeq().filter(i -> i > 10); // Result: Vector()
         
     }
 

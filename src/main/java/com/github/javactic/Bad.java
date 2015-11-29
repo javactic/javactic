@@ -58,12 +58,14 @@ public class Bad<G,B> implements Or<G,B> {
 		return new Bad<>(value);
 	}
 
-	/**
-	 * Helper method to get a {@link One} wrapped in a {@link Bad} directly. Equivalent to <code>Bad.of(One.of())</code>
-	 *  
-	 * @param value the value to put in the One
-	 * @return a One inside a Bad
-	 */
+    /**
+     * Helper method to get a {@link One} wrapped in a {@link Bad} directly.
+     * Equivalent to <code>Bad.of(One.of(value))</code>
+     * 
+     * @param value
+     *            the value to put in the One
+     * @return a One inside a Bad
+     */
     public static <G,B> Bad<G,One<B>> ofOne(B value) {
         return new Bad<>(One.of(value));
     }
