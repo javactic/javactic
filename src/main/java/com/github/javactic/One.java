@@ -56,7 +56,7 @@ public final class One<T> implements Every<T> {
 	
 	@Override
 	public String toString() {
-		return String.format("One(%s)", toVector());
+		return String.format("One(%s)", toVector().mkString());
 	}
 
 	@Override

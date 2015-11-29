@@ -58,7 +58,7 @@ public final class Many<T> implements Every<T> {
 	
 	@Override
 	public String toString() {
-		return String.format("Many(%s)", toVector());
+		return String.format("Many(%s)", toVector().mkString(", "));
 	}
 
 	@Override

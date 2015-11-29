@@ -1,6 +1,9 @@
 package com.github.javactic;
 
-import javaslang.control.Option;
+import javaslang.Tuple;
+import javaslang.Tuple2;
+import javaslang.control.Either;
+import javaslang.control.Either.RightProjection;
 
 public class Doc {
 
@@ -16,7 +19,7 @@ public class Doc {
             return "Person(" + name + "," + age + ")";
         }
     }
-
+/*
     static Option<String> parseName(String name) {
         String trimmed = name.trim();
         return (trimmed.isEmpty()) ? Option.none() : Option.of(trimmed);
@@ -36,7 +39,7 @@ public class Doc {
             parseAge(inputAge).map(age -> new Person(name, age))
         );
     }
-    
+    */
     /*
 parsePerson("Bridget Jones", "29")
 // Result: Some(Person(Bridget Jones,29))
@@ -52,6 +55,75 @@ parsePerson("", "")
 
      */
     
+    /*
+     def parseName(input: String): Either[String, String] = {
+  val trimmed = input.trim
+  if (!trimmed.isEmpty) Right(trimmed) else Left(s""""${input}" is not a valid name""")
+}
+     */
+    /*
+    static Either<String, String> parseName(String input) {
+        String trimmed = input.trim();
+        return (!trimmed.isEmpty()) ? Either.right(trimmed) : Either.left(input + "is not a valid name");
+    }
+    
+    static Either<String, Integer> parseAge(String input) {
+        try {
+            int age = Integer.parseInt(input.trim());
+            return (age >= 0) ? Either.right(age) : Either.left(age + "is not a valid age"); 
+        } catch (NumberFormatException e) {
+            return Either.left(input + "is not a valid integer");
+        }
+    }
+    
+    static Either<String, Person> parsePerson(String inputName, String inputAge) {
+        return parseName(inputName).right()
+                .flatMap(name -> parseAge(inputAge).right().map(age -> new Person(name, age)))
+                .toEither();
+    }
+    */
+    
+    /*
+    static Or<String, String> parseName(String input) {
+        String trimmed = input.trim();
+        return (!trimmed.isEmpty()) ? Or.good(trimmed) : Or.bad("\"" + input + "\" is not a valid name");
+    }
+    
+    static Or<Integer, String> parseAge(String input) {
+        try {
+            int age = Integer.parseInt(input.trim());
+            return (age >= 0) ? Or.good(age) : Or.bad("\"" + age + "\" is not a valid age"); 
+        } catch (NumberFormatException e) {
+            return Or.bad("\"" + input + "\" is not a valid integer");
+        }
+    }
+    
+    static Or<Person, String> parsePerson(String inputName, String inputAge) {
+        return parseName(inputName)
+                .flatMap(name -> parseAge(inputAge).map(age -> new Person(name, age)));
+    }
+    */
+    
+    static Or<String, One<String>> parseName(String input) {
+        String trimmed = input.trim();
+        return (!trimmed.isEmpty()) ? Or.good(trimmed) : Or.bad(One.of("\"" + input + "\" is not a valid name"));
+    }
+    
+    static Or<Integer, One<String>> parseAge(String input) {
+        try {
+            int age = Integer.parseInt(input.trim());
+            return (age >= 0) ? Or.good(age) : Or.bad(One.of("\"" + age + "\" is not a valid age")); 
+        } catch (NumberFormatException e) {
+            return Or.bad(One.of("\"" + input + "\" is not a valid integer"));
+        }
+    }
+    
+    static Or<Person, Every<String>> parsePerson(String inputName, String inputAge) {
+        Or<String, One<String>> name = parseName(inputName);
+        Or<Integer, One<String>> age = parseAge(inputAge);
+        return Accumulation.withGood(name, age, (n, a) -> new Person(n, a));
+    }
+
     public static void main(String[] args) {
 
         System.out.println(parsePerson("Bridget Jones", "29"));
