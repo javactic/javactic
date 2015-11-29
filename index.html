@@ -548,6 +548,62 @@ parsePerson("", "")
 			contains an error message for both name and age.
 		</p>
 
+		<h3>Working with Everys</h3>
+		<p>The previous examples demonstrate constructing a one-element
+			<code>Every</code> with a factory method in the <code>One</code> companion object. You can
+			similarly create an <code>Every</code> that contains more than one using a <code>Many</code>
+			factory method. Here are some examples:</p>
+		<pre>
+<code class="java">
+One.of(1);
+Many.of(1, 3);
+Many.of(1, 2, 3);
+</code>
+		</pre>
+			<p>
+			You can also construct an <code>Every</code> by passing one or more elements to the <code>Every.of</code> factory method:
+			</p>
+		<pre>
+<code class="java">
+Every.of(1);
+Every.of(1, 2);
+Every.of(1, 2, 3);
+</code>
+		</pre>
+		<p><code>Every</code> does not extend <code>Seq</code> or <code>Traversable</code> interfaces because
+			these require that implementations may be empty. For example, if you
+			invoke <code>tail()</code> on a <code>Seq</code> that contains just one element, you'll get an
+			empty <code>Seq</code> </p>
+		<p>On the other hand, many useful methods exist on <code>Seq</code> that when
+			invoked on a non-empty <code>Seq</code> are guaranteed to not result in an empty
+			<code>Seq</code>. For convenience, <code>Every</code> defines a method corresponding to every
+			such <code>Seq</code> method. Here are some examples:</p>
+		<pre>
+<code class="java">
+Many.of(1, 2, 3).map(i -&gt; i + 1);                   // Result: Many(2, 3, 4)
+One.of(1).map(i -&gt; i + 1);                          // Result: One(2)
+Every.of(1, 2, 3).containsSlice(Every.of(2, 3));       // Result: true
+Every.of(1, 2, 3).containsSlice(Every.of(3, 4));       // Result: false
+Every.of(-1, -2, 3, 4, 5).minBy(i -&gt; Math.abs(i));  // Result: -1
+</code>
+		</pre>
+		<p><code>Every</code> does not currently define any methods corresponding to
+			<code>Seq</code> methods that could result in an empty <code>Seq</code>. However, you can
+			convert an empty to a <code>Seq</code> and get hold of these methods:</p>
+		<pre>
+<code class="java">
+Every.of(1, 2, 3).toSeq().filter(i -&gt; i &lt; 10); // Result: Vector(1, 2, 3)
+Every.of(1, 2, 3).toSeq().filter(i -&gt; i &gt; 10); // Result: Vector()
+</code>
+		</pre>
+			<p>
+			
+			</p>
+		<pre>
+<code class="java">
+</code>
+		</pre>
+	
 
 		<footer class="site-footer">
 			<span class="site-footer-owner"><a
