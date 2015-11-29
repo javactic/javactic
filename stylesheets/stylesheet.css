@@ -172,7 +172,6 @@ a:hover {
 	font-size: 0.9rem;
 	color: #383e41;
 	background-color: #f3f6fa;
-	border-radius: 0.3rem;
 }
 
 .main-content pre {
@@ -182,9 +181,8 @@ a:hover {
 	font: 1rem Consolas, "Liberation Mono", Menlo, Courier, monospace;
 	color: #567482;
 	word-wrap: normal;
-	background-color: #f3f6fa;
+	background-color: #F0F0F0;
 	border: solid 1px #dce6f0;
-	border-radius: 0.3rem;
 }
 
 .main-content pre>code {
@@ -196,6 +194,7 @@ a:hover {
 	white-space: pre;
 	background: transparent;
 	border: 0;
+	tab-size: 4;
 }
 
 .main-content .highlight {
@@ -212,7 +211,7 @@ a:hover {
 	overflow: auto;
 	font-size: 0.9rem;
 	line-height: 1.45;
-	border-radius: 0.3rem;
+	display: flex;
 }
 
 .main-content pre code, .main-content pre tt {
