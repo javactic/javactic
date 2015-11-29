@@ -62,6 +62,8 @@ public class Bad<G,B> implements Or<G,B> {
      * Helper method to get a {@link One} wrapped in a {@link Bad} directly.
      * Equivalent to <code>Bad.of(One.of(value))</code>
      * 
+     * @param <G> the good type of the Or
+     * @param <B> the bad type of the Or
      * @param value
      *            the value to put in the One
      * @return a One inside a Bad
