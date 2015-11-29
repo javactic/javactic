@@ -99,6 +99,10 @@ a:hover {
 	margin-bottom: 0.1rem;
 }
 
+.or-color {
+	color: black;
+}
+
 @media screen and (min-width: 64em) {
 	.project-name {
 		font-size: 3.75rem;
