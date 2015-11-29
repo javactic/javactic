@@ -63,7 +63,7 @@ public final class Accumulation {
 	private Accumulation() {}
 
 	public static <G,A,ERR, I extends Iterable<G>> Or<I, Every<ERR>> 
-		combined(Iterable<Or<G, Every<ERR>>> iterable,
+		combined(Iterable<? extends Or<G, ? extends Every<ERR>>> iterable,
 				 Collector<? super G, A, I> collector) {
 		A goods = collector.supplier().get();
 		Vector<ERR> errs = Vector.empty();

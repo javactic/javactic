@@ -1,5 +1,8 @@
 package com.github.javactic;
 
+import javaslang.collection.List;
+import javaslang.control.Option;
+
 public class Doc {
 
     static class Person {
@@ -125,24 +128,20 @@ parsePerson("", "")
     }
     
     public static void main(String[] args) {
+List<Or<Integer, One<String>>> list = 
+        List.ofAll(parseAge("29"), parseAge("30"), parseAge("31"));
+Accumulation.combined(list, List.collector());
+    // Result: Good(List(29, 30, 31))
 
-One.of(1);
-Many.of(1, 3);
-Many.of(1, 2, 3);
+List<Or<Integer, One<String>>> list2 = 
+        List.ofAll(parseAge("29"), parseAge("-30"), parseAge("31"));
+Accumulation.combined(list2, List.collector());
+    // Result: Bad(One("-30" is not a valid age))
 
-Every.of(1);
-Every.of(1, 2);
-Every.of(1, 2, 3);
-
-Many.of(1, 2, 3).map(i -> i + 1);                   // Result: Many(2, 3, 4)
-One.of(1).map(i -> i + 1);                          // Result: One(2)
-Every.of(1, 2, 3).containsSlice(Every.of(2, 3));    // Result: true
-Every.of(1, 2, 3).containsSlice(Every.of(3, 4));    // Result: false
-Every.of(-1, -2, 3, 4, 5).minBy(i -> Math.abs(i));  // Result: -1
-
-Every.of(1, 2, 3).toSeq().filter(i -> i < 10); // Result: Vector(1, 2, 3)
-Every.of(1, 2, 3).toSeq().filter(i -> i > 10); // Result: Vector()
-        
+List<Or<Integer, One<String>>> list3 = 
+        List.ofAll(parseAge("29"), parseAge("-30"), parseAge("-31"));
+Accumulation.combined(list3, List.collector());
+    // Result: Bad(Many("-30" is not a valid age, "-31" is not a valid age))
     }
 
 }
