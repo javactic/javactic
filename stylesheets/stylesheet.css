@@ -113,12 +113,14 @@ a:hover {
 @media screen and (min-width: 42em) and (max-width: 80em) {
 	.project-name {
 		font-size: 2.25rem;
+		color: #8B0000;
 	}
 }
 
 @media screen and (max-width: 42em) {
 	.project-name {
 		font-size: 1.75rem;
+		color: #8B0000;
 	}
 }
 
