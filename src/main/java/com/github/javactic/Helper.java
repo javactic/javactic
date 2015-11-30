@@ -20,11 +20,15 @@
  **/
 package com.github.javactic;
 
+import java.util.regex.Pattern;
+
 import javaslang.collection.IndexedSeq;
 
 class Helper {
     
-	static <E> Every<E> fromNonEmptySeq(IndexedSeq<E> seq) {
+    private static final String REPLACE = Pattern.quote("{}");
+
+    static <E> Every<E> fromNonEmptySeq(IndexedSeq<E> seq) {
 		return Every.of(seq.head(), seq.tail());
 	}
 	
@@ -32,4 +36,11 @@ class Helper {
 		throw new UnsupportedOperationException("until basetype implements required functionality");
 	}
 	
+    static String parse(String msg, Object... args) {
+        for (Object arg : args) {
+            msg = msg.replaceFirst(REPLACE, arg.toString());
+        }
+        return msg;
+    }
+    
 }

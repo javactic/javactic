@@ -62,7 +62,21 @@ public final class Accumulation {
 	
 	private Accumulation() {}
 
-	public static <G,A,ERR, I extends Iterable<G>> Or<I, Every<ERR>> 
+    /**
+     * Combines an Iterable of Ors of type Or&lt;G, EVERY&lt;ERR&gt;&gt; (where
+     * EVERY is some subtype of Every) into a single Or of type
+     * Or&lt;COLL&lt;G&gt;, Every&lt;ERR&gt;&gt; using a Collector to determine
+     * the wanted collection type COLL.
+     * 
+     * @param <G> the good type of the resulting Or
+     * @param <A> the mutable accumulation type of the reduction operation of the collector
+     * @param <ERR> the bad type of the resulting Or
+     * @param <I> the resulting good iterable type
+     * @param iterable the iterable containing Ors to combine
+     * @param collector the collector producing the resulting collection
+     * @return an Or of all the good values or of all the errors 
+     */
+	public static <G,A,ERR, I extends Iterable<? extends G>> Or<I, Every<ERR>> 
 		combined(Iterable<? extends Or<G, ? extends Every<ERR>>> iterable,
 				 Collector<? super G, A, I> collector) {
 		A goods = collector.supplier().get();
@@ -75,19 +89,41 @@ public final class Accumulation {
 		}
 		I gds = collector.finisher().apply(goods);
 		if(errs.isEmpty())
-			return Or.good(gds);
+			return Good.of(gds);
 		else
-			return Or.bad(Every.of(errs.head(), errs.tail()));
+			return Bad.of(Every.of(errs.head(), errs.tail()));
 	}
 	
-	public static <G, H, A, I extends Iterable<H>, ERR> Or<I, Every<ERR>> 
-		validatedBy(Iterable<G> iterable, 
-					Function<G, ? extends Or<H, ? extends Every<ERR>>> f, 
-					Collector<? super H, A, I> collector) {
+    /**
+     * Maps a iterable of Fs into Ors of type Or&lt;G, EVERY&lt;ERR&gt;&gt;
+     * (where EVERY is some subtype of Every) using the passed function f, then
+     * combines the resulting Ors into a single Or of type Or&lt;COLL&lt;G&gt;,
+     * Every&lt;ERR&gt;&gt; using a Collector to determine the wanted collection
+     * type COLL.
+     * <p>
+     * Note: this process implemented by this method is sometimes called a
+     * &quot;traverse&quot;.
+     * </p>
+     * 
+     * @param <F> the type of the original iterable to validate
+     * @param <G> the Good type of the resulting Or
+     * @param <A> the mutable accumulation type of the reduction operation of the collector
+     * @param <I> the result type of the reduction operation
+     * @param <ERR>  the Bad type of the resulting Or
+     * @param iterable the iterable to validate
+     * @param f the validation function
+     * @param collector the collector producing the resulting collection
+     * @return an Or of all the good values or of all the errors
+     */
+	public static <F, G, A, I extends Iterable<? extends G>, ERR> 
+	    Or<I, Every<ERR>> 
+		validatedBy(Iterable<? extends F> iterable, 
+					Function<? super F, ? extends Or<G, ? extends Every<ERR>>> f, 
+					Collector<? super G, A, I> collector) {
 			A goods = collector.supplier().get();
 			Vector<ERR> errs = Vector.empty();
-			for(G g : iterable) {
-				Or<H, ? extends Every<ERR>> or = f.apply(g);
+			for(F g : iterable) {
+				Or<G, ? extends Every<ERR>> or = f.apply(g);
 				if(or.isGood()) 
 					collector.accumulator().accept(goods, or.get());
 				else
@@ -100,10 +136,20 @@ public final class Accumulation {
 				return Or.bad(Every.of(errs.head(), errs.tail()));
 	}
 
+	
+	/**
+	 * Enables further validation on an existing accumulating Or by passing validation functions.
+	 * 
+	 * @param <G> the Good type of the argument Or
+	 * @param <ERR> the type of the error message contained in the accumulating bad
+	 * @param or the accumulating or
+	 * @param validations the validation functions
+	 * @return the original or if it passed all validations or a Bad with all failures
+	 */
 	@SuppressWarnings("unchecked")
     @SafeVarargs
-	public static <A, ERR> Or<A, Every<ERR>> 
-		when(Or<A, ? extends Every<ERR>> or, Function<? super A, ? extends Validation<ERR>>... validations) {
+	public static <G, ERR> Or<G, Every<ERR>> 
+		when(Or<G, ? extends Every<ERR>> or, Function<? super G, ? extends Validation<ERR>>... validations) {
 			if(or.isGood()) {
 				Vector<ERR>  result = Stream.of(validations).flatMap(f -> {
 					Validation<ERR> v = f.apply(or.get());
@@ -113,7 +159,7 @@ public final class Accumulation {
 				if(result.length() == 0) return Or.good(or.get());
 				else return Or.bad(Every.of(result.head(), result.tail()));
 			} 
-			else return (Or<A, Every<ERR>>) or;
+			else return (Or<G, Every<ERR>>) or;
 	}
 
 	// ------------------------------------------------------------------------

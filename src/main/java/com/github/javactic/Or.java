@@ -134,7 +134,7 @@ public interface Or<G, B> {
      * @return this {@link Good}, if this {@link Or} is a {@link Good}; or this {@link Bad} value
      *         wrapped in a {@link One} if this {@link Or} is a {@link Bad}.
      */
-    Or<G, Every<B>> accumulating();
+    Or<G, One<B>> accumulating();
 
     /**
      * Maps the given function to this {@link Or}'s value if it is a {@link Good} or returns <span class="jCode">this</span>

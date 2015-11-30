@@ -33,12 +33,16 @@ public class Fail<T> implements Validation<T>, Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	final T error;
+	private final T error;
 	
 	public static <T> Fail<T> of(T error) {
 		return new Fail<>(error);
 	}
 	
+    public static Fail<String> of(String error, Object... args) {
+        return new Fail<>(Helper.parse(error, args));
+    }
+    
 	Fail(T error) {
 		this.error = error;
 	}
@@ -62,5 +66,35 @@ public class Fail<T> implements Validation<T>, Serializable {
 	public T getError() {
 		return error;
 	}
+	
+    @Override
+    public String toString() {
+        return "Fail(" + error + ")";
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((error == null) ? 0 : error.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Fail other = (Fail) obj;
+        if (error == null) {
+            if (other.error != null)
+                return false;
+        } else if (!error.equals(other.error))
+            return false;
+        return true;
+    }
 	
 }

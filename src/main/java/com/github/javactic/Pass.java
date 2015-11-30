@@ -62,5 +62,20 @@ public class Pass<T> implements Validation<T>, Serializable {
 	public T getError() {
 		throw new NoSuchElementException();
 	}
+	
+	@Override
+	public int hashCode() {
+	    return 1;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+	    return obj == this;
+	}
+	
+	@Override
+	public String toString() {
+	    return "Pass";
+	}
 
 }

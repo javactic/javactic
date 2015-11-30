@@ -59,18 +59,19 @@ public class Good<G,B> implements Or<G,B> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Or<G, Every<B>> accumulating() {
-		return (Or<G, Every<B>>) this;
+	public Or<G, One<B>> accumulating() {
+	    // not a bad, so we can cast the bad side to anything.
+		return (Or<G, One<B>>) this;
 	}
 	@Override
 	public <H> Or<H, B> map(Function<? super G, ? extends H> mapper) {
-		return Or.good(mapper.apply(value));
+		return Good.of(mapper.apply(value));
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <C> Or<G, C> badMap(Function<? super B, ? extends C> mapper) {
-		return (Or<G, C>) this;
+	public <C> Or<G,C> badMap(Function<? super B, ? extends C> mapper) {
+		return (Or<G,C>) this;
 	}
 
 	@Override
@@ -172,7 +173,7 @@ public class Good<G,B> implements Or<G,B> {
 
 	@Override
 	public <H, C> Or<H, C> transform(Function<G, H> gf, Function<B, C> bf) {
-		return Or.good(gf.apply(value));
+		return Good.of(gf.apply(value));
 	}
 	
 	@Override
@@ -182,14 +183,40 @@ public class Good<G,B> implements Or<G,B> {
 
 	@Override
 	public String toString() {
-		return String.format("Good(%s)", value);
+		return "Good(" + value + ")";
 	}
 
 	@Override
 	public Or<G, B> filter(Function<G, Validation<B>> validator) {
 		Validation<B> result = validator.apply(value);
 		if(result.isPass()) return this;
-		else return Or.bad(result.getError());
+		else return Bad.of(result.getError());
 	}
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((value == null) ? 0 : value.hashCode());
+        return result;
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Good other = (Good) obj;
+        if (value == null) {
+            if (other.value != null)
+                return false;
+        } else if (!value.equals(other.value))
+            return false;
+        return true;
+    }
+	
 }

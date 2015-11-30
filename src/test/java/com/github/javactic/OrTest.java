@@ -60,10 +60,10 @@ public class OrTest {
 	@Test
 	public void accumulating() {
 		Or<String, String> bad = Or.bad("Bad");
-		Or<String, Every<String>> badacc = bad.accumulating();
+		Or<String, One<String>> badacc = bad.accumulating();
 		assertTrue(badacc.isBad());
 		Or<String, String> good = Or.good("Good");
-		Or<String, Every<String>> goodacc = good.accumulating();
+		Or<String, One<String>> goodacc = good.accumulating();
 		assertTrue(goodacc.isGood());
 	}
 	

@@ -54,9 +54,21 @@ public class Bad<G,B> implements Or<G,B> {
 		value = bad;
 	}
 	
+	/**
+	 * Creates a Bad of type B.
+	 * 
+	 * @param <G> the good type of the Or
+     * @param <B> the bad type of the Or
+	 * @param value the value of the Bad
+	 * @return an instance of Bad
+	 */
 	public static <G,B> Bad<G,B> of(B value) {
 		return new Bad<>(value);
 	}
+	
+    public static <G> Bad<G,String> of(String value, Object... args) {
+        return new Bad<>(Helper.parse(value, args));
+    }
 
     /**
      * Helper method to get a {@link One} wrapped in a {@link Bad} directly.
@@ -72,9 +84,13 @@ public class Bad<G,B> implements Or<G,B> {
         return new Bad<>(One.of(value));
     }
 
+    public static <G> Bad<G,One<String>> ofOneString(String value, Object... args) {
+        return new Bad<>(One.of(Helper.parse(value, args)));
+    }
+
 	@Override
-	public Or<G, Every<B>> accumulating() {
-		return Or.bad(Every.of(value));
+	public Or<G, One<B>> accumulating() {
+		return Bad.ofOne(value);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -199,12 +215,40 @@ public class Bad<G,B> implements Or<G,B> {
 
 	@Override
 	public String toString() {
-		return String.format("Bad(%s)", value);
+		return "Bad(" + value + ")";
 	}
 
 	@Override
 	public Or<G, B> filter(Function<G, Validation<B>> validator) {
 		return this;
 	}
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((value == null) ? 0 : value.hashCode());
+        return result;
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Bad other = (Bad) obj;
+        if (value == null) {
+            if (other.value != null)
+                return false;
+        } else if (!value.equals(other.value))
+            return false;
+        return true;
+    }
+	
+	
 
 }
