@@ -100,9 +100,10 @@ public final class Accumulation {
 				return Or.bad(Every.of(errs.head(), errs.tail()));
 	}
 
-	@SafeVarargs
+	@SuppressWarnings("unchecked")
+    @SafeVarargs
 	public static <A, ERR> Or<A, Every<ERR>> 
-		when(Or<A, Every<ERR>> or, Function<A, Validation<ERR>>... validations) {
+		when(Or<A, ? extends Every<ERR>> or, Function<? super A, ? extends Validation<ERR>>... validations) {
 			if(or.isGood()) {
 				Vector<ERR>  result = Stream.of(validations).flatMap(f -> {
 					Validation<ERR> v = f.apply(or.get());
@@ -112,7 +113,7 @@ public final class Accumulation {
 				if(result.length() == 0) return Or.good(or.get());
 				else return Or.bad(Every.of(result.head(), result.tail()));
 			} 
-			else return or;
+			else return (Or<A, Every<ERR>>) or;
 	}
 
 	// ------------------------------------------------------------------------

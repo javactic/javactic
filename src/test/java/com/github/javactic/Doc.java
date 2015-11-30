@@ -1,5 +1,6 @@
 package com.github.javactic;
 
+import javaslang.Tuple2;
 import javaslang.collection.List;
 import javaslang.control.Option;
 
@@ -127,18 +128,46 @@ parsePerson("", "")
         return (!trimmed.isEmpty()) ? Good.of(trimmed) : Bad.ofOne("'" + input + "' is not a valid name");
     }
     
+    /*
+def isRound(i: Int): Validation[ErrorMessage] =
+    if (i % 10 == 0) Pass else Fail(i + " was not a round number")
+
+def isDivBy3(i: Int): Validation[ErrorMessage] =
+  if (i % 3 == 0) Pass else Fail(i + " was not divisible by 3")
+     * */
+    
+static Validation<String> isRound(int i) {
+    return (i % 10 == 0) ? Pass.instance() : Fail.of(i + " was not a round number");
+}
+
+static Validation<String> isDivBy3(int i) {
+    return (i % 3 == 0) ? Pass.instance() : Fail.of(i + " was not divisible by 3");
+}
+    
     public static void main(String[] args) {
-List<String> list = List.ofAll("29", "30", "31");
-Accumulation.validatedBy(list, Doc::parseAge, List.collector());
-    // Result: Good(List(29, 30, 31))
+Or<Tuple2<String, Integer>, Every<String>> zip = Accumulation.zip(parseName("Dude"), parseAge("21"));
+// Result: Good((Dude,21))
 
- List<String> list2 = List.ofAll("29", "-30", "31");
- Accumulation.validatedBy(list2, Doc::parseAge, List.collector());
- // Result: Bad(One("-30" is not a valid age))
+Accumulation.zip(parseName("Dude"), parseAge("-21"));
+// Result: Bad(One("-21" is not a valid age))
 
- List<String> list3 = List.ofAll("29", "-30", "-31");
- Accumulation.validatedBy(list3, Doc::parseAge, List.collector());
- // Result: Bad(Many("-30" is not a valid age, "-31" is not a valid age))
+Accumulation.zip(parseName(""), parseAge("-21"));
+// Result: Bad(Many("" is not a valid name, "-21" is not a valid age))
+
+Or<Integer, Every<String>> when = Accumulation.when(parseAge("-30"), Doc::isRound, Doc::isDivBy3);
+//Result: Bad(One("-30" is not a valid age))
+
+Accumulation.when(parseAge("30"), Doc::isRound, Doc::isDivBy3);
+//Result: Good(30)
+
+Accumulation.when(parseAge("33"), Doc::isRound, Doc::isDivBy3);
+//Result: Bad(One(33 was not a round number))
+
+Accumulation.when(parseAge("20"), Doc::isRound, Doc::isDivBy3);
+//Result: Bad(One(20 was not divisible by 3))
+
+Accumulation.when(parseAge("31"), Doc::isRound, Doc::isDivBy3);
+//Result: Bad(Many(31 was not a round number, 31 was not divisible by 3))    
     }
 
 }
