@@ -194,7 +194,7 @@ public interface Or<G, B> {
      * @return a {@link Good} if this {@link Or} is a {@link Good} that passes the validation function,
      *         else a {@link Bad}.
      */
-    Or<G, B> filter(Function<G, Validation<B>> validator);
+    Or<G, B> filter(Function<? super G, Validation<B>> validator);
 
     /**
      * Returns the given function applied to the value contained in this {@link Or} if it is a {@link Good},
@@ -304,7 +304,7 @@ public interface Or<G, B> {
      * @return this {@link Or}, if it is a {@link Good}, else the result of evaluating
      *         <span class="jCode">alt</span>
      */
-    Or<G, B> orElse(Supplier<Or<G, B>> alt);
+    Or<G, B> orElse(Supplier<? extends Or<G, B>> alt);
 
     /**
      * Maps the given function to this {@link Or}'s value if it is a {@link Bad}, transforming it into a
@@ -316,7 +316,7 @@ public interface Or<G, B> {
      * @return if this is a {@link Bad}, the result of applying the given function to the contained value wrapped
      *         in a {@link Good}, else this {@link Good} is returned
      */
-    Or<G, B> recover(Function<B, G> func);
+    Or<G, B> recover(Function<? super B, ? extends G> func);
 
     /**
      * Maps the given function to this {@link Or}'s value if it is a {@link Bad}, returning the result, or
@@ -329,7 +329,7 @@ public interface Or<G, B> {
      * @return if this is a {@link Bad}, the result of applying the given function to the contained value, else
      *         this {@link Good} is returned
      */
-    <C> Or<G, C> recoverWith(Function<B, Or<G, C>> func);
+    <C> Or<G, C> recoverWith(Function<? super B, ? extends Or<G, C>> func);
 
     /**
      * Returns an {@link Or} with the {@link Good} and {@link Bad} types swapped: {@link Bad}
@@ -418,7 +418,7 @@ public interface Or<G, B> {
      * @return the result of applying the appropriate one of the two passed functions, <span class="jCode">gf</span> or
      *         <span class="jCode">bf</span>, to this {@link Or}'s value
      */
-    <H, C> Or<H, C> transform(Function<G, H> gf, Function<B, C> bf);
+    <H, C> Or<H, C> transform(Function<? super G, ? extends H> gf, Function<? super B, ? extends C> bf);
 
     /**
      * A terminal operation to handle both good and bad cases.

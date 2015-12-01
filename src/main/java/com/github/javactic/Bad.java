@@ -151,17 +151,17 @@ public class Bad<G,B> implements Or<G,B> {
 	}
 
 	@Override
-	public Or<G,B> orElse(Supplier<Or<G,B>> alt) {
+	public Or<G,B> orElse(Supplier<? extends Or<G,B>> alt) {
 		return alt.get();
 	}
 
 	@Override
-	public Or<G, B> recover(Function<B,G> func) {
+	public Or<G, B> recover(Function<? super B, ? extends G> func) {
 		return Or.good(func.apply(value));
 	}
 
 	@Override
-	public <C> Or<G, C> recoverWith(Function<B, Or<G, C>> func) {
+	public <C> Or<G, C> recoverWith(Function<? super B, ? extends Or<G, C>> func) {
 		return func.apply(value);
 	}
 
@@ -204,7 +204,7 @@ public class Bad<G,B> implements Or<G,B> {
 	}
 
 	@Override
-	public <H, C> Or<H, C> transform(Function<G, H> gf, Function<B, C> bf) {
+	public <H, C> Or<H, C> transform(Function<? super G, ? extends H> gf, Function<? super B, ? extends C> bf) {
 		return Or.bad(bf.apply(value));
 	}
 
@@ -219,7 +219,7 @@ public class Bad<G,B> implements Or<G,B> {
 	}
 
 	@Override
-	public Or<G, B> filter(Function<G, Validation<B>> validator) {
+	public Or<G, B> filter(Function<? super G, Validation<B>> validator) {
 		return this;
 	}
 

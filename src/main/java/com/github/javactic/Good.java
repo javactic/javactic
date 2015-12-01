@@ -120,18 +120,18 @@ public class Good<G,B> implements Or<G,B> {
 	}
 
 	@Override
-	public Or<G,B> orElse(Supplier<Or<G,B>> alt) {
+	public Or<G,B> orElse(Supplier<? extends Or<G,B>> alt) {
 		return this;
 	}
 
 	@Override
-	public Or<G, B> recover(Function<B,G> func) {
+	public Or<G, B> recover(Function<? super B, ? extends G> func) {
 		return this;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <C> Or<G, C> recoverWith(Function<B, Or<G, C>> func) {
+	public <C> Or<G, C> recoverWith(Function<? super B, ? extends Or<G, C>> func) {
 		return (Or<G, C>) this;
 	}
 
@@ -172,7 +172,7 @@ public class Good<G,B> implements Or<G,B> {
 	}
 
 	@Override
-	public <H, C> Or<H, C> transform(Function<G, H> gf, Function<B, C> bf) {
+	public <H, C> Or<H, C> transform(Function<? super G, ? extends H> gf, Function<? super B, ? extends C> bf) {
 		return Good.of(gf.apply(value));
 	}
 	
@@ -187,7 +187,7 @@ public class Good<G,B> implements Or<G,B> {
 	}
 
 	@Override
-	public Or<G, B> filter(Function<G, Validation<B>> validator) {
+	public Or<G, B> filter(Function<? super G, Validation<B>> validator) {
 		Validation<B> result = validator.apply(value);
 		if(result.isPass()) return this;
 		else return Bad.of(result.getError());
