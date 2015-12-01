@@ -209,7 +209,7 @@ public class Bad<G,B> implements Or<G,B> {
 	}
 
 	@Override
-	public void forEach(Consumer<G> gc, Consumer<B> bc) {
+	public void forEach(Consumer<? super G> gc, Consumer<? super B> bc) {
 		bc.accept(value);
 	}
 

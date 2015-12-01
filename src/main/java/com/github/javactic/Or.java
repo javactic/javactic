@@ -422,10 +422,10 @@ public interface Or<G, B> {
 
     /**
      * A terminal operation to handle both good and bad cases.
-     * @param gc a function to be executed if this is {@link Or} is a {@link Good}
-     * @param bc a function to be executed if this is {@link Or} is a {@link Bad}
+     * @param gc a function to be executed if this {@link Or} is a {@link Good}
+     * @param bc a function to be executed if this {@link Or} is a {@link Bad}
      */
-    void forEach(Consumer<G> gc, Consumer<B> bc);
+    void forEach(Consumer<? super G> gc, Consumer<? super B> bc);
 
     /**
      * Indicates whether this {@link Or} is a {@link Good}.
