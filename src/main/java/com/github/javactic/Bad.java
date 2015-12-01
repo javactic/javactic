@@ -66,7 +66,7 @@ public class Bad<G,B> implements Or<G,B> {
 		return new Bad<>(value);
 	}
 	
-    public static <G> Bad<G,String> of(String value, Object... args) {
+    public static <G> Bad<G,String> ofString(String value, Object... args) {
         return new Bad<>(Helper.parse(value, args));
     }
 

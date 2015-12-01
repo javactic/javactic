@@ -33,8 +33,6 @@ import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 
-import javaslang.Function1;
-import javaslang.Function2;
 import javaslang.Tuple;
 import javaslang.Tuple2;
 import javaslang.Tuple3;
@@ -126,7 +124,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
 
     @SafeVarargs
     public static <T> Every<T> of(T first, T... rest) {
-        return of(first, Vector.ofAll(rest));
+        return of(first, Vector.of(rest));
     }
 
     public static <T> Every<T> of(T first, Seq<? extends T> rest) {
@@ -584,7 +582,8 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      * @return a new Every resulting from concatenating all nested Everys.
      */
     default <B> Every<B> flatten() {
-        return fromNonEmptySeq(toVector().<B> flatten());
+        return niy();
+//        return fromNonEmptySeq(toVector().<B> flatten());
         // TODO test
     }
 
@@ -1351,8 +1350,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
     }
 
     /**
-     * Not implemented yet. Indicates whether this Every ends with the given
-     * Iterable.
+     * Indicates whether this Every ends with the given Iterable.
      * 
      * <pre class="stHighlighted">
      * Scalactic: def endsWith[B](that: GenSeq[B]): Boolean <br>
@@ -1360,11 +1358,11 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      * </pre>
      * 
      * @param that
-     *            the Iterable to match.
+     *            the Seq to match.
      * @return true if this Every has that as a suffix, false otherwise.
      */
-    default boolean endsWith(Iterable<? extends T> that) {
-        return niy(); // TODO
+    default boolean endsWith(Seq<? extends T> that) {
+        return toVector().endsWith(that);
     }
 
     /**
@@ -1407,8 +1405,8 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
     }
 
     /**
-     * Not implemented yet. Returns the length of the longest prefix whose
-     * elements all satisfy some predicate.
+     * Returns the length of the longest prefix whose elements all satisfy some
+     * predicate.
      * 
      * <pre class="stHighlighted">
      * Scalactic: def prefixLength(p: (T) =&gt; Boolean): Int
@@ -1420,11 +1418,11 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      *         element of the segment satisfies the predicate p.
      */
     default int prefixLength(Predicate<? super T> p) {
-        return niy(); // TODO
+        return toVector().prefixLength(p);
     }
 
     /**
-     * Not implemented yet. Computes a prefix scan of the elements of this
+     * Computes a prefix scan of the elements of this
      * Every. Note: The neutral element z may be applied more than once.
      * 
      * <pre class="stHighlighted">
@@ -1441,12 +1439,12 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      *         Every
      */
     default Every<T> scan(T z, BiFunction<? super T, ? super T, ? extends T> op) {
-        return niy(); // TODO
+        return fromNonEmptySeq(toVector().scan(z, op));
     }
 
     /**
-     * Not implemented yet. Produces an Every containing cumulative results of
-     * applying the operator going left to right.
+     * Produces an Every containing cumulative results of applying the operator
+     * going left to right.
      * 
      * <pre class="stHighlighted">
      * Scalactic: def scanLeft[B](z: B)(op: (B, T) =&gt; B): Every[B]
@@ -1464,11 +1462,11 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      *         with the start value, z, on the left.
      */
     default <B> Every<B> scanLeft(B z, BiFunction<? super B, ? super T, ? extends B> op) {
-        return niy(); // TODO
+        return fromNonEmptySeq(toVector().scanLeft(z, op));
     }
 
     /**
-     * Not implemented yet. Produces an Every containing cumulative results of
+     * Produces an Every containing cumulative results of
      * applying the operator going right to left.
      * 
      * <pre class="stHighlighted">
@@ -1487,11 +1485,11 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      *         with the start value, z, on the right.
      */
     default <B> Every<B> scanRight(B z, BiFunction<? super T, ? super B, ? extends B> op) {
-        return niy(); // TODO
+        return fromNonEmptySeq(toVector().scanRight(z, op));
     }
 
     /**
-     * Not implemented yet. Computes length of longest segment whose elements
+     * Computes length of longest segment whose elements
      * all satisfy some predicate.
      * 
      * <pre class="stHighlighted">
@@ -1506,7 +1504,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      *         predicate.
      */
     default int segmentLength(Predicate<? super T> p, int from) {
-        return niy(); // TODO
+        return toVector().segmentLength(p, from);
     }
 
     /**

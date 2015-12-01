@@ -88,6 +88,7 @@ public class Fail<T> implements Validation<T>, Serializable {
             return false;
         if (getClass() != obj.getClass())
             return false;
+        @SuppressWarnings("rawtypes")
         Fail other = (Fail) obj;
         if (error == null) {
             if (other.error != null)
