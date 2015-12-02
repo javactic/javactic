@@ -65,7 +65,6 @@
 						<showWarnings>true</showWarnings>
 						<compilerArgs>
 							<arg>-Xlint:all</arg>
-							<arg>-Werror</arg>
 						</compilerArgs>
 					</configuration>
 				</plugin>
