@@ -1,4 +1,5 @@
 [![codecov.io](https://codecov.io/github/javactic/javactic/coverage.svg?branch=master)](https://codecov.io/github/javactic/javactic?branch=master)
+[![Build Status](https://travis-ci.org/javactic/javactic.svg?branch=master)](https://travis-ci.org/javactic/javactic)
 
 # Javactic
 Java port of [Scalactic](http://www.scalactic.org/) (2.2.4) based on [Javaslang](http://javaslang.com/)(2.0.0). Mostly focused on [Or and Every](http://www.scalactic.org/user_guide/OrAndEvery), constructs *"inspired in part by the disjoint union (\/) and Validation types of [scalaz](https://github.com/scalaz/scalaz), the ProcessResult type of [Typesafe Activator](https://github.com/typesafehub/activator/), and the Result type of [ScalaKittens](https://github.com/vpatryshev/ScalaKittens)"*.
