@@ -29,7 +29,7 @@ import org.junit.Test;
 
 import javaslang.Tuple;
 
-public class EveryTestA {
+public class EveryATest {
 
     @Test
     public void testTrivial() {

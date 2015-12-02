@@ -33,7 +33,7 @@ import com.github.javactic.Every;
 import javaslang.collection.List;
 import javaslang.collection.Stream;
 
-public class EveryTestB {
+public class EveryBTest {
 
     @Test
     public void addString() {
