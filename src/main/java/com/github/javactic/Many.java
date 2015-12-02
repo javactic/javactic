@@ -20,6 +20,8 @@
  **/
 package com.github.javactic;
 
+import java.util.Objects;
+
 import javaslang.collection.Seq;
 import javaslang.collection.Vector;
 
@@ -36,6 +38,9 @@ public final class Many<T> implements Every<T> {
 	
 	@SafeVarargs
 	public static <T> Many<T> of(T first, T second, T... rest) {
+        Objects.requireNonNull(first, "first of Many cannot be null");
+        Objects.requireNonNull(first, "second of Many cannot be null");
+        Objects.requireNonNull(rest, "rest of Many cannot be null");
 		return new Many<T>(first, Vector.of(rest).prepend(second));
 	}
 	

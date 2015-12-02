@@ -20,7 +20,9 @@
  **/
 package com.github.javactic;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Assert;
@@ -28,6 +30,8 @@ import org.junit.Test;
 
 import com.github.javactic.Fail;
 import com.github.javactic.Pass;
+
+import javaslang.Tuple0;
 
 public class ValidationTest {
 
@@ -47,6 +51,25 @@ public class ValidationTest {
 	public void failTest() {
 		assertTrue(Fail.of("error").and(Pass.instance()).isFail());
 		assertFalse(Fail.of("error").isPass());
-		Assert.assertEquals("error", Fail.of("error").getError());
+		assertEquals("error", Fail.of("error").getError());
+	}
+	
+	@Test
+	public void equalsHashCodeToString() {
+	    assertEquals("Pass", Pass.instance().toString());
+	    assertEquals(1, Pass.instance().hashCode());
+	    assertTrue(Pass.instance().equals(Pass.instance()));
+	    assertFalse(Pass.instance().equals(Tuple0.instance()));
+	    
+	    Fail<String> a1 = Fail.of("a");
+	    Fail<String> a2 = Fail.ofString("a");
+	    Fail<String> b1 = Fail.of("b");
+	    assertEquals(a1, a1);
+	    assertEquals(a1, a2);
+	    assertNotEquals(a1, b1);
+	    assertNotEquals(a1, Pass.instance());
+	    assertNotEquals(a1, null);
+	    assertEquals(a1.toString(), a2.toString());
+	    assertEquals(a1.hashCode(), a2.hashCode());
 	}
 }

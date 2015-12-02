@@ -31,6 +31,24 @@ import com.github.javactic.Every;
 
 public class EveryTest {
 
+    @Test
+    public void hashCodeEqualsToString() {
+        Many<String> pair1 = Many.of("a", "b");
+        Many<String> pair2 = Many.of("a", "b");
+        assertEquals(pair1, pair2);
+        assertEquals(pair1.hashCode(), pair2.hashCode());
+        assertEquals(pair1.toString(), pair2.toString());
+        
+        One<String> single1 = One.of("c");
+        One<String> single2 = One.of("c");
+        assertEquals(single1, single2);
+        assertEquals(single1.hashCode(), single2.hashCode());
+        assertEquals(single1.toString(), single2.toString());
+        
+        Assert.assertNotEquals(pair1, single1);
+        Assert.assertNotEquals(single2, pair2);
+    }
+    
 	@Test
 	public void groupedTest1() {
 		Every<String> e = Every.of("a", "b", "c");

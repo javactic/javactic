@@ -20,6 +20,8 @@
  **/
 package com.github.javactic;
 
+import java.util.Objects;
+
 import javaslang.collection.Vector;
 
 /**
@@ -38,6 +40,7 @@ public final class One<T> implements Every<T> {
 	}
 	
 	private One(T loneElement) {
+	    Objects.requireNonNull(loneElement, "lone element of One cannot be null");
 		elements = Vector.of(loneElement);
 	}
 	

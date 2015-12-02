@@ -37,6 +37,7 @@ class Helper {
 	}
 	
     static String parse(String msg, Object... args) {
+        if(msg == null) return msg;
         for (Object arg : args) {
             msg = msg.replaceFirst(REPLACE, arg.toString());
         }

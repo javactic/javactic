@@ -22,6 +22,7 @@ package com.github.javactic;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.NoSuchElementException;
@@ -35,7 +36,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.javactic.Bad;
-import com.github.javactic.Every;
 import com.github.javactic.Good;
 import com.github.javactic.Or;
 import com.github.javactic.Validation;
@@ -264,6 +264,32 @@ public class OrTest {
 		assertEquals("good", value.get());
 		Or.<String, String>bad("bad").forEach(g -> value.set(g), b -> value.set(b));
 		assertEquals("bad", value.get());
+	}
+	
+	@Test
+	public void hashCodeEqualsToString() {
+	    Bad<Object, String> bad1 = Bad.of("b");
+	    Bad<Object, String> bad2 = Bad.ofString("b");
+	    Bad<Object, String> bad3 = Bad.ofString("too {}", "bad");
+	    assertEquals(bad1, bad2);
+	    assertEquals(bad1, bad1);
+	    assertNotEquals(bad1, bad3);
+	    assertNotEquals(bad1, null);
+	    assertEquals(bad1.toString(), bad2.toString());
+	    assertEquals(bad1.hashCode(), bad2.hashCode());
+	    
+	    Good<String, Object> good1 = Good.of("g");
+	    Good<String, Object> good2 = Good.of("g");
+	    Good<String, Object> good3 = Good.of("g2");
+	    assertEquals(good1, good2);
+	    assertEquals(good1, good1);
+	    assertNotEquals(good1, good3);
+	    assertNotEquals(good1, null);
+        assertEquals(good1.toString(), good2.toString());
+        assertEquals(good1.hashCode(), good2.hashCode());
+        
+        assertNotEquals(good1, bad1);
+        assertNotEquals(bad1, good1);
 	}
 	
 }
