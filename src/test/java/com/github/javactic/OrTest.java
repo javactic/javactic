@@ -290,6 +290,8 @@ public class OrTest {
         
         assertNotEquals(good1, bad1);
         assertNotEquals(bad1, good1);
+        
+        assertEquals(Bad.ofOneString("BofOneString"), Bad.ofOneString("BofOneString"));
 	}
 	
 }

@@ -91,7 +91,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      *         otherwise.
      */
     default boolean isDefinedAt(Integer index) {
-        return index > 0 && index < length();
+        return index >= 0 && index < length();
     }
 
     /**
@@ -462,12 +462,16 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      * 
      * @param index
      *            the index to select from.
-     * @param def
+     * @param fallback
      *            the function to execute if index is out of bounds.
      * @return returns the element of this Every at index or result of the
      *         fallback function.
      */
-    default T getOrElse(int index, IntFunction<? extends T> def) {
+    default T getOrElse(int index, IntFunction<? extends T> fallback) {
+        return applyOrElse(index, fallback);
+    }
+
+    default T getOrElse(int index, T def) {
         return applyOrElse(index, def);
     }
 
@@ -507,6 +511,10 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
         return isDefinedAt(index) ? apply(index) : fallback.apply(index);
     }
 
+    default T applyOrElse(int index, T def) {
+        return isDefinedAt(index) ? apply(index) : def;
+    }
+    
     /**
      * Composes an instance of ToIntFunction with this IntFunction.
      * 

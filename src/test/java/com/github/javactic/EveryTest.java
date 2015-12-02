@@ -22,6 +22,7 @@ package com.github.javactic;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.function.Function;
 
 import org.junit.Assert;
 import static org.junit.Assert.*;
@@ -29,24 +30,67 @@ import org.junit.Test;
 
 import com.github.javactic.Every;
 
+import javaslang.collection.List;
+import javaslang.collection.Stream;
+
 public class EveryTest {
 
     @Test
-    public void hashCodeEqualsToString() {
-        Many<String> pair1 = Many.of("a", "b");
-        Many<String> pair2 = Many.of("a", "b");
-        assertEquals(pair1, pair2);
-        assertEquals(pair1.hashCode(), pair2.hashCode());
-        assertEquals(pair1.toString(), pair2.toString());
+    public void addString() {
+        Every<String> e = Every.of("a", "b", "c");
+        StringBuilder sb = e.addString(new StringBuilder());
+        assertEquals("abc", sb.toString());
+        sb = e.addString(new StringBuilder(), ":");
+        assertEquals("a:b:c", sb.toString());
+        sb = e.addString(new StringBuilder(), "[", ":", "]");
+        assertEquals("[a:b:c]", sb.toString());
+    }
+    
+    @Test
+    public void append() {
+        Every<String> e = Every.of("a", "b", "c");
+        assertEquals("d", e.append("d").last());
+        assertEquals("d", e.appendAll(Stream.of("d")).last());
+        assertEquals("d", e.appendAll(Every.of("d")).last());
+    }
+    
+    @Test
+    public void applyAndGet() {
+        Every<String> e = Every.of("a", "b", "c");
+        assertEquals("a", e.get(0)); // get calls apply, no separate test
+        assertEquals("c", e.getOrElse(2, i -> "x")); // idem
+        assertEquals("d", e.getOrElse(3, i -> "d"));
         
-        One<String> single1 = One.of("c");
-        One<String> single2 = One.of("c");
-        assertEquals(single1, single2);
-        assertEquals(single1.hashCode(), single2.hashCode());
-        assertEquals(single1.toString(), single2.toString());
-        
-        Assert.assertNotEquals(pair1, single1);
-        Assert.assertNotEquals(single2, pair2);
+        assertEquals("c", e.getOrElse(2, "x"));
+        assertEquals("d", e.getOrElse(3, "d"));
+    }
+    
+    @Test
+    public void compose() {
+        Every<String> e = Every.of("1", "2");
+        Function<String, String> compose = e.compose((String a) -> Integer.parseInt(a) -1);
+        assertEquals("1", compose.apply("1"));
+    }
+    
+    @Test
+    public void containsAndContainsSlice() {
+        Every<String> e = Every.of("a", "b", "b", "c");
+        assertTrue(e.contains("a"));
+        assertTrue(e.containsSlice(Stream.of("b", "c")));
+    }
+    
+    @Test
+    public void copyToArray() {
+        Every<String> e = Every.of("a", "b", "c");
+        String[] target = new String[2];
+        e.copyToArray(target);
+        assertEquals(List.of("a", "b"), List.of(target));
+        target = new String[4];
+        e.copyToArray(target);
+        assertEquals(List.of("a", "b", "c", null), List.of(target));
+        target = new String[1];
+        e.copyToArray(target, 4);
+        assertEquals(null, target[0]);
     }
     
 	@Test
