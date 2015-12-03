@@ -292,7 +292,67 @@ public class EveryBTest {
         assertEquals("4321", e2.reduceRight((s2, s1) -> s1 + s2));
         assertEquals("4321", e2.reduceRightOption((s2, s1) -> s1 + s2).get());
     }
+    
+    @Test
+    public void reverseMap() {
+        Every<Integer> e = Every.of(1,2,3,4);
+        assertEquals(Every.of("4","3","2","1"), e.reverseMap(i -> ""+i));
+    }
+    
+    @Test
+    public void endsWith() {
+        Every<Integer> e = Every.of(1,2,3,4);
+        assertTrue(e.endsWith(Stream.of(3,4)));
+    }
+    
+    @Test
+    public void flatMap() {
+        Every<Integer> e = Every.of(1,2,3,4);
+        Every<Integer> exp = Every.of(1,1,2,2,3,3,4,4);
+        assertEquals(exp, e.flatMap(i -> Many.of(i,i)));
+    }
+    
+    @Test
+    public void permutations() {
+        Every<Integer> e = Every.of(1,2,3);
+        Vector<Every<Integer>> permutations = Vector.ofAll(e.permutations());
+        assertTrue(permutations.contains(Every.of(1,2,3)));
+        assertTrue(permutations.contains(Every.of(2,3,1)));
+        assertTrue(permutations.contains(Every.of(3,1,2)));
+        assertTrue(permutations.contains(Every.of(1,3,2)));
+        assertTrue(permutations.contains(Every.of(2,1,3)));
+        assertTrue(permutations.contains(Every.of(3,2,1)));
+    }
+    
+    @Test
+    public void prefixSegmentLength() {
+        Every<Integer> e = Every.of(1,2,3);
+        assertEquals(2, e.prefixLength(i -> i < 3));
+        assertEquals(2, e.segmentLength(i -> i > 1, 1));
+    }
 	
+    @Test
+    public void scans() {
+        Every<String> e = Every.of("1","2","3");
+        Every<String> left = Every.of("z", "z1", "z12", "z123");
+        assertEquals(left, e.scan("z", (s1, s2) -> s1 + s2));
+        assertEquals(left, e.scanLeft("z", (acc, s2) -> acc + s2));
+        Every<String> right = Every.of("z321", "z32", "z3", "z");
+        assertEquals(right, e.scanRight("z", (s, acc) -> acc + s));
+    }
+    
+    @Test
+    public void sliding() {
+        Every<Integer> e = Every.of(1,2,3,4);
+        Iterator<Every<Integer>> slide = e.sliding(2);
+        assertEquals(Every.of(1, 2), slide.next());
+        assertEquals(Every.of(2, 3), slide.next());
+        assertEquals(Every.of(3, 4), slide.next());
+        slide = e.sliding(2, 2);
+        assertEquals(Every.of(1, 2), slide.next());
+        assertEquals(Every.of(3, 4), slide.next());
+    }
+    
 	@Test
 	public void patch() {
 		Every<String> e = Every.of("a", "b", "c");

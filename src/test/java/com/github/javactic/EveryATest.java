@@ -28,6 +28,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import javaslang.Tuple;
+import javaslang.collection.Stream;
 import javaslang.collection.Vector;
 
 public class EveryATest {
@@ -44,6 +45,7 @@ public class EveryATest {
         assertTrue(every.lastOption().isDefined());
         assertEquals(2, every.size());
         assertEquals(0, every.lengthCompare(2));
+        assertTrue(every.sameElements(Stream.of("a", "b")));
     }
     
     @Test
