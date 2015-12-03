@@ -28,6 +28,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import javaslang.Tuple;
+import javaslang.collection.Vector;
 
 public class EveryATest {
 
@@ -39,6 +40,19 @@ public class EveryATest {
         assertFalse(every.isDefinedAt(2));
         assertFalse(every.isDefinedAt(-1));
         assertFalse(every.isEmpty());
+        assertTrue(every.headOption().isDefined());
+        assertTrue(every.lastOption().isDefined());
+        assertEquals(2, every.size());
+        assertEquals(0, every.lengthCompare(2));
+    }
+    
+    @Test
+    public void reverse() {
+        Every<String> every = Every.of("a", "b");
+        Every<String> reversed = Every.of("b", "a");
+        assertEquals(reversed, every.reverse());
+        assertEquals(Vector.ofAll(every.reverse().iterator()), Vector.ofAll(every.reverseIterator()));
+        
     }
     
     @Test

@@ -21,7 +21,6 @@
 package com.github.javactic;
 
 import static com.github.javactic.Helper.fromNonEmptySeq;
-import static com.github.javactic.Helper.niy;
 
 import java.util.Comparator;
 import java.util.function.BiFunction;
@@ -579,7 +578,8 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
 
     /**
      * Converts this Every of Everys into an Every formed by the elements of the
-     * nested Everys.
+     * nested Everys. This is a static method because there's no way in Java to 
+     * require that T is an Every.
      * 
      * <pre class="stHighlighted">
      * Scalactic: def flatten[B](implicit ev: &lt;:&lt;[T, Every[B]]): Every[B]
@@ -589,10 +589,12 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      *            the type of the new Every
      * @return a new Every resulting from concatenating all nested Everys.
      */
-    default <B> Every<B> flatten() {
-        return niy();
-//        return fromNonEmptySeq(toVector().<B> flatten());
-        // TODO test
+    static <B> Every<B> flatten(Every<? extends Every<B>> every) {
+        Vector<B> acc = Vector.empty();
+        for(Every<B> nested: every) {
+            acc = acc.appendAll(nested.toVector());
+        }
+        return fromNonEmptySeq(acc);
     }
 
     /**
@@ -829,11 +831,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      *         satisfies the predicate p, or -1, if none exists.
      */
     default int indexWhere(Predicate<? super T> p, int from) {
-        for (int i = from; i < length(); i++) {
-            if (p.test(toVector().get(i)))
-                return i;
-        }
-        return -1;
+        return toVector().indexWhere(p, from);
     }
 
     /**
@@ -950,7 +948,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      *         predicate p, or -1, if none exists.
      */
     default int lastIndexWhere(Predicate<? super T> p) {
-        return lastIndexWhere(p, 0);
+        return toVector().lastIndexWhere(p);
     }
 
     /**
@@ -969,12 +967,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      *         satisfies the predicate p, or -1, if none exists.
      */
     default int lastIndexWhere(Predicate<? super T> p, int end) {
-        int e = Math.min(end, length());
-        for (int i = e; i >= 0; i--) {
-            if (p.test(toVector().get(i)))
-                return i;
-        }
-        return -1;
+        return toVector().lastIndexWhere(p, end);
     }
 
     /**
@@ -1303,19 +1296,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      * @return an iterator yielding the elements of this Every in reversed order
      */
     default Iterator<T> reverseIterator() {
-        return new Iterator<T>() {
-            private int i = length();
-
-            @Override
-            public boolean hasNext() {
-                return i > 0;
-            }
-
-            @Override
-            public T next() {
-                return toVector().get(--i);
-            }
-        };
+        return toVector().reverseIterator();
     }
 
     /**
