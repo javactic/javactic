@@ -46,10 +46,10 @@ import javaslang.control.Try;
  * 
  * <h1>Motivation for Or</h1>
  * 
- * Please refer to the original documentation for the
- * <a href="http://www.scalactic.org/">Scalactic</a> library on
- * <a href="http://www.scalactic.org/user_guide/OrAndEvery">Ors and Everys</a>
- * as well as the corresponding
+ * Please refer to <a href="http://javactic.github.io/javactic/">the
+ * documentation</a> for more information. You can also check to the original
+ * documentation for the <a href="http://www.scalactic.org/">Scalactic</a>
+ * library or the corresponding
  * <a href="http://doc.scalatest.org/2.2.4/index.html#org.scalactic.Or">Scaladoc
  * </a>.
  * 
@@ -378,20 +378,28 @@ public interface Or<G, B> {
     Either<B, G> toEither();
 
     /**
-     * Returns a {@link Try}: a {@link Success} containing the {@link Good} value, if this is a
-     * {@link Good}; a {@link Failure} containing the {@link Bad} value, if this is a {@link Bad}.
+     * Returns a {@link Try}: a {@link Success} containing the {@link Good}
+     * value if the given Or is a {@link Good}; a {@link Failure} containing
+     * the {@link Bad} value if it's a {@link Bad}.
      *
      * <p>
-     * Note: If the {@link Bad} type of this {@link Or} is not a subclass of {@link Throwable} 
-     * (or {@link Throwable} itself) the cause of the {@link Failure} will be a {@link IllegalArgumentException}
-     * containing as message the string value of the {@link Bad}.
+     * Note: This is a static method because there is no way in Java to require
+     * implicit evidence about the type of Bad.
      * 
-     * <pre class="stHighlighted">Scalactic: def toTry(implicit ev: &lt;:&lt;[B, Throwable]): Try[G] </pre>
+     * <pre class="stHighlighted">
+     * Scalactic: def toTry(implicit ev: &lt;:&lt;[B, Throwable]): Try[G]
+     * </pre>
      *
-     * @return this {@link Good} value, wrapped in a {@link Success}, or this {@link Bad} value, wrapped in
-     *         a {@link Failure}.
+     * @param <G> the good type of the Or
+     * @param <T> the bad type of the Or, a subtype of Throwable
+     * @param or an instance of {@link Or}
+     * @return this {@link Good} value, wrapped in a {@link Success}, or this
+     *         {@link Bad} value, wrapped in a {@link Failure}.
      */
-    Try<G> toTry();
+    static <G, T extends Throwable> Try<G> toTry(Or<G,T> or) {
+        if(or.isGood()) return new Success<>(or.get());
+        else return new Failure<>(or.getBad());
+    }
 
     /**
      * Converts this {@link Or} into anything produced by the given converter.

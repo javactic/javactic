@@ -107,17 +107,17 @@ public class AccumulationTest {
 	public void zips() {
 		Function<Or<String, Every<String>>[], Or<?, Every<String>>> fun = ors -> Accumulation.zip(ors[0], ors[1]);
 		testWithF(fun, 2);
-		fun = o -> Accumulation.zip(o[0], o[1], o[2]);
+		fun = o -> Accumulation.zip3(o[0], o[1], o[2]);
 		testWithF(fun, 3);
-		fun = o -> Accumulation.zip(o[0],o[1],o[2],o[3]);
+		fun = o -> Accumulation.zip4(o[0],o[1],o[2],o[3]);
 		testWithF(fun, 4);
-		fun = o -> Accumulation.zip(o[0],o[1],o[2],o[3],o[4]);
+		fun = o -> Accumulation.zip5(o[0],o[1],o[2],o[3],o[4]);
 		testWithF(fun, 5);
-		fun = o -> Accumulation.zip(o[0],o[1],o[2],o[3],o[4],o[5]);
+		fun = o -> Accumulation.zip6(o[0],o[1],o[2],o[3],o[4],o[5]);
 		testWithF(fun, 6);
-		fun = o -> Accumulation.zip(o[0],o[1],o[2],o[3],o[4],o[5],o[6]);
+		fun = o -> Accumulation.zip7(o[0],o[1],o[2],o[3],o[4],o[5],o[6]);
 		testWithF(fun, 7);
-		fun = o -> Accumulation.zip(o[0],o[1],o[2],o[3],o[4],o[5],o[6],o[7]);
+		fun = o -> Accumulation.zip8(o[0],o[1],o[2],o[3],o[4],o[5],o[6],o[7]);
 		testWithF(fun, 8);
 		
 	}

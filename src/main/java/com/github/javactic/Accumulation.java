@@ -172,14 +172,14 @@ public final class Accumulation {
 		return withGood(a, b, Tuple::of);
 	}
 	
-	public static <A,B,C,ERR> Or<Tuple3<A,B,C>, Every<ERR>> zip(
+	public static <A,B,C,ERR> Or<Tuple3<A,B,C>, Every<ERR>> zip3(
 			Or<A, ? extends Every<ERR>> a,
 			Or<B, ? extends Every<ERR>> b,
 			Or<C, ? extends Every<ERR>> c) {
 		return withGood(a, b, c, Tuple::of);
 	}
 	
-	public static <A,B,C,D,ERR> Or<Tuple4<A,B,C,D>, Every<ERR>> zip(
+	public static <A,B,C,D,ERR> Or<Tuple4<A,B,C,D>, Every<ERR>> zip4(
 			Or<A, ? extends Every<ERR>> a,
 			Or<B, ? extends Every<ERR>> b,
 			Or<C, ? extends Every<ERR>> c,
@@ -187,7 +187,7 @@ public final class Accumulation {
 		return withGood(a, b, c, d, Tuple::of);
 	}
 	
-	public static <A,B,C,D,E,ERR> Or<Tuple5<A,B,C,D,E>, Every<ERR>> zip(
+	public static <A,B,C,D,E,ERR> Or<Tuple5<A,B,C,D,E>, Every<ERR>> zip5(
 			Or<A, ? extends Every<ERR>> a,
 			Or<B, ? extends Every<ERR>> b,
 			Or<C, ? extends Every<ERR>> c,
@@ -196,7 +196,7 @@ public final class Accumulation {
 		return withGood(a, b, c, d, e, Tuple::of);
 	}
 	
-	public static <A,B,C,D,E,F,ERR> Or<Tuple6<A,B,C,D,E,F>, Every<ERR>> zip(
+	public static <A,B,C,D,E,F,ERR> Or<Tuple6<A,B,C,D,E,F>, Every<ERR>> zip6(
 			Or<A, ? extends Every<ERR>> a,
 			Or<B, ? extends Every<ERR>> b,
 			Or<C, ? extends Every<ERR>> c,
@@ -206,7 +206,7 @@ public final class Accumulation {
 		return withGood(a, b, c, d, e, f, Tuple::of);
 	}
 	
-	public static <A,B,C,D,E,F,G,ERR> Or<Tuple7<A,B,C,D,E,F,G>, Every<ERR>> zip(
+	public static <A,B,C,D,E,F,G,ERR> Or<Tuple7<A,B,C,D,E,F,G>, Every<ERR>> zip7(
 			Or<A, ? extends Every<ERR>> a,
 			Or<B, ? extends Every<ERR>> b,
 			Or<C, ? extends Every<ERR>> c,
@@ -217,7 +217,7 @@ public final class Accumulation {
 		return withGood(a, b, c, d, e, f, g, Tuple::of);
 	}
 	
-	public static <A,B,C,D,E,F,G,H,ERR> Or<Tuple8<A,B,C,D,E,F,G,H>, Every<ERR>> zip(
+	public static <A,B,C,D,E,F,G,H,ERR> Or<Tuple8<A,B,C,D,E,F,G,H>, Every<ERR>> zip8(
 			Or<A, ? extends Every<ERR>> a,
 			Or<B, ? extends Every<ERR>> b,
 			Or<C, ? extends Every<ERR>> c,

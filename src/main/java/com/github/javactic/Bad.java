@@ -29,10 +29,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import javaslang.control.Either;
-import javaslang.control.Failure;
 import javaslang.control.Left;
 import javaslang.control.Option;
-import javaslang.control.Try;
 
 /**
  * Contains a "bad" value.
@@ -185,14 +183,6 @@ public class Bad<G,B> implements Or<G,B> {
 	@Override
 	public Either<B, G> toEither() {
 		return new Left<>(value);
-	}
-
-	@Override
-	public Try<G> toTry() {
-	    if(value instanceof Throwable) 
-	        return new Failure<>((Throwable) value);
-	    else 
-	        return new Failure<>(new IllegalArgumentException(value.toString()));
 	}
 
 	@Override

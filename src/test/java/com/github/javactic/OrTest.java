@@ -246,14 +246,10 @@ public class OrTest {
 		assertEquals("good", Or.good("good").toEither().right().get());
 		assertEquals("bad", Or.bad("bad").toEither().left().get());
 		
-		assertEquals(Try.of(() -> "good"), Good.of("good").toTry());
-		assertEquals(
-				"foo", 
-				Bad.of("foo").toTry().getCause().getMessage());
-		
+		assertEquals(Try.of(() -> "good"), Or.toTry(Good.of("good")));
 		assertEquals(
 				new RuntimeException().getClass(), 
-				Bad.of(new RuntimeException()).toTry().getCause().getClass());
+				Or.toTry(Bad.of(new RuntimeException())).getCause().getClass());
 		
 	}
 	

@@ -49,7 +49,7 @@ import java.util.NoSuchElementException;
  * <pre>{@code
  * Or.<Integer, String>good(123).filter(this::isRound).filter(this::isDivBy3);
  * // Result: Bad(123 was not a round number)
- * }}</pre>
+ * }</pre>
  *
  * <p>
  * {@link Validation}s can also be used to accumulate error using <code>when</code>, a method that's made available by class {@link Accumulation}
@@ -65,7 +65,7 @@ import java.util.NoSuchElementException;
  * }</pre>
  *
  * <p>
- * Note: You can think of <code>Validation</code> as an "<code>Option</code> with attitude," where <code>Pass</code> is 
+ * Note: You can think of <code>Validation</code> as a "mirror <code>Option</code>", where <code>Pass</code> is 
  * a <code>None</code> that indicates validation success and <code>Fail</code> is a <code>Some</code> whose value describes 
  * the validation failure.
  * </p>

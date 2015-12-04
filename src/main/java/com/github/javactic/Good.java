@@ -31,8 +31,6 @@ import java.util.function.Supplier;
 import javaslang.control.Either;
 import javaslang.control.Option;
 import javaslang.control.Right;
-import javaslang.control.Success;
-import javaslang.control.Try;
 
 /**
  * Contains a "good" value.
@@ -156,12 +154,6 @@ public class Good<G,B> implements Or<G,B> {
 	public Either<B, G> toEither() {
 		return new Right<>(value);
 	}
-
-	@Override
-	public Try<G> toTry() {
-		return new Success<>(value);
-	}
-
 
 	@Override
 	public boolean isGood() {
