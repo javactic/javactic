@@ -32,10 +32,6 @@ class Helper {
 		return Every.of(seq.head(), seq.tail());
 	}
 	
-	static <X> X niy() {
-		throw new UnsupportedOperationException("until basetype implements required functionality");
-	}
-	
     static String parse(String msg, Object... args) {
         if(msg == null) return msg;
         for (Object arg : args) {

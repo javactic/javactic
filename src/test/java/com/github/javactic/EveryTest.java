@@ -22,24 +22,120 @@ package com.github.javactic;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.function.IntFunction;
+import java.util.function.IntPredicate;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import javaslang.Tuple;
 import javaslang.collection.List;
 import javaslang.collection.Map;
 import javaslang.collection.Stream;
 import javaslang.collection.Vector;
+import javaslang.control.Option;
 
-public class EveryBTest {
+public class EveryTest {
 
+    @Test
+    public void testTrivial() {
+        Every<String> every = Every.of("a", "b");
+        assertTrue(every.isDefinedAt(0));
+        assertTrue(every.isDefinedAt(1));
+        assertFalse(every.isDefinedAt(2));
+        assertFalse(every.isDefinedAt(-1));
+        assertFalse(every.isEmpty());
+        assertTrue(every.headOption().isDefined());
+        assertTrue(every.lastOption().isDefined());
+        assertEquals(2, every.size());
+        assertEquals(0, every.lengthCompare(2));
+        assertTrue(every.sameElements(Stream.of("a", "b")));
+        assertTrue(every.nonEmpty());
+        assertNull(Helper.parse(null));
+    }
+    
+    @Test
+    public void reverse() {
+        Every<String> every = Every.of("a", "b");
+        Every<String> reversed = Every.of("b", "a");
+        assertEquals(reversed, every.reverse());
+        assertEquals(Vector.ofAll(every.reverse().iterator()), Vector.ofAll(every.reverseIterator()));
+        
+    }
+    
+    @Test
+    public void testConversions() {
+        Every<String> every = Every.of("a", "b");
+        assertEquals(every.length(), every.toArray().length());
+        assertEquals(every.length(), every.toJavaArray(String.class).length);
+        assertEquals(every.length(), every.toJavaList().size());
+        assertEquals(every.length(), every.toJavaMap(s -> Tuple.of(s, s)).size());
+        assertEquals(every.length(), every.toJavaSet().size());
+        assertEquals(every.length(), every.toJavaStream().count());
+        assertEquals(every.length(), every.toList().length());
+        assertEquals(every.length(), every.toMap(s -> Tuple.of(s, s)).length());
+        assertEquals(every.length(), every.toSeq().length());
+        assertEquals(every.length(), every.toSet().length());
+        assertEquals(every.length(), every.toStream().length());
+        assertEquals(every.length(), every.toTraversable().length());
+        assertEquals(every.length(), every.toVector().length());
+    }
+    
+    @Test
+    public void hashCodeEqualsToString() {
+        Many<String> pair1 = Many.of("a", "b");
+        Many<String> pair2 = Many.of("a", "b");
+        assertEquals(pair1, pair2);
+        assertEquals(pair1.hashCode(), pair2.hashCode());
+        assertEquals(pair1.toString(), pair2.toString());
+        
+        One<String> single1 = One.of("c");
+        One<String> single2 = One.of("c");
+        assertEquals(single1, single2);
+        assertEquals(single1.hashCode(), single2.hashCode());
+        assertEquals(single1.toString(), single2.toString());
+        
+        assertNotEquals(pair1, single1);
+        assertNotEquals(single2, pair2);
+    }
+    
+    @Test
+    public void lift() {
+        Every<Integer> e = Every.of(4,8,12);
+        IntFunction<Option<Integer>> lift = e.lift();
+        assertEquals(8, lift.apply(1).get().intValue());
+        assertTrue(lift.apply(3).isEmpty());
+    }
+    
+    @Test
+    public void orElse() {
+        Every<Integer> e = Every.of(4,8,12);
+        IntFunction<Integer> orElse = e.orElse(i -> 66);
+        assertEquals(8, orElse.apply(1).intValue());
+        assertEquals(66, orElse.apply(5).intValue());
+    }
+    
+    @Test
+    public void runWith() {
+        Every<Integer> e = Every.of(4,8,12);
+        AtomicReference<String> ref = new AtomicReference<>();
+        IntPredicate runWith = e.runWith(i -> ref.set(""+i));
+        assertFalse(runWith.test(6));
+        assertNull(ref.get());
+        assertTrue(runWith.test(1));
+        assertEquals("8", ref.get());
+    }
+    
     @Test
     public void addString() {
         Every<String> e = Every.of("a", "b", "c");
@@ -369,9 +465,84 @@ public class EveryBTest {
 
 	@Test
 	public void sortWith() {
-		Every<Integer> e = Every.of(3,6,1,7);
-		Every<Integer> sorted = e.sortWith((l,r) -> l < r);
-		assertEquals(Every.of(1,3,6,7), sorted);
+		Every<Integer> e = Every.of(3,6,1,7,7);
+		Every<Integer> increasing = e.sortWith((l,r) -> l < r);
+		assertEquals(Every.of(1,3,6,7,7), increasing);
+		Every<Integer> decreasing = e.sortWith((l,r) -> l > r);
+		assertEquals(Every.of(7,7,6,3,1), decreasing);
+		assertEquals(Every.of(7, 7, 6, 3, 1), e.sortBy(i -> -i));
+		
+		assertEquals(Every.of(1,3,6,7,7), e.sorted());
+		assertEquals(Every.of(1,3,6,7,7), e.sorted(Comparator.naturalOrder()));
+	}
+	
+	@Test
+	public void startsWith() {
+	    Every<Integer> e = Every.of(1,2,3,1,2,3);
+	    assertTrue(e.startsWith(Stream.of(1,2)));
+	    assertTrue(e.startsWith(Stream.of(3,1), 2));
+	}
+	
+	@Test
+	public void union() {
+	    Every<Integer> e1 = Every.of(1,2,3);
+	    Every<Integer> e2 = Every.of(3,2,1);
+	    assertEquals(Every.of(1,2,3,3,2,1), e1.union(e2));
+	}
+	
+	@Test
+	public void unzips() {
+	    Every<Integer> e = Every.of(1,2,3);
+	    assertEquals(Tuple.of(Every.of(1,2,3), Every.of(-1,-2,-3)), e.unzip(i -> Tuple.of(i, -i)));
+	    assertEquals(Tuple.of(Every.of(1,2,3), Every.of("1","2","3"), Every.of(-1,-2,-3)), e.unzip3(i -> Tuple.of(i, ""+i, -i)));
+	}
+	
+	@Test
+	public void updated() {
+	    Every<Integer> e = Every.of(1,2,3);
+	    assertEquals(Every.of(1,-2,3), e.updated(1, -2));
+	}
+	
+	@Test
+	public void zips() {
+	    Every<Integer> e = Every.of(1,2);
+	    assertEquals(Every.of(Tuple.of(1,5), Tuple.of(2,9)), e.zipAll(List.of(5), 0, 9));
+	    assertEquals(Every.of(Tuple.of(1,5), Tuple.of(2,6), Tuple.of(0,7)), e.zipAll(List.of(5,6,7), 0, 19));
+	    Every<String> e2 = Every.of("A", "B");
+	    assertEquals(Every.of(Tuple.of("A",0), Tuple.of("B",1)), e2.zipWithIndex());
+	}
+	
+	@Test
+	public void productSum() {
+	    Every<Integer> e = Every.of(4,4);
+	    assertEquals(16, e.product());
+	    assertEquals(8, e.sum());
+	}
+	
+	@Test
+	public void prepend(){
+	    Every<Integer> e = Every.of(2,3);
+	    assertEquals(Every.of(1,2,3), e.prepend(1));
+	}
+	
+	@Test
+	public void mkString() {
+	    Every<Integer> e = Every.of(4,5,6);
+	    assertEquals("{4:5:6}", e.mkString("{", ":", "}"));
+	    assertEquals("4:5:6", e.mkString(":"));
+	    assertEquals("456", e.mkString());
+	}
+	
+	@Test
+	public void exists() {
+	    Every<Integer> e = Every.of(4,5,6);
+	    assertTrue(e.exists(i -> i == 5));
+	}
+	
+	@Test
+	public void find() {
+	    Every<Integer> e = Every.of(4,8,12);
+	    assertEquals(8, e.find(i -> i > 4).get().intValue());
 	}
 	
 }

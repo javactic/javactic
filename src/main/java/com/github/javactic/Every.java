@@ -1863,7 +1863,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      *         same
      */
     default Every<T> union(Iterable<T> that) {
-        return fromNonEmptySeq(toVector().appendAll(that)).distinct();
+        return fromNonEmptySeq(toVector().appendAll(that));
     }
 
     /**
