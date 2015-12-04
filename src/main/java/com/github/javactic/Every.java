@@ -587,6 +587,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      * 
      * @param <B>
      *            the type of the new Every
+     * @param every the Every to flatten
      * @return a new Every resulting from concatenating all nested Everys.
      */
     static <B> Every<B> flatten(Every<? extends Every<B>> every) {
