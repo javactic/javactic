@@ -23,22 +23,16 @@ package com.github.javactic;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javaslang.collection.Vector;
-
 import org.junit.Test;
 
-import com.github.javactic.Accumulation;
-import com.github.javactic.Every;
-import com.github.javactic.Fail;
-import com.github.javactic.One;
-import com.github.javactic.Or;
-import com.github.javactic.Pass;
-import com.github.javactic.Validation;
+import javaslang.collection.Vector;
 
 public class AccumulationTest {
 
@@ -121,6 +115,16 @@ public class AccumulationTest {
 		testWithF(fun, 8);
 		
 	}
+	
+    @Test
+    public void constructorsForCoverage() throws Exception {
+        Constructor<Accumulation> constructor = Accumulation.class.getDeclaredConstructor();
+        assertTrue(Modifier.isPrivate(constructor.getModifiers()));
+        constructor.setAccessible(true);
+        constructor.newInstance();
+        
+        new Helper();
+    }
 	
 	private void testWithF(Function<Or<String, Every<String>>[], Or<?, Every<String>>> f, int size) {
 		@SuppressWarnings("unchecked")

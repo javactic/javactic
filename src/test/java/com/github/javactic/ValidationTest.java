@@ -71,5 +71,13 @@ public class ValidationTest {
 	    assertNotEquals(a1, null);
 	    assertEquals(a1.toString(), a2.toString());
 	    assertEquals(a1.hashCode(), a2.hashCode());
+	    
+	    a1 = Fail.of(null);
+	    a2 = Fail.of(null);
+	    assertEquals(a1, a2);
+	    assertEquals(a2, a1);
+	    assertNotEquals(a1, b1);
+	    assertEquals(a1.hashCode(), a2.hashCode());
+	    
 	}
 }

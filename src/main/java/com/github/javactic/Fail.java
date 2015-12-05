@@ -21,7 +21,6 @@
 package com.github.javactic;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 /**
  * Indicates a validation failed, describing the failure with a contained error value.
@@ -45,7 +44,6 @@ public class Fail<T> implements Validation<T>, Serializable {
     }
     
 	Fail(T error) {
-        Objects.requireNonNull(error, "fail error cannot be null");
 		this.error = error;
 	}
 	

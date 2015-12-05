@@ -21,7 +21,6 @@
 package com.github.javactic;
 
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -50,7 +49,6 @@ public class Bad<G,B> implements Or<G,B> {
 	final B value;
 	
 	Bad(B bad) {
-        Objects.requireNonNull(bad, "bad value cannot be null");
 		value = bad;
 	}
 	

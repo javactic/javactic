@@ -316,4 +316,23 @@ public class OrTest {
         assertEquals(Bad.ofOneString("BofOneString"), Bad.ofOneString("BofOneString"));
 	}
 	
+	@Test
+	public void nullEquals() {
+	    Good<String, String> g1 = Good.of(null);
+	    Good<String, String> g2 = Good.of(null);
+	    Good<String, String> g3 = Good.of("");
+        assertEquals(g1, g2);
+        assertEquals(g2, g1);
+        assertNotEquals(g1, g3);
+        assertEquals(g1.hashCode(), g2.hashCode());
+        
+        Bad<String, String> b1 = Bad.of(null);
+        Bad<String, String> b2 = Bad.of(null);
+        Bad<String, String> b3 = Bad.of("");
+        assertEquals(b1, b2);
+        assertEquals(b2, b1);
+        assertNotEquals(b1, b3);
+        assertEquals(b1.hashCode(), b2.hashCode());        
+	}
+	
 }

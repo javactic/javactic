@@ -184,15 +184,21 @@ public class EveryTest {
     @Test
     public void copyToArray() {
         Every<String> e = Every.of("a", "b", "c");
-        String[] target = new String[2];
+        String[] target = new String[2]; // target < this
         e.copyToArray(target);
         assertEquals(List.of("a", "b"), List.of(target));
-        target = new String[4];
+        
+        target = new String[4]; // target > this
         e.copyToArray(target);
         assertEquals(List.of("a", "b", "c", null), List.of(target));
-        target = new String[1];
-        e.copyToArray(target, 4);
+        
+        target = new String[1]; 
+        e.copyToArray(target, 4, 10);
         assertEquals(null, target[0]);
+        
+        target = new String[5];
+        e.copyToArray(target, 0, 10);
+        assertEquals(List.of("a", "b", "c", null, null), List.of(target));
     }
     
     @Test
@@ -338,6 +344,7 @@ public class EveryTest {
 	    Every<Integer> e = Every.of(1,2,3,1,2,3);
 	    Stream<Integer> s = Stream.of(1,2,3);
 	    assertEquals(3, e.lastIndexOfSlice(s));
+	    assertEquals(3, e.lastIndexOfSlice(s, 6));
 	    // assertEquals(0, e.lastIndexOfSlice(s, 2)); Javaslang bug
 	}
 	
