@@ -2,7 +2,7 @@
 <project default="javadoc">
     <target name="javadoc">
         <javadoc access="public" author="true" 
-        	classpath="/home/mvh/.m2/repository/com/javaslang/javaslang/2.0.0-beta/javaslang-2.0.0-beta.jar" 
+        	classpath="/home/mvh/.m2/repository/com/javaslang/javaslang/2.0.0-RC2/javaslang-2.0.0-RC2.jar" 
         	destdir="../../Documents/javactic/javadoc/" 
         	doctitle="Javactic API"
         	windowtitle="Javactic API"
