@@ -45,13 +45,13 @@ public class AccumulationTest {
 	
 	@Test
 	public void testCombined() {
-		Vector<Or<String, Every<String>>> vec = Vector.of(Or.good("A"), Or.good("B"));
+		Vector<Or<String, Every<String>>> vec = Vector.of(Good.of("A"), Good.of("B"));
 		Or<Vector<String>, Every<String>> result = Accumulation.combined(vec, Vector.collector());
 		assertTrue(result.isGood());
 		assertEquals("A", result.get().head());
 		assertEquals("B", result.get().tail().head());
 		
-		List<Or<String, Every<String>>> list = Arrays.asList(Or.good("A"), Or.bad(Every.of("B")));
+		List<Or<String, Every<String>>> list = Arrays.asList(Good.of("A"), Bad.of(Every.of("B")));
 		Or<List<String>, Every<String>> result2 = Accumulation.combined(list, Collectors.toList());
 		assertTrue(result2.isBad());
 		assertEquals("B", result2.getBad().head());
@@ -61,8 +61,8 @@ public class AccumulationTest {
 	public void testValidatedBy() {
 		Vector<Integer> vec = Vector.of(1,2,3);
 		Function<Integer, Or<Integer, Every<String>>> f = i -> {
-			if(i < 10) return Or.good(i);
-			else return Or.bad(One.of("wasn't under 10"));
+			if(i < 10) return Good.of(i);
+			else return Bad.of(One.of("wasn't under 10"));
 		};
 		Or<Vector<Integer>, Every<String>> res = Accumulation.validatedBy(vec, f, Vector.collector());
 		assertTrue(res.isGood());
@@ -76,11 +76,11 @@ public class AccumulationTest {
 	public void testWhen() {
 		Function<String, Validation<String>> f1 = f -> f.startsWith("s") ? Pass.instance() : Fail.of("does not start with s");
 		Function<String, Validation<String>> f2 = f -> f.length() > 4 ? Fail.of("too long") : Pass.instance();
-		Or<String, Every<String>> res = Accumulation.when(Or.bad(One.of("bad")), f1, f2);
+		Or<String, Every<String>> res = Accumulation.when(Bad.of(One.of("bad")), f1, f2);
 		assertEquals("bad", res.getBad().get(0));
-		res = Accumulation.when(Or.good("sub"), f1, f2);
+		res = Accumulation.when(Good.of("sub"), f1, f2);
 		assertTrue(res.isGood());
-		res = Accumulation.when(Or.good("fubiluuri"), f1, f2);
+		res = Accumulation.when(Good.of("fubiluuri"), f1, f2);
 		assertTrue(res.isBad());
 	}
 	
@@ -127,8 +127,8 @@ public class AccumulationTest {
 		Or<String, Every<String>>[] ors = new Or[size];
 		for(int i = 0; i <= ors.length; i++){
 			for(int j = 0; j < ors.length; j++) {
-				if(j == i) ors[j] = Or.bad(One.of("bad"));
-				else ors[j] = Or.good("good");
+				if(j == i) ors[j] = Bad.of(One.of("bad"));
+				else ors[j] = Good.of("good");
 			}
 			Or<?, Every<String>> val = f.apply(ors);
 			if(i < ors.length)

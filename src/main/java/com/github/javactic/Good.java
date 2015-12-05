@@ -115,7 +115,7 @@ public class Good<G,B> implements Or<G,B> {
 	}
 
 	@Override
-	public G getOrElse(Supplier<? extends G> alt) {
+	public G getOrElse(Function<? super B, ? extends G> def) {
 		return value;
 	}
 
@@ -123,7 +123,12 @@ public class Good<G,B> implements Or<G,B> {
 	public Or<G,B> orElse(Supplier<? extends Or<G,B>> alt) {
 		return this;
 	}
-
+	
+	@Override
+	public Or<G, B> orElse(Or<G, B> alt) {
+	    return this;
+	}
+	
 	@Override
 	public Or<G, B> recover(Function<? super B, ? extends G> func) {
 		return this;
@@ -137,7 +142,7 @@ public class Good<G,B> implements Or<G,B> {
 
 	@Override
 	public Or<B, G> swap() {
-		return Or.bad(value);
+		return Bad.of(value);
 	}
 	
 	@Override

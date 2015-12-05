@@ -21,6 +21,7 @@
 package com.github.javactic;
 
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -63,6 +64,60 @@ import javaslang.control.Try;
 public interface Or<G, B> {
 
     /**
+     * Transforms an {@link Option} into an Or.
+     * 
+     * @param <G> the {@link Good} type 
+     * @param <B> the {@link Bad} type
+     * @param option the Option to transform
+     * @param bad a Supplier used to get the bad value if the given Option is None
+     * @return an Or
+     */
+    public static <G, B> Or<G, B> from(Option<G> option, Supplier<B> bad) {
+        Objects.requireNonNull(option, "option cannot be null");
+        return option.map(Or::<G,B>good).orElseGet(() -> Bad.of(bad.get()));
+    }
+    
+    /**
+     * Transforms an {@link Option} into an Or.
+     * 
+     * @param <G> the {@link Good} type 
+     * @param <B> the {@link Bad} type
+     * @param option the Option to transform
+     * @param bad the value to use for the Bad if the given option is None
+     * @return an Or
+     */
+    public static <G, B> Or<G, B> from(Option<G> option, B bad) {
+        Objects.requireNonNull(option, "option cannot be null");
+        return option.map(Or::<G,B>good).orElse(Bad.of(bad));
+    }
+    
+    /**
+     * Transforms an {@link Either} into an Or.
+     * 
+     * @param <G> the {@link Good} type 
+     * @param <B> the {@link Bad} type
+     * @param either the Either to transform
+     * @return an Or
+     */
+    public static <B, G> Or<G, B> from(Either<B, G> either) {
+        Objects.requireNonNull(either, "either cannot be null");
+        if(either.isRight()) return Good.of(either.right().get());
+        else return Bad.of(either.left().get());
+    }
+
+    /**
+     * Transforms a {@link Try} into an Or.
+     * 
+     * @param <G> the {@link Good} type 
+     * @param theTry the Try to transform into an Or
+     * @return an Or
+     */
+    public static <G> Or<G, Throwable> from(Try<G> theTry) {
+        Objects.requireNonNull(theTry, "try cannot be null");
+        return theTry.map(Or::<G,Throwable>good).orElseGet(t -> Bad.of(t));
+    }
+    
+    /**
      * Builds a {@link Good} from the given {@link Optional} if it is defined, or a {@link Bad} if it is not using 
      * the given argument.  
      * 
@@ -73,7 +128,21 @@ public interface Or<G, B> {
      * @return an instance of {@link Or}
      */
     public static <G, B> Or<G, B> fromJavaOptional(Optional<G> optional, B bad) {
-        return optional.<Or<G, B>> map(Or::good).orElse(Or.bad(bad));
+        return optional.map(Or::<G,B>good).orElse(Bad.of(bad));
+    }
+
+    /**
+     * Builds a {@link Good} from the given {@link Optional} if it is defined, or a {@link Bad} if it is not using 
+     * the given argument.  
+     * 
+     * @param <G> the {@link Good} type 
+     * @param <B> the {@link Bad} type
+     * @param optional the {@link Optional} whose value to use to build a {@link Good} if it is defined
+     * @param bad the supplier to use to get the value for a {@link Bad} if the given {@link Optional} is not defined
+     * @return an instance of {@link Or}
+     */
+    public static <G, B> Or<G, B> fromJavaOptional(Optional<G> optional, Supplier<B> bad) {
+        return optional.map(Or::<G,B>good).orElseGet(() -> Bad.of(bad.get()));
     }
 
     /**
@@ -98,8 +167,8 @@ public interface Or<G, B> {
      * @param value the good value
      * @return an instance of {@link Good}
      */
-    public static <G, B> Good<G, B> good(G value) {
-        return new Good<G, B>(value);
+    public static <G, B> Or<G, B> good(G value) {
+        return Good.of(value);
     }
 
     /**
@@ -110,8 +179,8 @@ public interface Or<G, B> {
      * @param value the bad value
      * @return an instance of {@link Bad}
      */
-    public static <G, B> Bad<G, B> bad(B value) {
-        return new Bad<G, B>(value);
+    public static <G, B> Or<G, B> bad(B value) {
+        return Bad.of(value);
     }
 
     /**
@@ -292,7 +361,7 @@ public interface Or<G, B> {
      * @return the contained value, if this {@link Or} is a {@link Good}, else the result of evaluating the
      *         given <span class="jCode">default</span>
      */
-    G getOrElse(Supplier<? extends G> def);
+    G getOrElse(Function<? super B, ? extends G> def);
 
     /**
      * Returns this {@link Or} if it is a {@link Good}, otherwise returns the result of evaluating the passed
@@ -300,12 +369,25 @@ public interface Or<G, B> {
      * 
      * <pre class="stHighlighted">Scalactic: def orElse[H &gt;: G, C &gt;: B](alternative: =&gt; Or[H, C]): Or[H, C] </pre>
      *
-     * @param alt the alternative by-name to evaluate if this {@link Or} is a {@link Bad}
+     * @param alt the alternative supplier to evaluate if this {@link Or} is a {@link Bad}
      * @return this {@link Or}, if it is a {@link Good}, else the result of evaluating
      *         <span class="jCode">alt</span>
      */
     Or<G, B> orElse(Supplier<? extends Or<G, B>> alt);
-
+    
+    
+    /**
+     * Returns this {@link Or} if it is a {@link Good}, otherwise returns the passed
+     * <span class="jCode">alt</span>.
+     * 
+     * <pre class="stHighlighted">Scalactic: def orElse[H &gt;: G, C &gt;: B](alternative: =&gt; Or[H, C]): Or[H, C] </pre>
+     *
+     * @param alt the alternative to return if this {@link Or} is a {@link Bad}
+     * @return this {@link Or}, if it is a {@link Good}, else the result of evaluating
+     *         <span class="jCode">alt</span>
+     */
+    Or<G, B> orElse(Or<G, B> alt);
+    
     /**
      * Maps the given function to this {@link Or}'s value if it is a {@link Bad}, transforming it into a
      * {@link Good}, or returns <span class="jCode">this</span> if it is already a {@link Good}.

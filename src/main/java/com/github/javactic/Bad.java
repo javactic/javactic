@@ -101,7 +101,7 @@ public class Bad<G,B> implements Or<G,B> {
 
 	@Override
 	public <C> Or<G, C> badMap(Function<? super B, ? extends C> mapper) {
-		return Or.bad(mapper.apply(value));
+		return Bad.of(mapper.apply(value));
 	}
 
 	@Override
@@ -146,18 +146,23 @@ public class Bad<G,B> implements Or<G,B> {
 	}
 
 	@Override
-	public G getOrElse(Supplier<? extends G> alt) {
-		return alt.get();
+	public G getOrElse(Function<? super B, ? extends G> alt) {
+		return alt.apply(value);
 	}
 
 	@Override
 	public Or<G,B> orElse(Supplier<? extends Or<G,B>> alt) {
 		return alt.get();
 	}
-
+	
+	@Override
+	public Or<G, B> orElse(Or<G, B> alt) {
+	    return alt;
+	}
+	
 	@Override
 	public Or<G, B> recover(Function<? super B, ? extends G> func) {
-		return Or.good(func.apply(value));
+		return Good.of(func.apply(value));
 	}
 
 	@Override
@@ -167,7 +172,7 @@ public class Bad<G,B> implements Or<G,B> {
 
 	@Override
 	public Or<B, G> swap() {
-		return Or.good(value);
+		return Good.of(value);
 	}
 
 	@Override
@@ -197,7 +202,7 @@ public class Bad<G,B> implements Or<G,B> {
 
 	@Override
 	public <H, C> Or<H, C> transform(Function<? super G, ? extends H> gf, Function<? super B, ? extends C> bf) {
-		return Or.bad(bf.apply(value));
+		return Bad.of(bf.apply(value));
 	}
 
 	@Override

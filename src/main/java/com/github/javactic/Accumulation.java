@@ -131,9 +131,9 @@ public final class Accumulation {
 			}
 			I gds = collector.finisher().apply(goods);
 			if(errs.isEmpty()) 
-				return Or.good(gds);
+				return Good.of(gds);
 			else
-				return Or.bad(Every.of(errs.head(), errs.tail()));
+				return Bad.of(Every.of(errs.head(), errs.tail()));
 	}
 
 	
@@ -156,8 +156,8 @@ public final class Accumulation {
 					if(v.isPass()) return Stream.empty();
 					else return Stream.of(v.getError());
 				}).collect(Vector.collector());
-				if(result.length() == 0) return Or.good(or.get());
-				else return Or.bad(Every.of(result.head(), result.tail()));
+				if(result.length() == 0) return Good.of(or.get());
+				else return Bad.of(Every.of(result.head(), result.tail()));
 			} 
 			else return (Or<G, Every<ERR>>) or;
 	}
@@ -238,10 +238,10 @@ public final class Accumulation {
 			Or<B, ? extends Every<ERR>> b,
 			BiFunction<A, B, RESULT> function) {
 		if(allGood(a,b))
-			return Or.good(function.apply(a.get(), b.get()));
+			return Good.of(function.apply(a.get(), b.get()));
 		else {
 			Vector<ERR> bads = getBads(a, b);
-			return Or.bad(Every.of(bads.head(), bads.tail()));
+			return Bad.of(Every.of(bads.head(), bads.tail()));
 		}
 	}
 
@@ -251,10 +251,10 @@ public final class Accumulation {
 			Or<C, ? extends Every<ERR>> c, 
 			Function3<A, B, C, RESULT> function) {
 		if(allGood(a,b,c))
-			return Or.good(function.apply(a.get(), b.get(), c.get()));
+			return Good.of(function.apply(a.get(), b.get(), c.get()));
 		else {
 			Vector<ERR> bads = getBads(a, b, c);
-			return Or.bad(Every.of(bads.head(), bads.tail()));
+			return Bad.of(Every.of(bads.head(), bads.tail()));
 		}
 	}
 
@@ -265,10 +265,10 @@ public final class Accumulation {
 			Or<D, ? extends Every<ERR>> d,
 			Function4<A, B, C, D, RESULT> function) {
 		if(allGood(a,b,c,d))
-			return Or.good(function.apply(a.get(), b.get(), c.get(), d.get()));
+			return Good.of(function.apply(a.get(), b.get(), c.get(), d.get()));
 		else {
 			Vector<ERR> bads = getBads(a, b, c, d);
-			return Or.bad(Every.of(bads.head(), bads.tail()));
+			return Bad.of(Every.of(bads.head(), bads.tail()));
 		}
 	}
 
@@ -280,10 +280,10 @@ public final class Accumulation {
 			Or<E, ? extends Every<ERR>> e,
 			Function5<A, B, C, D, E, RESULT> function) {
 		if(allGood(a,b,c,d,e))
-			return Or.good(function.apply(a.get(), b.get(), c.get(), d.get(), e.get()));
+			return Good.of(function.apply(a.get(), b.get(), c.get(), d.get(), e.get()));
 		else {
 			Vector<ERR> bads = getBads(a, b, c, d, e);
-			return Or.bad(Every.of(bads.head(), bads.tail()));
+			return Bad.of(Every.of(bads.head(), bads.tail()));
 		}
 	}
 
@@ -296,10 +296,10 @@ public final class Accumulation {
 			Or<F, ? extends Every<ERR>> f,
 			Function6<A, B, C, D, E, F, RESULT> function) {
 		if(allGood(a,b,c,d,e,f))
-			return Or.good(function.apply(a.get(), b.get(), c.get(), d.get(), e.get(), f.get()));
+			return Good.of(function.apply(a.get(), b.get(), c.get(), d.get(), e.get(), f.get()));
 		else {
 			Vector<ERR> bads = getBads(a, b, c, d, e, f);
-			return Or.bad(Every.of(bads.head(), bads.tail()));
+			return Bad.of(Every.of(bads.head(), bads.tail()));
 		}
 	}
 
@@ -313,10 +313,10 @@ public final class Accumulation {
 			Or<G, ? extends Every<ERR>> g,
 			Function7<A, B, C, D, E, F, G, RESULT> function) {
 		if(allGood(a,b,c,d,e,f,g))
-			return Or.good(function.apply(a.get(), b.get(), c.get(), d.get(), e.get(), f.get(), g.get()));
+			return Good.of(function.apply(a.get(), b.get(), c.get(), d.get(), e.get(), f.get(), g.get()));
 		else {
 			Vector<ERR> bads = getBads(a, b, c, d, e, f, g);
-			return Or.bad(Every.of(bads.head(), bads.tail()));
+			return Bad.of(Every.of(bads.head(), bads.tail()));
 		}
 	}
 
@@ -331,10 +331,10 @@ public final class Accumulation {
 			Or<H, ? extends Every<ERR>> h,
 			Function8<A, B, C, D, E, F, G, H, RESULT> function) {
 		if(allGood(a,b,c,d,e,f,g,h))
-			return Or.good(function.apply(a.get(), b.get(), c.get(), d.get(), e.get(), f.get(), g.get(), h.get()));
+			return Good.of(function.apply(a.get(), b.get(), c.get(), d.get(), e.get(), f.get(), g.get(), h.get()));
 		else {
 			Vector<ERR> bads = getBads(a, b, c, d, e, f, g, h);
-			return Or.bad(Every.of(bads.head(), bads.tail()));
+			return Bad.of(Every.of(bads.head(), bads.tail()));
 		}
 	}
 
