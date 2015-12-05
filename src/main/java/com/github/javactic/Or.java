@@ -146,16 +146,16 @@ public interface Or<G, B> {
     }
 
     /**
-     * Builds an {@link Or} from the given <span class="jCode">source</span> using the provided <span class="jCode">converter</span> function.
+     * Builds an {@link Or} from the given <code>source</code> using the provided <code>converter</code> function.
      *
      * @param <S> the source type
      * @param <G> the {@link Good} type 
      * @param <B> the {@link Bad} type
      * @param source the object to convert to an {@link Or}
-     * @param converter the converter to use to make an {@link Good} from <span class="jCode">source</span>
+     * @param converter the converter to use to make an {@link Good} from <code>source</code>
      * @return an instance of {@link Or}
      */
-    public static <S, G, B> Or<G, B> fromAny(S source, Function<? super S, Or<G, B>> converter) {
+    public static <S, G, B> Or<G, B> fromAny(S source, Function<? super S, ? extends Or<G, B>> converter) {
         return converter.apply(source);
     }
 
@@ -188,15 +188,15 @@ public interface Or<G, B> {
      * type consisting of {@link One} parameterized by this {@link Or}'s {@link Bad} type.
      *
      * <p>
-     * For example, invoking the <span class="jCode">accumulating</span> method on an <span class="jCode">Or&lt;Int,ErrorMessage&gt;</span> would convert
-     * it to an <span class="jCode">Or&lt;Int,One&lt;ErrorMessage&gt;&gt;</span>. This result type, because the {@link Bad} type is an
+     * For example, invoking the <code>accumulating</code> method on an <code>Or&lt;Int,ErrorMessage&gt;</code> would convert
+     * it to an <code>Or&lt;Int,One&lt;ErrorMessage&gt;&gt;</code>. This result type, because the {@link Bad} type is an
      * {@link Every}, can be used with the mechanisms provided in class {@link Accumulation} to accumulate errors.
      * 
      * <p>
      * Note that if this {@link Or} is already an accumulating {@link Or}, the behavior of this
-     * <span class="jCode">accumulating</span> method does not change. For example, if you invoke <span class="jCode">accumulating</span> on an
-     * <span class="jCode">Or&lt;Int,One&lt;ErrorMessage&gt;&gt;</span> you will be rewarded with an 
-     * <span class="jCode">Or&lt;Int,One&lt;One&lt;ErrorMessage&gt;&gt;&gt;</span>.
+     * <code>accumulating</code> method does not change. For example, if you invoke <code>accumulating</code> on an
+     * <code>Or&lt;Int,One&lt;ErrorMessage&gt;&gt;</code> you will be rewarded with an 
+     * <code>Or&lt;Int,One&lt;One&lt;ErrorMessage&gt;&gt;&gt;</code>.
      *
      * <pre class="stHighlighted"> Scalactic: def accumulating: Or[G, One[B]] </pre>
      * 
@@ -206,7 +206,7 @@ public interface Or<G, B> {
     Or<G, One<B>> accumulating();
 
     /**
-     * Maps the given function to this {@link Or}'s value if it is a {@link Good} or returns <span class="jCode">this</span>
+     * Maps the given function to this {@link Or}'s value if it is a {@link Good} or returns <code>this</code>
      * if it is a {@link Bad}.
      * 
      * <pre class="stHighlighted">Scalactic: def map[H](f: (G) =&gt; H): Or[H, B] </pre>
@@ -219,7 +219,7 @@ public interface Or<G, B> {
     <H> Or<H, B> map(Function<? super G, ? extends H> mapper);
 
     /**
-     * Maps the given function to this {@link Or}'s value if it is a {@link Bad} or returns <span class="jCode">this</span>
+     * Maps the given function to this {@link Or}'s value if it is a {@link Bad} or returns <code>this</code>
      * if it is a {@link Good}.
      * 
      * <pre class="stHighlighted">Scalactic: def badMap[C](f: (B) =&gt; C): Or[G, C] </pre>
@@ -232,29 +232,29 @@ public interface Or<G, B> {
     <C> Or<G, C> badMap(Function<? super B, ? extends C> mapper);
 
     /**
-     * Returns <span class="jCode">true</span> if this {@link Or} is a {@link Good} and the predicate <span class="jCode">p</span> returns
+     * Returns <code>true</code> if this {@link Or} is a {@link Good} and the predicate <code>p</code> returns
      * true when applied to this {@link Good}'s value.
      *
      * <p>
-     * Note: The <span class="jCode">exists</span> method will return the same result as {@link #forAll} if this {@link Or}
+     * Note: The <code>exists</code> method will return the same result as {@link #forAll} if this {@link Or}
      * is a {@link Good}, but the opposite result if this {@link Or} is a {@link Bad}.
      * 
      * <pre class="stHighlighted">Scalactic: def exists(p: (G) =&gt; Boolean): Boolean </pre>
      *
      * @param p the predicate to apply to the {@link Good} value, if this is a {@link Good}
-     * @return the result of applying the passed predicate <span class="jCode">p</span> to the {@link Good} value, if this is a
-     *         {@link Good}, else <span class="jCode">false</span>
+     * @return the result of applying the passed predicate <code>p</code> to the {@link Good} value, if this is a
+     *         {@link Good}, else <code>false</code>
      */
     boolean exists(Predicate<? super G> p);
 
     /**
      * Returns this {@link Or} if either 1) it is a {@link Bad} or 2) it is a {@link Good} and applying
-     * the validation function <span class="jCode">validation</span> to this {@link Good}'s value returns {@link Pass}; otherwise,
+     * the validation function <code>validation</code> to this {@link Good}'s value returns {@link Pass}; otherwise,
      * returns a new {@link Bad} containing the error value contained in the {@link Fail} resulting from
-     * applying the validation function <span class="jCode">validation</span> to this {@link Good}'s value.
+     * applying the validation function <code>validation</code> to this {@link Good}'s value.
      *
      * <p>
-     * For examples of <span class="jCode">filter</span> used in <span class="jCode">for</span> expressions, see the main documentation for interface
+     * For examples of <code>filter</code> used in <code>for</code> expressions, see the main documentation for interface
      * {@link Validation}.
      * 
      * <pre class="stHighlighted">Scalactic: def filter[C &gt;: B](f: (G) =&gt; Validation[C]): Or[G, C] </pre>
@@ -267,7 +267,7 @@ public interface Or<G, B> {
 
     /**
      * Returns the given function applied to the value contained in this {@link Or} if it is a {@link Good},
-     * or returns <span class="jCode">this</span> if it is a {@link Bad}.
+     * or returns <code>this</code> if it is a {@link Bad}.
      * 
      * <pre class="stHighlighted">Scalactic: def flatMap[H, C &gt;: B](f: (G) =&gt; Or[H, C]): Or[H, C] </pre>
      *
@@ -279,8 +279,8 @@ public interface Or<G, B> {
     <H> Or<H, B> flatMap(Function<? super G, Or<H, B>> func);
 
     /**
-     * Folds this {@link Or} into a value of type <span class="jCode">V</span> by applying the given <span class="jCode">gf</span> function if
-     * this is a {@link Good} else the given <span class="jCode">bf</span> function if this is a {@link Bad}.
+     * Folds this {@link Or} into a value of type <code>V</code> by applying the given <code>gf</code> function if
+     * this is a {@link Good} else the given <code>bf</code> function if this is a {@link Bad}.
      * 
      * <pre class="stHighlighted">Scalactic: def fold[V](gf: (G) =&gt; V, bf: (B) =&gt; V): V </pre>
      *
@@ -289,14 +289,14 @@ public interface Or<G, B> {
      *            the function to apply to this {@link Or}'s {@link Good} value, if it is a {@link Good}
      * @param bf
      *            the function to apply to this {@link Or}'s {@link Bad} value, if it is a {@link Bad}
-     * @return the result of applying the appropriate one of the two passed functions, <span class="jCode">gf</span> or
-     *         <span class="jCode">bf</span>, to this {@link Or}'s value
+     * @return the result of applying the appropriate one of the two passed functions, <code>gf</code> or
+     *         <code>bf</code>, to this {@link Or}'s value
      */
     <V> V fold(Function<? super G, V> gf, Function<? super B, V> bf);
 
     /**
-     * Returns <span class="jCode">true</span> if either this {@link Or} is a {@link Bad} or if the predicate <span class="jCode">p</span>
-     * returns <span class="jCode">true</span> when applied to this {@link Good}'s value.
+     * Returns <code>true</code> if either this {@link Or} is a {@link Bad} or if the predicate <code>p</code>
+     * returns <code>true</code> when applied to this {@link Good}'s value.
      *
      * <p>
      * Note: The {@link #forAll} method will return the same result as {@link #exists} if this {@link Or}
@@ -306,13 +306,13 @@ public interface Or<G, B> {
      *
      * @param p
      *            the predicate to apply to the {@link Good} value, if this is a {@link Good}
-     * @return the result of applying the passed predicate <span class="jCode">p</span> to the {@link Good} value, if this is a
-     *         {@link Good}, else <span class="jCode">true</span>
+     * @return the result of applying the passed predicate <code>p</code> to the {@link Good} value, if this is a
+     *         {@link Good}, else <code>true</code>
      */
     boolean forAll(Predicate<? super G> p);
 
     /**
-     * Applies the given function <span class="jCode">action</span> to the contained value if this {@link Or} is a {@link Good}; does nothing
+     * Applies the given function <code>action</code> to the contained value if this {@link Or} is a {@link Good}; does nothing
      * if this {@link Or} is a {@link Bad}.
      * 
      * <pre class="stHighlighted">Scalactic: def foreach(f: (G) =&gt; Unit): Unit </pre>
@@ -342,55 +342,55 @@ public interface Or<G, B> {
     B getBad();
 
     /**
-     * Returns, if this {@link Or} is {@link Good}, this {@link Good}'s value; otherwise returns <span class="jCode">default</span>.
+     * Returns, if this {@link Or} is {@link Good}, this {@link Good}'s value; otherwise returns <code>default</code>.
      * 
      * <pre class="stHighlighted">Scalactic: def getOrElse[H &gt;: G](default: =&gt; H): H </pre>
      *
      * @param def the default expression to evaluate if this {@link Or} is a {@link Bad}
-     * @return the contained value, if this {@link Or} is a {@link Good}, else given <span class="jCode">default</span>
+     * @return the contained value, if this {@link Or} is a {@link Good}, else given <code>default</code>
      */
     G getOrElse(G def);
 
     /**
      * Returns, if this {@link Or} is {@link Good}, this {@link Good}'s value; otherwise returns the
-     * result of evaluating <span class="jCode">default</span>.
+     * result of evaluating <code>default</code>.
      * 
      * <pre class="stHighlighted">Scalactic: def getOrElse[H &gt;: G](default: =&gt; H): H </pre>
      *
      * @param def the default expression to evaluate if this {@link Or} is a {@link Bad}
      * @return the contained value, if this {@link Or} is a {@link Good}, else the result of evaluating the
-     *         given <span class="jCode">default</span>
+     *         given <code>default</code>
      */
     G getOrElse(Function<? super B, ? extends G> def);
 
     /**
      * Returns this {@link Or} if it is a {@link Good}, otherwise returns the result of evaluating the passed
-     * <span class="jCode">alt</span>.
+     * <code>alt</code>.
      * 
      * <pre class="stHighlighted">Scalactic: def orElse[H &gt;: G, C &gt;: B](alternative: =&gt; Or[H, C]): Or[H, C] </pre>
      *
      * @param alt the alternative supplier to evaluate if this {@link Or} is a {@link Bad}
      * @return this {@link Or}, if it is a {@link Good}, else the result of evaluating
-     *         <span class="jCode">alt</span>
+     *         <code>alt</code>
      */
     Or<G, B> orElse(Supplier<? extends Or<G, B>> alt);
     
     
     /**
      * Returns this {@link Or} if it is a {@link Good}, otherwise returns the passed
-     * <span class="jCode">alt</span>.
+     * <code>alt</code>.
      * 
      * <pre class="stHighlighted">Scalactic: def orElse[H &gt;: G, C &gt;: B](alternative: =&gt; Or[H, C]): Or[H, C] </pre>
      *
      * @param alt the alternative to return if this {@link Or} is a {@link Bad}
      * @return this {@link Or}, if it is a {@link Good}, else the result of evaluating
-     *         <span class="jCode">alt</span>
+     *         <code>alt</code>
      */
     Or<G, B> orElse(Or<G, B> alt);
     
     /**
      * Maps the given function to this {@link Or}'s value if it is a {@link Bad}, transforming it into a
-     * {@link Good}, or returns <span class="jCode">this</span> if it is already a {@link Good}.
+     * {@link Good}, or returns <code>this</code> if it is already a {@link Good}.
      * 
      * <pre class="stHighlighted">Scalactic: def recover[H &gt;: G](f: (B) =&gt; H): Or[H, B] </pre>
      *
@@ -402,7 +402,7 @@ public interface Or<G, B> {
 
     /**
      * Maps the given function to this {@link Or}'s value if it is a {@link Bad}, returning the result, or
-     * returns <span class="jCode">this</span> if it is already a {@link Good}.
+     * returns <code>this</code> if it is already a {@link Good}.
      * 
      * <pre class="stHighlighted">Scalactic: def recoverWith[H &gt;: G, C](f: (B) =&gt; Or[H, C]): Or[H, C] </pre>
      *
@@ -446,11 +446,11 @@ public interface Or<G, B> {
      * {@link Good}; a {@link Left} containing the {@link Bad} value, if this is a {@link Bad}.
      *
      * <p>
-     * Note that values effectively <span class="jCode">switch sides</span> when converting an {@link Or} to an
+     * Note that values effectively <code>switch sides</code> when converting an {@link Or} to an
      * {@link Either}. If the type of the {@link Or} on which you invoke {@link #toEither()} is
-     * <span class="jCode">Or&lt;Int,ErrorMessage&gt;</span> for example, the result will be an <span class="jCode">Either&lt;ErrorMessage,Int&gt;</span>. 
-     * The reason is that the convention for {@link Either} is that {@link Left} is used for <span class="jCode">bad</span>
-     * values and {@link Right} is used for <span class="jCode">good</span> ones.
+     * <code>Or&lt;Int,ErrorMessage&gt;</code> for example, the result will be an <code>Either&lt;ErrorMessage,Int&gt;</code>. 
+     * The reason is that the convention for {@link Either} is that {@link Left} is used for <code>bad</code>
+     * values and {@link Right} is used for <code>good</code> ones.
      * 
      * <pre class="stHighlighted">Scalactic: def toEither: Either[B, G] </pre>
      *
@@ -495,8 +495,8 @@ public interface Or<G, B> {
     }
 
     /**
-     * Transforms this {@link Or} by applying the function <span class="jCode">gf</span> to this {@link Or}'s
-     * {@link Good} value if it is a {@link Good}, or by applying <span class="jCode">bf</span> to this {@link Or}'s
+     * Transforms this {@link Or} by applying the function <code>gf</code> to this {@link Or}'s
+     * {@link Good} value if it is a {@link Good}, or by applying <code>bf</code> to this {@link Or}'s
      * {@link Bad} value if it is a {@link Bad}.
      * 
      * <pre class="stHighlighted">Scalactic: def transform[H, C](gf: (G) =&gt; Or[H, C], bf: (B) =&gt; Or[H, C]): Or[H, C] </pre>
@@ -505,8 +505,8 @@ public interface Or<G, B> {
      * @param <C> the type of the transformed {@link Bad} 
      * @param gf the function to apply to this {@link Or}'s {@link Good} value, if it is a {@link Good}
      * @param bf the function to apply to this {@link Or}'s {@link Bad} value, if it is a {@link Bad}
-     * @return the result of applying the appropriate one of the two passed functions, <span class="jCode">gf</span> or
-     *         <span class="jCode">bf</span>, to this {@link Or}'s value
+     * @return the result of applying the appropriate one of the two passed functions, <code>gf</code> or
+     *         <code>bf</code>, to this {@link Or}'s value
      */
     <H, C> Or<H, C> transform(Function<? super G, ? extends H> gf, Function<? super B, ? extends C> bf);
 
@@ -522,7 +522,7 @@ public interface Or<G, B> {
      * 
      * <pre class="stHighlighted">Scalactic: def isGood: Boolean </pre>
      *
-     * @return true if this {@link Or} is a {@link Good}, <span class="jCode">false</span> if it is a {@link Bad}.
+     * @return true if this {@link Or} is a {@link Good}, <code>false</code> if it is a {@link Bad}.
      */
     boolean isGood();
 
@@ -531,7 +531,7 @@ public interface Or<G, B> {
      * 
      * <pre class="stHighlighted">Scalactic: def isBad: Boolean </pre>
      *
-     * @return true if this {@link Or} is a {@link Bad}, <span class="jCode">false</span> if it is a {@link Good}.
+     * @return true if this {@link Or} is a {@link Bad}, <code>false</code> if it is a {@link Good}.
      */
     boolean isBad();
 
