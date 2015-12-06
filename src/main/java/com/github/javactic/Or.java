@@ -114,7 +114,7 @@ public interface Or<G, B> {
      */
     public static <G> Or<G, Throwable> from(Try<G> theTry) {
         Objects.requireNonNull(theTry, "try cannot be null");
-        return theTry.map(Or::<G,Throwable>good).orElseGet(t -> Bad.of(t));
+        return theTry.map(Or::<G,Throwable>good).recover(t -> Bad.of(t)).get();
     }
     
     /**
@@ -276,7 +276,7 @@ public interface Or<G, B> {
      * @return if this is a {@link Good}, the result of applying the given function to the contained value wrapped
      *         in a {@link Good}, else this {@link Bad} is returned
      */
-    <H> Or<H, B> flatMap(Function<? super G, Or<H, B>> func);
+    <H> Or<H, B> flatMap(Function<? super G, Or<H, ? extends B>> func);
 
     /**
      * Folds this {@link Or} into a value of type <code>V</code> by applying the given <code>gf</code> function if
@@ -292,7 +292,7 @@ public interface Or<G, B> {
      * @return the result of applying the appropriate one of the two passed functions, <code>gf</code> or
      *         <code>bf</code>, to this {@link Or}'s value
      */
-    <V> V fold(Function<? super G, V> gf, Function<? super B, V> bf);
+    <V> V fold(Function<? super G, ? extends V> gf, Function<? super B, ? extends V> bf);
 
     /**
      * Returns <code>true</code> if either this {@link Or} is a {@link Bad} or if the predicate <code>p</code>
@@ -373,7 +373,7 @@ public interface Or<G, B> {
      * @return this {@link Or}, if it is a {@link Good}, else the result of evaluating
      *         <code>alt</code>
      */
-    Or<G, B> orElse(Supplier<? extends Or<G, B>> alt);
+    Or<G, B> orElse(Supplier<? extends Or<? extends G, ? extends B>> alt);
     
     
     /**
@@ -386,7 +386,7 @@ public interface Or<G, B> {
      * @return this {@link Or}, if it is a {@link Good}, else the result of evaluating
      *         <code>alt</code>
      */
-    Or<G, B> orElse(Or<G, B> alt);
+    Or<G, B> orElse(Or<? extends G, ? extends B> alt);
     
     /**
      * Maps the given function to this {@link Or}'s value if it is a {@link Bad}, transforming it into a
@@ -411,7 +411,7 @@ public interface Or<G, B> {
      * @return if this is a {@link Bad}, the result of applying the given function to the contained value, else
      *         this {@link Good} is returned
      */
-    <C> Or<G, C> recoverWith(Function<? super B, ? extends Or<G, C>> func);
+    <C> Or<G, C> recoverWith(Function<? super B, ? extends Or<? extends G, C>> func);
 
     /**
      * Returns an {@link Or} with the {@link Good} and {@link Bad} types swapped: {@link Bad}
@@ -490,7 +490,7 @@ public interface Or<G, B> {
      * @param converter a function to map an {@link Or} into anything.
      * @return an instance of T
      */
-    default <T> T toAny(Function<Or<G, B>, T> converter) {
+    default <T> T toAny(Function<? super Or<? extends G, ? extends B>, T> converter) {
         return converter.apply(this);
     }
 

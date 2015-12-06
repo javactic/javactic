@@ -77,13 +77,14 @@ public class Good<G,B> implements Or<G,B> {
 		return predicate.test(value);
 	}
 
-	@Override
-	public <H> Or<H, B> flatMap(Function<? super G, Or<H, B>> func) {
-		return func.apply(value);
+	@SuppressWarnings("unchecked")
+    @Override
+	public <H> Or<H, B> flatMap(Function<? super G, Or<H, ? extends B>> func) {
+		return (Or<H, B>) func.apply(value);
 	}
 
 	@Override
-	public <V> V fold(Function<? super G, V> good, Function<? super B, V> bad) {
+	public <V> V fold(Function<? super G, ? extends V> good, Function<? super B, ? extends V> bad) {
 		return good.apply(value);
 	}
 
@@ -118,12 +119,12 @@ public class Good<G,B> implements Or<G,B> {
 	}
 
 	@Override
-	public Or<G,B> orElse(Supplier<? extends Or<G,B>> alt) {
+	public Or<G,B> orElse(Supplier<? extends Or<? extends G, ? extends B>> alt) {
 		return this;
 	}
 	
 	@Override
-	public Or<G, B> orElse(Or<G, B> alt) {
+	public Or<G, B> orElse(Or<? extends G, ? extends B> alt) {
 	    return this;
 	}
 	
@@ -134,7 +135,7 @@ public class Good<G,B> implements Or<G,B> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <C> Or<G, C> recoverWith(Function<? super B, ? extends Or<G, C>> func) {
+	public <C> Or<G, C> recoverWith(Function<? super B, ? extends Or<? extends G, C>> func) {
 		return (Or<G, C>) this;
 	}
 

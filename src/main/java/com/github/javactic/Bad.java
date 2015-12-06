@@ -109,12 +109,12 @@ public class Bad<G,B> implements Or<G,B> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <H> Or<H, B> flatMap(Function<? super G, Or<H, B>> func) {
+	public <H> Or<H, B> flatMap(Function<? super G, Or<H, ? extends B>> func) {
 		return (Or<H, B>) this;
 	}
 
 	@Override
-	public <V> V fold(Function<? super G, V> good, Function<? super B, V> bad) {
+	public <V> V fold(Function<? super G, ? extends V> good, Function<? super B, ? extends V> bad) {
 		return bad.apply(value);
 	}
 
@@ -148,14 +148,16 @@ public class Bad<G,B> implements Or<G,B> {
 		return alt.apply(value);
 	}
 
-	@Override
-	public Or<G,B> orElse(Supplier<? extends Or<G,B>> alt) {
-		return alt.get();
+	@SuppressWarnings("unchecked")
+    @Override
+	public Or<G,B> orElse(Supplier<? extends Or<? extends G,? extends B>> alt) {
+		return (Or<G, B>) alt.get();
 	}
 	
-	@Override
-	public Or<G, B> orElse(Or<G, B> alt) {
-	    return alt;
+	@SuppressWarnings("unchecked")
+    @Override
+	public Or<G, B> orElse(Or<? extends G, ? extends B> alt) {
+	    return (Or<G, B>) alt;
 	}
 	
 	@Override
@@ -163,9 +165,10 @@ public class Bad<G,B> implements Or<G,B> {
 		return Good.of(func.apply(value));
 	}
 
-	@Override
-	public <C> Or<G, C> recoverWith(Function<? super B, ? extends Or<G, C>> func) {
-		return func.apply(value);
+	@SuppressWarnings("unchecked")
+    @Override
+	public <C> Or<G, C> recoverWith(Function<? super B, ? extends Or<? extends G, C>> func) {
+		return (Or<G, C>) func.apply(value);
 	}
 
 	@Override
