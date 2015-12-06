@@ -2,6 +2,7 @@ package com.github.javactic.doc;
 
 import com.github.javactic.Bad;
 import com.github.javactic.Good;
+import com.github.javactic.One;
 import com.github.javactic.Or;
 
 public class OrExample {
@@ -43,6 +44,24 @@ public class OrExample {
     
     public static void main(String[] args) {
         new OrExample().print();
+        
+        Or.good("good"); // Or<String, Object>
+        Or.bad("bad");   // Or<Object, String>
+        
+        Or.<String, Integer>good("good"); // Or<String, Integer>
+        Or.<Integer, String>bad("bad");   // Or<Integer, String>
+        
+        Or<String, Integer> good = Or.good("good"); // Or<String, Integer>
+        Or<Integer, String> bad = Or.bad("bad");    // Or<Integer, String>
+        
+        Good.of("good"); // Good<String, Object>
+        Bad.of("bad");   // Bad<Object, String>
+        
+        Bad.of("bad").asOr(); // Or<Object, String>
+        
+        Bad<String, One<String>> ofOne = Bad.ofOne("bad"); // Bad<String, One<String>>
+        Bad<String, One<String>> ofOneString = Bad.ofOneString("error with value {}", 12); // Bad<String, One<String>>
+        
     }
 
 }
