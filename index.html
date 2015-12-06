@@ -424,8 +424,8 @@ parsePerson("", "")
 Or&lt;String, One&lt;String&gt;&gt; parseName(String input) {
     String trimmed = input.trim();
     return (!trimmed.isEmpty()) 
-    	? Or.good(trimmed) 
-    	: Or.bad(One.of(&quot;\&quot;&quot; + input + &quot;\&quot; is not a valid name&quot;));
+    	? Good.of(trimmed) 
+    	: Bad.ofOneString(&quot;'{}' is not a valid name&quot;, input);
 }
 </code>
 		</pre>
@@ -451,11 +451,9 @@ Or&lt;String, One&lt;String&gt;&gt; parseName(String input) {
 Or&lt;Integer, One&lt;String&gt;&gt; parseAge(String input) {
     try {
         int age = Integer.parseInt(input.trim());
-        return (age &gt;= 0) 
-        	? Or.good(age) 
-        	: Or.bad(One.of(&quot;\&quot;&quot; + age + &quot;\&quot; is not a valid age&quot;)); 
+        return (age &gt;= 0) ? Good.of(age) : Bad.ofOneString(&quot;'{}' is not a valid age&quot;, age);
     } catch (NumberFormatException e) {
-        return Or.bad(One.of(&quot;\&quot;&quot; + input + &quot;\&quot; is not a valid integer&quot;));
+        return Bad.ofOneString(&quot;'{}' is not a valid integer&quot;, input);
     }
 }
 </code>
@@ -548,6 +546,17 @@ parsePerson("", "")
 			<code>Bad</code>
 			contains an error message for both name and age.
 		</p>
+
+		<h3>Working with Ors</h3>
+		Ors can be created using static constructors on either the Or
+		interface or the implementing Good and Bad classes. Constructors on
+		the Or interface will return the value as an Or, whereas constructors
+		on specific types will return specific types:
+
+<code class="java">
+Or.good("good"); // 
+</code>
+		
 
 		<h3>Working with Everys</h3>
 		<p>
