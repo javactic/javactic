@@ -206,6 +206,17 @@ public interface Or<G, B> {
     Or<G, One<B>> accumulating();
 
     /**
+     * Returns this Good or Bad with the type widened to Or.
+     * 
+     * <pre class="stHighlighted"> Scalactic: def asOr: Or[G, B] </pre>
+     * 
+     * @return this Good or Bad with the type widened to Or
+     */
+    default Or<G, B> asOr() {
+        return this;
+    }
+    
+    /**
      * Maps the given function to this {@link Or}'s value if it is a {@link Good} or returns <code>this</code>
      * if it is a {@link Bad}.
      * 

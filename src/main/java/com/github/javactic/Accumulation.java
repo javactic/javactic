@@ -165,7 +165,19 @@ public final class Accumulation {
 	// ------------------------------------------------------------------------
 	// ZIP
 	// ------------------------------------------------------------------------
-	
+
+    /**
+     * Zips two accumulating Ors together. If both are Good, you'll get a Good
+     * tuple containin both original Good values. Otherwise, you'll get a Bad
+     * containing every error message.
+     * 
+     * @param <A> the good type of the first Or
+     * @param <B> the good type of the second Or
+     * @param <ERR> the error type of the accumulating Ors
+     * @param a the first Or to zip
+     * @param b the second Or to zip
+     * @return an Or with a good type of Tuple2
+     */
 	public static <A,B,ERR> Or<Tuple2<A,B>, Every<ERR>> zip(
 			Or<? extends A, ? extends Every<? extends ERR>> a,
 			Or<? extends B, ? extends Every<? extends ERR>> b) {
@@ -233,6 +245,20 @@ public final class Accumulation {
 	// WITHGOOD
 	// ------------------------------------------------------------------------
 	
+    /**
+     * Combines two accumulating Or into a single one using the given function.
+     * The resulting Or will be a Good if both Ors are Goods, otherwise it will
+     * be a Bad containing every error in the Bads.
+     * 
+     * @param <A> the good type of the first Or
+     * @param <B> the good type of the second Or
+     * @param <ERR> the error type of the Ors
+     * @param <RESULT> the good type of the resulting Or
+     * @param a the first Or to combine
+     * @param b the second Or to combine
+     * @param function the function combining the Ors
+     * @return a Good if both Ors were Goods, otherwise a Bad with every error.
+     */
 	public static <A, B, ERR, RESULT> Or<RESULT, Every<ERR>> withGood(
 			Or<? extends A, ? extends Every<? extends ERR>> a, 
 			Or<? extends B, ? extends Every<? extends ERR>> b,

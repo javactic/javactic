@@ -114,7 +114,7 @@ public class Bad<G,B> implements Or<G,B> {
 	public Or<G, One<B>> accumulating() {
 		return Bad.ofOne(value);
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public <H> Or<H, B> map(Function<? super G, ? extends H> mapper) {

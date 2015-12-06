@@ -110,6 +110,11 @@ public class OrTest {
 	}
 	
 	@Test
+	public void casts() {
+	    Bad.of("b").asOr(); 
+	}
+	
+	@Test
 	public void flatMap() {
 		Or<String, String> good = Good.of("1");
 		Or<Integer, String> goodI = good.flatMap(s -> Good.of(Integer.parseInt(s)));

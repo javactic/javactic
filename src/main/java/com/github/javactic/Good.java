@@ -66,11 +66,11 @@ public class Good<G,B> implements Or<G,B> {
 		return Good.of(mapper.apply(value));
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public <C> Or<G,C> badMap(Function<? super B, ? extends C> mapper) {
-		return (Or<G,C>) this;
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    public <C> Or<G, C> badMap(Function<? super B, ? extends C> mapper) {
+        return (Or<G, C>) this;
+    }
 
 	@Override
 	public boolean exists(Predicate<? super G> predicate) {
