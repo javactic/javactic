@@ -307,8 +307,8 @@ parsePerson("", "")
 Or&lt;String, String&gt; parseName(String input) {
     String trimmed = input.trim();
     return (!trimmed.isEmpty()) 
-    	? Or.good(trimmed) 
-    	: Or.bad(&quot;\&quot;&quot; + input + &quot;\&quot; is not a valid name&quot;);
+        ? Good.of(trimmed) 
+        : Bad.ofString(&quot;'{}' is not a valid name&quot;, input);
 }
 </code>
 		</pre>
@@ -322,9 +322,9 @@ Or&lt;String, String&gt; parseName(String input) {
 Or&lt;Integer, String&gt; parseAge(String input) {
     try {
         int age = Integer.parseInt(input.trim());
-        return (age &gt;= 0) ? Or.good(age) : Or.bad(&quot;\&quot;&quot; + age + &quot;\&quot; is not a valid age&quot;); 
+        return (age &gt;= 0) ? Good.of(age) : Bad.ofString(&quot;'{}' is not a valid age&quot;, age);
     } catch (NumberFormatException e) {
-        return Or.bad(&quot;\&quot;&quot; + input + &quot;\&quot; is not a valid integer&quot;);
+        return Bad.ofString(&quot;'{}' is not a valid integer&quot;, input);
     }
 }
 </code>
@@ -338,7 +338,9 @@ Or&lt;Integer, String&gt; parseAge(String input) {
 <code class="java">
 Or&lt;Person, String&gt; parsePerson(String inputName, String inputAge) {
     return parseName(inputName)
-            .flatMap(name -&gt; parseAge(inputAge).map(age -&gt; new Person(name, age)));
+    	.flatMap(name -&gt; parseAge(inputAge)
+    		.map(age -&gt; new Person(name, age))
+    	);
 }
 </code>
 		</pre>
