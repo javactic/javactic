@@ -59,6 +59,7 @@ public class OrExample {
         
         Bad.of("bad").asOr(); // Or<Object, String>
         
+        Or<String, One<String>> acc = Bad.<String,String>of("bad").accumulating(); // Or<String, One<String>>
         Bad<String, One<String>> ofOne = Bad.ofOne("bad"); // Bad<String, One<String>>
         Bad<String, One<String>> ofOneString = Bad.ofOneString("error with value {}", 12); // Bad<String, One<String>>
         
