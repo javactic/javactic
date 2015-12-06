@@ -548,15 +548,64 @@ parsePerson("", "")
 		</p>
 
 		<h3>Working with Ors</h3>
-		Ors can be created using static constructors on either the Or
-		interface or the implementing Good and Bad classes. Constructors on
-		the Or interface will return the value as an Or, whereas constructors
+		<p>
+		<code>Ors</code> can be created using static constructors on either the <code>Or</code>
+		interface or the implementing <code>Good</code> and <code>Bad</code> classes. Constructors on
+		the <code>Or</code> interface will return the value as an <code>Or</code>, whereas constructors
 		on specific types will return specific types:
-
+		</p>
+<pre>
 <code class="java">
-Or.good("good"); // 
+Or.good(&quot;good&quot;); // Or&lt;String, Object&gt;
+Or.bad(&quot;bad&quot;);   // Or&lt;Object, String&gt;
+Good.of(&quot;good&quot;); // Good&lt;String, Object&gt;
+Bad.of(&quot;bad&quot;);   // Bad&lt;Object, String&gt;
 </code>
-		
+</pre>
+		<p>Note that since <code>Or</code> has two types, but each of its two subtypes
+			only takes a value of one or the other type, the Java compiler will
+			infer <code>Object</code> for the unspecified type. This can be changed by either
+			assigning the value to a variable with a more specific type or by
+			giving explicit type arguments:</p>
+		<pre>
+<code class="java">
+Or&lt;String, Integer&gt; good = Or.good(&quot;good&quot;); // Or&lt;String, Integer&gt;
+Or&lt;Integer, String&gt; bad = Or.bad(&quot;bad&quot;);    // Or&lt;Integer, String&gt;
+
+Or.&lt;String, Integer&gt;good(&quot;good&quot;); // Or&lt;String, Integer&gt;
+Or.&lt;Integer, String&gt;bad(&quot;bad&quot;);   // Or&lt;Integer, String&gt;
+</code>
+		</pre>
+		<p>
+			A specific type like
+			<code>Bad</code>
+			can be widened back to an
+			<code>Or</code>
+			with the
+			<code>asOr</code>
+			method
+		</p>
+		<pre>
+<code class="java">
+Bad.of(&quot;bad&quot;).asOr(); // Or&lt;Object, String&gt;
+</code>
+		</pre>
+		<p>
+			You can transform an existing
+			<code>Or</code>
+			into an accumulating one with the
+			<code>accumulating()</code>
+			method. There are also factory methods for creating accumulating
+			<code>Or</code>
+			s directly:
+		</p>
+		<pre>
+<code class="java">
+Bad&lt;String, One&lt;String&gt;&gt; ofOne = Bad.of(&quot;bad&quot;).accumulating(); // Bad&lt;String, One&lt;String&gt;&gt;
+Bad&lt;String, One&lt;String&gt;&gt; ofOne = Bad.ofOne(&quot;bad&quot;); // Bad&lt;String, One&lt;String&gt;&gt;
+Bad&lt;String, One&lt;String&gt;&gt; ofOneString = Bad.ofOneString(&quot;error with value {}&quot;, 12); // Bad&lt;String, One&lt;String&gt;&gt;
+</code>
+		</pre>
 
 		<h3>Working with Everys</h3>
 		<p>
