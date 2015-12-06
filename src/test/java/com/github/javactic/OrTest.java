@@ -83,11 +83,6 @@ public class OrTest {
 	
 	@Test
 	public void accumulating() {
-	    
-	    
-//	    Or<String, String> good = Good.of("Good");
-//	    good.<Object>map(s -> 123).getOrElse("");
-	    
 		Or<String, String> bad = Bad.of("Bad");
 		Or<String, One<String>> badacc = bad.accumulating();
 		assertTrue(badacc.isBad());

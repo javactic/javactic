@@ -64,8 +64,19 @@ public class Bad<G,B> implements Or<G,B> {
 		return new Bad<>(value);
 	}
 	
-    public static <G> Bad<G,String> ofString(String value, Object... args) {
-        return new Bad<>(Helper.parse(value, args));
+    /**
+     * Creates a Bad with a bad type of String based on the given message. The
+     * message can be a slf4j string with {} placeholders that will be replaced
+     * by the given optional arguments.
+     * 
+     * @param <G>
+     *            the good type of the Or
+     * @param msg the message string with possible placeholders
+     * @param args the values to replace the placeholders with
+     * @return a Bad
+     */
+    public static <G> Bad<G,String> ofString(String msg, Object... args) {
+        return new Bad<>(Helper.parse(msg, args));
     }
 
     /**
@@ -82,8 +93,21 @@ public class Bad<G,B> implements Or<G,B> {
         return new Bad<>(One.of(value));
     }
 
-    public static <G> Bad<G,One<String>> ofOneString(String value, Object... args) {
-        return new Bad<>(One.of(Helper.parse(value, args)));
+    /**
+     * Creates a Bad with a bad type of One&lt;String&gt; based on the given
+     * message. The message can be a slf4j string with {} placeholders that will
+     * be replaced by the given optional arguments.
+     * 
+     * @param <G>
+     *            the good type of the Or
+     * @param msg
+     *            the message string with possible placeholders
+     * @param args
+     *            the values to replace the placeholders with
+     * @return a Bad
+     */
+    public static <G> Bad<G,One<String>> ofOneString(String msg, Object... args) {
+        return new Bad<>(One.of(Helper.parse(msg, args)));
     }
 
 	@Override

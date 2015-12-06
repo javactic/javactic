@@ -99,7 +99,7 @@ public class EveryTest {
         assertEquals(pair1.hashCode(), pair2.hashCode());
         assertEquals(pair1.toString(), pair2.toString());
         
-        One<String> single1 = One.of("c");
+        One<String> single1 = One.ofString("c");
         One<String> single2 = One.of("c");
         assertEquals(single1, single2);
         assertEquals(single1.hashCode(), single2.hashCode());

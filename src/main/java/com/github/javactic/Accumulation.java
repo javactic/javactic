@@ -118,12 +118,12 @@ public final class Accumulation {
 	public static <F, G, A, I extends Iterable<? extends G>, ERR> 
 	    Or<I, Every<ERR>> 
 		validatedBy(Iterable<? extends F> iterable, 
-					Function<? super F, ? extends Or<G, ? extends Every<ERR>>> f, 
+					Function<? super F, ? extends Or<G, ? extends Every<? extends ERR>>> f, 
 					Collector<? super G, A, I> collector) {
 			A goods = collector.supplier().get();
 			Vector<ERR> errs = Vector.empty();
 			for(F g : iterable) {
-				Or<G, ? extends Every<ERR>> or = f.apply(g);
+				Or<G, ? extends Every<? extends ERR>> or = f.apply(g);
 				if(or.isGood()) 
 					collector.accumulator().accept(goods, or.get());
 				else
@@ -149,7 +149,7 @@ public final class Accumulation {
 	@SuppressWarnings("unchecked")
     @SafeVarargs
 	public static <G, ERR> Or<G, Every<ERR>> 
-		when(Or<G, ? extends Every<ERR>> or, Function<? super G, ? extends Validation<ERR>>... validations) {
+		when(Or<G, ? extends Every<? extends ERR>> or, Function<? super G, ? extends Validation<ERR>>... validations) {
 			if(or.isGood()) {
 				Vector<ERR>  result = Stream.of(validations).flatMap(f -> {
 					Validation<ERR> v = f.apply(or.get());
@@ -167,65 +167,65 @@ public final class Accumulation {
 	// ------------------------------------------------------------------------
 	
 	public static <A,B,ERR> Or<Tuple2<A,B>, Every<ERR>> zip(
-			Or<A, ? extends Every<ERR>> a,
-			Or<B, ? extends Every<ERR>> b) {
+			Or<? extends A, ? extends Every<? extends ERR>> a,
+			Or<? extends B, ? extends Every<? extends ERR>> b) {
 		return withGood(a, b, Tuple::of);
 	}
 	
 	public static <A,B,C,ERR> Or<Tuple3<A,B,C>, Every<ERR>> zip3(
-			Or<A, ? extends Every<ERR>> a,
-			Or<B, ? extends Every<ERR>> b,
-			Or<C, ? extends Every<ERR>> c) {
+			Or<? extends A, ? extends Every<? extends ERR>> a,
+			Or<? extends B, ? extends Every<? extends ERR>> b,
+			Or<? extends C, ? extends Every<? extends ERR>> c) {
 		return withGood(a, b, c, Tuple::of);
 	}
 	
 	public static <A,B,C,D,ERR> Or<Tuple4<A,B,C,D>, Every<ERR>> zip4(
-			Or<A, ? extends Every<ERR>> a,
-			Or<B, ? extends Every<ERR>> b,
-			Or<C, ? extends Every<ERR>> c,
-			Or<D, ? extends Every<ERR>> d) {
+			Or<? extends A, ? extends Every<? extends ERR>> a,
+			Or<? extends B, ? extends Every<? extends ERR>> b,
+			Or<? extends C, ? extends Every<? extends ERR>> c,
+			Or<? extends D, ? extends Every<? extends ERR>> d) {
 		return withGood(a, b, c, d, Tuple::of);
 	}
 	
 	public static <A,B,C,D,E,ERR> Or<Tuple5<A,B,C,D,E>, Every<ERR>> zip5(
-			Or<A, ? extends Every<ERR>> a,
-			Or<B, ? extends Every<ERR>> b,
-			Or<C, ? extends Every<ERR>> c,
-			Or<D, ? extends Every<ERR>> d,
-			Or<E, ? extends Every<ERR>> e) {
+			Or<? extends A, ? extends Every<? extends ERR>> a,
+			Or<? extends B, ? extends Every<? extends ERR>> b,
+			Or<? extends C, ? extends Every<? extends ERR>> c,
+			Or<? extends D, ? extends Every<? extends ERR>> d,
+			Or<? extends E, ? extends Every<? extends ERR>> e) {
 		return withGood(a, b, c, d, e, Tuple::of);
 	}
 	
 	public static <A,B,C,D,E,F,ERR> Or<Tuple6<A,B,C,D,E,F>, Every<ERR>> zip6(
-			Or<A, ? extends Every<ERR>> a,
-			Or<B, ? extends Every<ERR>> b,
-			Or<C, ? extends Every<ERR>> c,
-			Or<D, ? extends Every<ERR>> d,
-			Or<E, ? extends Every<ERR>> e,
-			Or<F, ? extends Every<ERR>> f) {
+			Or<? extends A, ? extends Every<? extends ERR>> a,
+			Or<? extends B, ? extends Every<? extends ERR>> b,
+			Or<? extends C, ? extends Every<? extends ERR>> c,
+			Or<? extends D, ? extends Every<? extends ERR>> d,
+			Or<? extends E, ? extends Every<? extends ERR>> e,
+			Or<? extends F, ? extends Every<? extends ERR>> f) {
 		return withGood(a, b, c, d, e, f, Tuple::of);
 	}
 	
 	public static <A,B,C,D,E,F,G,ERR> Or<Tuple7<A,B,C,D,E,F,G>, Every<ERR>> zip7(
-			Or<A, ? extends Every<ERR>> a,
-			Or<B, ? extends Every<ERR>> b,
-			Or<C, ? extends Every<ERR>> c,
-			Or<D, ? extends Every<ERR>> d,
-			Or<E, ? extends Every<ERR>> e,
-			Or<F, ? extends Every<ERR>> f,
-			Or<G, ? extends Every<ERR>> g) {
+			Or<? extends A, ? extends Every<? extends ERR>> a,
+			Or<? extends B, ? extends Every<? extends ERR>> b,
+			Or<? extends C, ? extends Every<? extends ERR>> c,
+			Or<? extends D, ? extends Every<? extends ERR>> d,
+			Or<? extends E, ? extends Every<? extends ERR>> e,
+			Or<? extends F, ? extends Every<? extends ERR>> f,
+			Or<? extends G, ? extends Every<? extends ERR>> g) {
 		return withGood(a, b, c, d, e, f, g, Tuple::of);
 	}
 	
 	public static <A,B,C,D,E,F,G,H,ERR> Or<Tuple8<A,B,C,D,E,F,G,H>, Every<ERR>> zip8(
-			Or<A, ? extends Every<ERR>> a,
-			Or<B, ? extends Every<ERR>> b,
-			Or<C, ? extends Every<ERR>> c,
-			Or<D, ? extends Every<ERR>> d,
-			Or<E, ? extends Every<ERR>> e,
-			Or<F, ? extends Every<ERR>> f,
-			Or<G, ? extends Every<ERR>> g,
-			Or<H, ? extends Every<ERR>> h) {
+			Or<? extends A, ? extends Every<? extends ERR>> a,
+			Or<? extends B, ? extends Every<? extends ERR>> b,
+			Or<? extends C, ? extends Every<? extends ERR>> c,
+			Or<? extends D, ? extends Every<? extends ERR>> d,
+			Or<? extends E, ? extends Every<? extends ERR>> e,
+			Or<? extends F, ? extends Every<? extends ERR>> f,
+			Or<? extends G, ? extends Every<? extends ERR>> g,
+			Or<? extends H, ? extends Every<? extends ERR>> h) {
 		return withGood(a, b, c, d, e, f, g, h, Tuple::of);
 	}
 
@@ -234,21 +234,21 @@ public final class Accumulation {
 	// ------------------------------------------------------------------------
 	
 	public static <A, B, ERR, RESULT> Or<RESULT, Every<ERR>> withGood(
-			Or<A, ? extends Every<ERR>> a, 
-			Or<B, ? extends Every<ERR>> b,
+			Or<? extends A, ? extends Every<? extends ERR>> a, 
+			Or<? extends B, ? extends Every<? extends ERR>> b,
 			BiFunction<A, B, RESULT> function) {
 		if(allGood(a,b))
 			return Good.of(function.apply(a.get(), b.get()));
 		else {
-			Vector<ERR> bads = getBads(a, b);
+			Vector<? extends ERR> bads = getBads(a, b);
 			return Bad.of(Every.of(bads.head(), bads.tail()));
 		}
 	}
 
 	public static <A, B, C, ERR, RESULT> Or<RESULT, Every<ERR>> withGood(
-			Or<A, ? extends Every<ERR>> a, 
-			Or<B, ? extends Every<ERR>> b,
-			Or<C, ? extends Every<ERR>> c, 
+			Or<? extends A, ? extends Every<? extends ERR>> a, 
+			Or<? extends B, ? extends Every<? extends ERR>> b,
+			Or<? extends C, ? extends Every<? extends ERR>> c, 
 			Function3<A, B, C, RESULT> function) {
 		if(allGood(a,b,c))
 			return Good.of(function.apply(a.get(), b.get(), c.get()));
@@ -259,10 +259,10 @@ public final class Accumulation {
 	}
 
 	public static <A, B, C, D, ERR, RESULT> Or<RESULT, Every<ERR>> withGood(
-			Or<A, ? extends Every<ERR>> a, 
-			Or<B, ? extends Every<ERR>> b,
-			Or<C, ? extends Every<ERR>> c,
-			Or<D, ? extends Every<ERR>> d,
+			Or<? extends A, ? extends Every<? extends ERR>> a, 
+			Or<? extends B, ? extends Every<? extends ERR>> b,
+			Or<? extends C, ? extends Every<? extends ERR>> c,
+			Or<? extends D, ? extends Every<? extends ERR>> d,
 			Function4<A, B, C, D, RESULT> function) {
 		if(allGood(a,b,c,d))
 			return Good.of(function.apply(a.get(), b.get(), c.get(), d.get()));
@@ -273,11 +273,11 @@ public final class Accumulation {
 	}
 
 	public static <A, B, C, D, E, ERR, RESULT> Or<RESULT, Every<ERR>> withGood(
-			Or<A, ? extends Every<ERR>> a, 
-			Or<B, ? extends Every<ERR>> b,
-			Or<C, ? extends Every<ERR>> c,
-			Or<D, ? extends Every<ERR>> d,
-			Or<E, ? extends Every<ERR>> e,
+			Or<? extends A, ? extends Every<? extends ERR>> a, 
+			Or<? extends B, ? extends Every<? extends ERR>> b,
+			Or<? extends C, ? extends Every<? extends ERR>> c,
+			Or<? extends D, ? extends Every<? extends ERR>> d,
+			Or<? extends E, ? extends Every<? extends ERR>> e,
 			Function5<A, B, C, D, E, RESULT> function) {
 		if(allGood(a,b,c,d,e))
 			return Good.of(function.apply(a.get(), b.get(), c.get(), d.get(), e.get()));
@@ -288,12 +288,12 @@ public final class Accumulation {
 	}
 
 	public static <A, B, C, D, E, F, ERR, RESULT> Or<RESULT, Every<ERR>> withGood(
-			Or<A, ? extends Every<ERR>> a, 
-			Or<B, ? extends Every<ERR>> b,
-			Or<C, ? extends Every<ERR>> c,
-			Or<D, ? extends Every<ERR>> d,
-			Or<E, ? extends Every<ERR>> e,
-			Or<F, ? extends Every<ERR>> f,
+			Or<? extends A, ? extends Every<? extends ERR>> a, 
+			Or<? extends B, ? extends Every<? extends ERR>> b,
+			Or<? extends C, ? extends Every<? extends ERR>> c,
+			Or<? extends D, ? extends Every<? extends ERR>> d,
+			Or<? extends E, ? extends Every<? extends ERR>> e,
+			Or<? extends F, ? extends Every<? extends ERR>> f,
 			Function6<A, B, C, D, E, F, RESULT> function) {
 		if(allGood(a,b,c,d,e,f))
 			return Good.of(function.apply(a.get(), b.get(), c.get(), d.get(), e.get(), f.get()));
@@ -304,13 +304,13 @@ public final class Accumulation {
 	}
 
 	public static <A, B, C, D, E, F, G, ERR, RESULT> Or<RESULT, Every<ERR>> withGood(
-			Or<A, ? extends Every<ERR>> a, 
-			Or<B, ? extends Every<ERR>> b,
-			Or<C, ? extends Every<ERR>> c,
-			Or<D, ? extends Every<ERR>> d,
-			Or<E, ? extends Every<ERR>> e,
-			Or<F, ? extends Every<ERR>> f,
-			Or<G, ? extends Every<ERR>> g,
+			Or<? extends A, ? extends Every<? extends ERR>> a, 
+			Or<? extends B, ? extends Every<? extends ERR>> b,
+			Or<? extends C, ? extends Every<? extends ERR>> c,
+			Or<? extends D, ? extends Every<? extends ERR>> d,
+			Or<? extends E, ? extends Every<? extends ERR>> e,
+			Or<? extends F, ? extends Every<? extends ERR>> f,
+			Or<? extends G, ? extends Every<? extends ERR>> g,
 			Function7<A, B, C, D, E, F, G, RESULT> function) {
 		if(allGood(a,b,c,d,e,f,g))
 			return Good.of(function.apply(a.get(), b.get(), c.get(), d.get(), e.get(), f.get(), g.get()));
@@ -321,14 +321,14 @@ public final class Accumulation {
 	}
 
 	public static <A, B, C, D, E, F, G, H, ERR, RESULT> Or<RESULT, Every<ERR>> withGood(
-			Or<A, ? extends Every<ERR>> a, 
-			Or<B, ? extends Every<ERR>> b,
-			Or<C, ? extends Every<ERR>> c,
-			Or<D, ? extends Every<ERR>> d,
-			Or<E, ? extends Every<ERR>> e,
-			Or<F, ? extends Every<ERR>> f,
-			Or<G, ? extends Every<ERR>> g,
-			Or<H, ? extends Every<ERR>> h,
+			Or<? extends A, ? extends Every<? extends ERR>> a, 
+			Or<? extends B, ? extends Every<? extends ERR>> b,
+			Or<? extends C, ? extends Every<? extends ERR>> c,
+			Or<? extends D, ? extends Every<? extends ERR>> d,
+			Or<? extends E, ? extends Every<? extends ERR>> e,
+			Or<? extends F, ? extends Every<? extends ERR>> f,
+			Or<? extends G, ? extends Every<? extends ERR>> g,
+			Or<? extends H, ? extends Every<? extends ERR>> h,
 			Function8<A, B, C, D, E, F, G, H, RESULT> function) {
 		if(allGood(a,b,c,d,e,f,g,h))
 			return Good.of(function.apply(a.get(), b.get(), c.get(), d.get(), e.get(), f.get(), g.get(), h.get()));
@@ -345,9 +345,9 @@ public final class Accumulation {
 	}
 	
 	@SafeVarargs
-	private static <ERR> Vector<ERR> getBads(Or<?, ? extends Every<ERR>>... ors) {
+	private static <ERR> Vector<ERR> getBads(Or<?, ? extends Every<? extends ERR>>... ors) {
 		Vector<ERR> errs = Vector.empty();
-		for(Or<?, ? extends Every<ERR>> or: ors) {
+		for(Or<?, ? extends Every<? extends ERR>> or: ors) {
 			if(or.isBad()) errs = errs.appendAll(or.getBad().toVector());
 		}
 		return errs;
