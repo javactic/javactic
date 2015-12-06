@@ -601,7 +601,7 @@ Bad.of(&quot;bad&quot;).asOr(); // Or&lt;Object, String&gt;
 		</p>
 		<pre>
 <code class="java">
-Bad&lt;String, One&lt;String&gt;&gt; ofOne = Bad.of(&quot;bad&quot;).accumulating(); // Bad&lt;String, One&lt;String&gt;&gt;
+Or&lt;String, One&lt;String&gt;&gt; acc = Bad.&lt;String,String&gt;of(&quot;bad&quot;).accumulating(); // Or&lt;String, One&lt;String&gt;&gt;
 Bad&lt;String, One&lt;String&gt;&gt; ofOne = Bad.ofOne(&quot;bad&quot;); // Bad&lt;String, One&lt;String&gt;&gt;
 Bad&lt;String, One&lt;String&gt;&gt; ofOneString = Bad.ofOneString(&quot;error with value {}&quot;, 12); // Bad&lt;String, One&lt;String&gt;&gt;
 </code>
