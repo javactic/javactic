@@ -118,12 +118,12 @@ public final class Accumulation {
 	public static <F, G, A, I extends Iterable<? extends G>, ERR> 
 	    Or<I, Every<ERR>> 
 		validatedBy(Iterable<? extends F> iterable, 
-					Function<? super F, ? extends Or<G, ? extends Every<? extends ERR>>> f, 
+					Function<? super F, ? extends Or<? extends G, ? extends Every<? extends ERR>>> f, 
 					Collector<? super G, A, I> collector) {
 			A goods = collector.supplier().get();
 			Vector<ERR> errs = Vector.empty();
 			for(F g : iterable) {
-				Or<G, ? extends Every<? extends ERR>> or = f.apply(g);
+				Or<? extends G, ? extends Every<? extends ERR>> or = f.apply(g);
 				if(or.isGood()) 
 					collector.accumulator().accept(goods, or.get());
 				else
