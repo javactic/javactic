@@ -262,7 +262,7 @@ public final class Accumulation {
 	public static <A, B, ERR, RESULT> Or<RESULT, Every<ERR>> withGood(
 			Or<? extends A, ? extends Every<? extends ERR>> a, 
 			Or<? extends B, ? extends Every<? extends ERR>> b,
-			BiFunction<A, B, RESULT> function) {
+			BiFunction<? super A, ? super B, ? extends RESULT> function) {
 		if(allGood(a,b))
 			return Good.of(function.apply(a.get(), b.get()));
 		else {
@@ -275,7 +275,7 @@ public final class Accumulation {
 			Or<? extends A, ? extends Every<? extends ERR>> a, 
 			Or<? extends B, ? extends Every<? extends ERR>> b,
 			Or<? extends C, ? extends Every<? extends ERR>> c, 
-			Function3<A, B, C, RESULT> function) {
+			Function3<? super A, ? super B, C, ? extends RESULT> function) {
 		if(allGood(a,b,c))
 			return Good.of(function.apply(a.get(), b.get(), c.get()));
 		else {
@@ -289,7 +289,8 @@ public final class Accumulation {
 			Or<? extends B, ? extends Every<? extends ERR>> b,
 			Or<? extends C, ? extends Every<? extends ERR>> c,
 			Or<? extends D, ? extends Every<? extends ERR>> d,
-			Function4<A, B, C, D, RESULT> function) {
+			Function4<? super A, ? super B, ? super C, 
+			          ? super D, ? extends RESULT> function) {
 		if(allGood(a,b,c,d))
 			return Good.of(function.apply(a.get(), b.get(), c.get(), d.get()));
 		else {
@@ -304,7 +305,8 @@ public final class Accumulation {
 			Or<? extends C, ? extends Every<? extends ERR>> c,
 			Or<? extends D, ? extends Every<? extends ERR>> d,
 			Or<? extends E, ? extends Every<? extends ERR>> e,
-			Function5<A, B, C, D, E, RESULT> function) {
+			Function5<? super A, ? super B, ? super C, 
+			          ? super D, ? super E, ? extends RESULT> function) {
 		if(allGood(a,b,c,d,e))
 			return Good.of(function.apply(a.get(), b.get(), c.get(), d.get(), e.get()));
 		else {
@@ -320,7 +322,8 @@ public final class Accumulation {
 			Or<? extends D, ? extends Every<? extends ERR>> d,
 			Or<? extends E, ? extends Every<? extends ERR>> e,
 			Or<? extends F, ? extends Every<? extends ERR>> f,
-			Function6<A, B, C, D, E, F, RESULT> function) {
+			Function6<? super A, ? super B, ? super C, 
+			          ? super D, ? super E, ? super F, ? extends RESULT> function) {
 		if(allGood(a,b,c,d,e,f))
 			return Good.of(function.apply(a.get(), b.get(), c.get(), d.get(), e.get(), f.get()));
 		else {
@@ -337,7 +340,8 @@ public final class Accumulation {
 			Or<? extends E, ? extends Every<? extends ERR>> e,
 			Or<? extends F, ? extends Every<? extends ERR>> f,
 			Or<? extends G, ? extends Every<? extends ERR>> g,
-			Function7<A, B, C, D, E, F, G, RESULT> function) {
+			Function7<? super A, ? super B, ? super C, ? super D, 
+			          ? super E, ? super F, ? super G, ? extends RESULT> function) {
 		if(allGood(a,b,c,d,e,f,g))
 			return Good.of(function.apply(a.get(), b.get(), c.get(), d.get(), e.get(), f.get(), g.get()));
 		else {
@@ -355,7 +359,8 @@ public final class Accumulation {
 			Or<? extends F, ? extends Every<? extends ERR>> f,
 			Or<? extends G, ? extends Every<? extends ERR>> g,
 			Or<? extends H, ? extends Every<? extends ERR>> h,
-			Function8<A, B, C, D, E, F, G, H, RESULT> function) {
+			Function8<? super A, ? super B, ? super C, ? super D, 
+			          ? super E, ? super F, ? super G, ? super H, ? extends RESULT> function) {
 		if(allGood(a,b,c,d,e,f,g,h))
 			return Good.of(function.apply(a.get(), b.get(), c.get(), d.get(), e.get(), f.get(), g.get(), h.get()));
 		else {
