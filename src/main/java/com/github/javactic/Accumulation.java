@@ -77,11 +77,11 @@ public final class Accumulation {
      * @return an Or of all the good values or of all the errors 
      */
 	public static <G,A,ERR, I extends Iterable<? extends G>> Or<I, Every<ERR>> 
-		combined(Iterable<? extends Or<G, ? extends Every<ERR>>> iterable,
+		combined(Iterable<? extends Or<? extends G, ? extends Every<ERR>>> iterable,
 				 Collector<? super G, A, I> collector) {
 		A goods = collector.supplier().get();
 		Vector<ERR> errs = Vector.empty();
-		for(Or<G, ? extends Every<ERR>> or: iterable) {
+		for(Or<? extends G, ? extends Every<ERR>> or: iterable) {
 			if(or.isGood())
 				collector.accumulator().accept(goods, or.get());
 			else
@@ -149,7 +149,7 @@ public final class Accumulation {
 	@SuppressWarnings("unchecked")
     @SafeVarargs
 	public static <G, ERR> Or<G, Every<ERR>> 
-		when(Or<G, ? extends Every<? extends ERR>> or, Function<? super G, ? extends Validation<ERR>>... validations) {
+		when(Or<? extends G, ? extends Every<? extends ERR>> or, Function<? super G, ? extends Validation<ERR>>... validations) {
 			if(or.isGood()) {
 				Vector<ERR>  result = Stream.of(validations).flatMap(f -> {
 					Validation<ERR> v = f.apply(or.get());
