@@ -38,7 +38,7 @@ public class AccumulationTest {
 
 	
 	@Test
-	public void testCombined() {
+	public void combined() {
 		Vector<Or<String, Every<String>>> vec = Vector.of(Good.of("A"), Good.of("B"));
 		Or<Vector<String>, Every<String>> result = Accumulation.combined(vec, Vector.collector());
 		assertTrue(result.isGood());
@@ -52,7 +52,7 @@ public class AccumulationTest {
 	}
 	
 	@Test
-	public void testValidatedBy() {
+	public void validatedBy() {
 		Vector<Integer> vec = Vector.of(1,2,3);
 		Function<Integer, Or<Integer, Every<String>>> f = i -> {
 			if(i < 10) return Good.of(i);
@@ -67,7 +67,7 @@ public class AccumulationTest {
 	}
 	
 	@Test
-	public void testWhen() {
+	public void when() {
 		Function<String, Validation<String>> f1 = f -> f.startsWith("s") ? Pass.instance() : Fail.of("does not start with s");
 		Function<String, Validation<String>> f2 = f -> f.length() > 4 ? Fail.of("too long") : Pass.instance();
 		Or<String, Every<String>> res = Accumulation.when(Bad.of(One.of("bad")), f1, f2);
@@ -79,7 +79,7 @@ public class AccumulationTest {
 	}
 	
 	@Test
-	public void testWithGood(){
+	public void withGood(){
 		Function<Or<String, Every<String>>[], Or<?, Every<String>>> fun = 
 				ors -> Accumulation.withGood(ors[0], ors[1], (a,b) -> "");
 		testWithF(fun, 2);
