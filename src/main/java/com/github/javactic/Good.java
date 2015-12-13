@@ -185,8 +185,8 @@ public class Good<G,B> implements Or<G,B> {
 	}
 
 	@Override
-	public Or<G, B> filter(Function<? super G, Validation<B>> validator) {
-		Validation<B> result = validator.apply(value);
+	public Or<G, B> filter(Function<? super G, ? extends Validation<? extends B>> validator) {
+		Validation<? extends B> result = validator.apply(value);
 		if(result.isPass()) return this;
 		else return Bad.of(result.getError());
 	}

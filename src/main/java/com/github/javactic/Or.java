@@ -274,7 +274,7 @@ public interface Or<G, B> {
      * @return a {@link Good} if this {@link Or} is a {@link Good} that passes the validation function,
      *         else a {@link Bad}.
      */
-    Or<G, B> filter(Function<? super G, Validation<B>> validator);
+    Or<G, B> filter(Function<? super G, ? extends Validation<? extends B>> validator); 
 
     /**
      * Returns the given function applied to the value contained in this {@link Or} if it is a {@link Good},

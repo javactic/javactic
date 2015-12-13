@@ -241,7 +241,7 @@ public class Bad<G,B> implements Or<G,B> {
 	}
 
 	@Override
-	public Or<G, B> filter(Function<? super G, Validation<B>> validator) {
+	public Or<G, B> filter(Function<? super G, ? extends Validation<? extends B>> validator) {
 		return this;
 	}
 

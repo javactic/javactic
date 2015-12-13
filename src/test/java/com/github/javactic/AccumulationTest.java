@@ -40,7 +40,7 @@ public class AccumulationTest {
 	@Test
 	public void combined() {
 		Vector<Or<String, Every<String>>> vec = Vector.of(Good.of("A"), Good.of("B"));
-		Or<Vector<String>, Every<String>> result = Accumulation.combined(vec, Vector.collector());
+		Or<Vector<String>, Every<String>> result = Accumulation.combined(vec);
 		assertTrue(result.isGood());
 		assertEquals("A", result.get().head());
 		assertEquals("B", result.get().tail().head());
@@ -58,7 +58,7 @@ public class AccumulationTest {
 			if(i < 10) return Good.of(i);
 			else return Bad.of(One.of("wasn't under 10"));
 		};
-		Or<Vector<Integer>, Every<String>> res = Accumulation.validatedBy(vec, f, Vector.collector());
+		Or<Vector<Integer>, Every<String>> res = Accumulation.validatedBy(vec, f);
 		assertTrue(res.isGood());
 		assertEquals(vec, res.get());
 		res = Accumulation.validatedBy(Vector.of(11), f, Vector.collector());
@@ -80,7 +80,7 @@ public class AccumulationTest {
 	
 	@Test
 	public void withGood(){
-		Function<Or<String, Every<String>>[], Or<?, Every<String>>> fun = 
+		Function<Or<String, ? extends Every<String>>[], Or<?, Every<String>>> fun = 
 				ors -> Accumulation.withGood(ors[0], ors[1], (a,b) -> "");
 		testWithF(fun, 2);
 		fun = o -> Accumulation.withGood(o[0], o[1], o[2], (a, b, c) -> "");
@@ -99,7 +99,7 @@ public class AccumulationTest {
 	
 	@Test
 	public void zips() {
-		Function<Or<String, Every<String>>[], Or<?, Every<String>>> fun = ors -> Accumulation.zip(ors[0], ors[1]);
+		Function<Or<String, ? extends Every<String>>[], Or<?, Every<String>>> fun = ors -> Accumulation.zip(ors[0], ors[1]);
 		testWithF(fun, 2);
 		fun = o -> Accumulation.zip3(o[0], o[1], o[2]);
 		testWithF(fun, 3);
@@ -126,12 +126,12 @@ public class AccumulationTest {
         new Helper();
     }
 	
-	private void testWithF(Function<Or<String, Every<String>>[], Or<?, Every<String>>> f, int size) {
+	private void testWithF(Function<Or<String, ? extends Every<String>>[], Or<?, Every<String>>> f, int size) {
 		@SuppressWarnings("unchecked")
-		Or<String, Every<String>>[] ors = new Or[size];
+		Or<String, ? extends Every<String>>[] ors = new Or[size];
 		for(int i = 0; i <= ors.length; i++){
 			for(int j = 0; j < ors.length; j++) {
-				if(j == i) ors[j] = Bad.of(One.of("bad"));
+				if(j == i) ors[j] = Bad.ofOne("bad");
 				else ors[j] = Good.of("good");
 			}
 			Or<?, Every<String>> val = f.apply(ors);

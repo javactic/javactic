@@ -65,6 +65,21 @@ public final class Accumulation {
     /**
      * Combines an Iterable of Ors of type Or&lt;G, EVERY&lt;ERR&gt;&gt; (where
      * EVERY is some subtype of Every) into a single Or of type
+     * Or&lt;Vector&lt;G&gt;, Every&lt;ERR&gt;&gt;.
+     * 
+     * @param <G> the good type of the resulting Or
+     * @param <ERR> the bad type of the resulting Or
+     * @param iterable the iterable containing Ors to combine
+     * @return an Or of all the good values or of all the errors 
+     */
+    public static <G, ERR> Or<Vector<G>, Every<ERR>>
+            combined(Iterable<? extends Or<? extends G, ? extends Every<ERR>>> iterable) {
+        return combined(iterable, Vector.<G> collector());
+    }
+	
+    /**
+     * Combines an Iterable of Ors of type Or&lt;G, EVERY&lt;ERR&gt;&gt; (where
+     * EVERY is some subtype of Every) into a single Or of type
      * Or&lt;COLL&lt;G&gt;, Every&lt;ERR&gt;&gt; using a Collector to determine
      * the wanted collection type COLL.
      * 
@@ -87,13 +102,38 @@ public final class Accumulation {
 			else
 				errs = errs.appendAll(or.getBad().toVector());
 		}
-		I gds = collector.finisher().apply(goods);
-		if(errs.isEmpty())
+		if(errs.isEmpty()) {
+	        I gds = collector.finisher().apply(goods);
 			return Good.of(gds);
+		}
 		else
 			return Bad.of(Every.of(errs.head(), errs.tail()));
 	}
 	
+    /**
+     * Maps a iterable of Fs into Ors of type Or&lt;G, EVERY&lt;ERR&gt;&gt;
+     * (where EVERY is some subtype of Every) using the passed function f, then
+     * combines the resulting Ors into a single Or of type Or&lt;Vector&lt;G&gt;,
+     * Every&lt;ERR&gt;&gt;.
+     * <p>
+     * Note: this process implemented by this method is sometimes called a
+     * &quot;traverse&quot;.
+     * </p>
+     * 
+     * @param <F> the type of the original iterable to validate
+     * @param <G> the Good type of the resulting Or
+     * @param <A> the mutable accumulation type of the reduction operation of the collector
+     * @param <ERR>  the Bad type of the resulting Or
+     * @param iterable the iterable to validate
+     * @param f the validation function
+     * @return an Or of all the good values or of all the errors
+     */
+    public static <F, G, A, ERR> Or<Vector<G>, Every<ERR>>
+            validatedBy(Iterable<? extends F> iterable,
+                        Function<? super F, ? extends Or<? extends G, ? extends Every<? extends ERR>>> f) {
+        return validatedBy(iterable, f, Vector.collector());
+    }
+
     /**
      * Maps a iterable of Fs into Ors of type Or&lt;G, EVERY&lt;ERR&gt;&gt;
      * (where EVERY is some subtype of Every) using the passed function f, then
