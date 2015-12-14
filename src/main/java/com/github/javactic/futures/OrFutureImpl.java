@@ -1,5 +1,6 @@
 package com.github.javactic.futures;
 
+import java.time.Duration;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -96,14 +97,14 @@ class OrFutureImpl<G,B> implements OrFuture<G, B> {
     }
 
     @Override
-    public Or<G, B> result(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
-        if(finished.await(timeout, unit)) return value.get();
+    public Or<G, B> result(Duration timeout) throws InterruptedException, TimeoutException {
+        if(finished.await(timeout.toMillis(), TimeUnit.MILLISECONDS)) return value.get();
         else throw new TimeoutException("timeout waiting for result");
     }
     
     @Override
-    public Or<G, B> result(long timeout, TimeUnit unit, B timeoutBad) throws InterruptedException {
-        if(finished.await(timeout, unit)) return value.get();
+    public Or<G, B> result(Duration timeout, B timeoutBad) throws InterruptedException {
+        if(finished.await(timeout.toMillis(), TimeUnit.MILLISECONDS)) return value.get();
         else return Bad.of(timeoutBad);
     }
     

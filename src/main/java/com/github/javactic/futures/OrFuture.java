@@ -1,8 +1,8 @@
 package com.github.javactic.futures;
 
+import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -38,9 +38,9 @@ public interface OrFuture<G,B> {
     
     Option<Or<G,B>> value();
     
-    Or<G,B> result(long timeout, TimeUnit unit) throws TimeoutException, InterruptedException, ExecutionException;
+    Or<G,B> result(Duration timeout) throws TimeoutException, InterruptedException, ExecutionException;
     
-    Or<G,B> result(long timeout, TimeUnit unit, B timeoutBad) throws InterruptedException;
+    Or<G,B> result(Duration timeout, B timeoutBad) throws InterruptedException;
     
     default OrFuture<G,B> filter(Function<? super G, ? extends Validation<? extends B>> validator) {
         Objects.requireNonNull(validator, "validator is null");

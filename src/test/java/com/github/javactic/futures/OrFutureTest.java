@@ -1,10 +1,9 @@
 package com.github.javactic.futures;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertEquals;
 
+import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -43,7 +42,7 @@ public class OrFutureTest {
     public void filter() throws Exception {
         OrFuture<Integer, String> orFuture = getF(5)
                 .filter(i -> (i > 10) ? Pass.instance() : Fail.of(FAIL));
-        Or<Integer, String> or = orFuture.result(10, TimeUnit.SECONDS);
+        Or<Integer, String> or = orFuture.result(Duration.ofSeconds(10));
         Assert.assertEquals(FAIL, or.getBad());
     }
 
@@ -51,39 +50,39 @@ public class OrFutureTest {
     public void map() throws Exception {
         OrFuture<String, String> orFuture = getF(5)
                 .map(i -> "" + i);
-        Assert.assertEquals("5", orFuture.result(10, TimeUnit.SECONDS).get());
+        Assert.assertEquals("5", orFuture.result(Duration.ofSeconds(10)).get());
     }
     
     @Test
     public void flatMap() throws Exception {
         OrFuture<String, String> orFuture = getF(5)
                 .flatMap(i -> OrFuture.of(() -> Good.of(i + "")));
-        Assert.assertEquals("5", orFuture.result(10, TimeUnit.SECONDS).get());
+        Assert.assertEquals("5", orFuture.result(Duration.ofSeconds(10)).get());
         
         orFuture = getF(5).flatMap(i -> OrFuture.failed(FAIL));
-        Assert.assertEquals(FAIL, orFuture.result(10, TimeUnit.SECONDS).getBad());
+        Assert.assertEquals(FAIL, orFuture.result(Duration.ofSeconds(10)).getBad());
         
         orFuture = OrFuture.<String, String>failed(FAIL).flatMap(i -> OrFuture.successful("5"));
-        assertEquals(FAIL, orFuture.result(10, TimeUnit.SECONDS).getBad());
+        assertEquals(FAIL, orFuture.result(Duration.ofSeconds(10)).getBad());
     }
 
     @Test
     public void recover() throws Exception {
         OrFuture<String, String> recover = OrFuture.<String,String>failed(FAIL).recover(f -> "5");
-        assertEquals("5", recover.result(10, TimeUnit.SECONDS).get());
+        assertEquals("5", recover.result(Duration.ofSeconds(10)).get());
     }
     
     @Test
     public void recoverWith() throws Exception {
         OrFuture<String, String> recover = OrFuture.<String,String>failed(FAIL).recoverWith(f -> OrFuture.successful("5"));
-        assertEquals("5", recover.result(10, SECONDS).get());
+        assertEquals("5", recover.result(Duration.ofSeconds(10)).get());
     }
     
     @Test
     public void transform() throws Exception {
         OrFuture<String, String> or = OrFuture.failed(FAIL);
         OrFuture<Integer, Integer> transform = or.transform(s -> 5, f -> -5);
-        assertEquals(-5, transform.result(10, SECONDS).getBad().intValue());
+        assertEquals(-5, transform.result(Duration.ofSeconds(10)).getBad().intValue());
     }
     
     private <G> OrFuture<G,String> getF(G g){

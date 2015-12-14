@@ -2,8 +2,8 @@ package com.github.javactic.futures;
 
 import static org.junit.Assert.assertFalse;
 
+import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.Assert;
@@ -44,7 +44,7 @@ public class OrFutureImplTest {
             // expected
         }
         latch.countDown();
-        Or<String, String> result = f.result(10, TimeUnit.SECONDS);
+        Or<String, String> result = f.result(Duration.ofSeconds(10));
         try {
             f.run(() -> Bad.of("should be complete"));
             Assert.fail("can't run a completed future");
@@ -66,10 +66,10 @@ public class OrFutureImplTest {
             }
             return Good.of("5");
         });
-        Or<String, String> fail = f.result(10, TimeUnit.MILLISECONDS, FAIL);
+        Or<String, String> fail = f.result(Duration.ofMillis(10), FAIL);
         Assert.assertEquals(FAIL, fail.getBad());
         latch.countDown();
-        Or<String, String> succ = f.result(10, TimeUnit.SECONDS, FAIL);
+        Or<String, String> succ = f.result(Duration.ofSeconds(10), FAIL);
         Assert.assertEquals("5", succ.get());
     }
     
@@ -86,13 +86,13 @@ public class OrFutureImplTest {
             return Good.of("5");
         });
         try {
-            f.result(10, TimeUnit.MILLISECONDS);
+            f.result(Duration.ofMillis(10));
             Assert.fail("should throw timeout");
         } catch (TimeoutException e) {
             // expected
         }
         latch.countDown();
-        Or<String, String> succ = f.result(10, TimeUnit.SECONDS);
+        Or<String, String> succ = f.result(Duration.ofSeconds(10));
         Assert.assertEquals("5", succ.get());
     }
 

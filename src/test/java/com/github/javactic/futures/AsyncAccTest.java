@@ -4,7 +4,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 import java.util.function.Function;
 
 import org.junit.Assert;
@@ -25,7 +25,7 @@ public class AsyncAccTest {
         OrFuture<String, String> success = OrFuture.successful("good");
         OrFuture<String, String> fail = OrFuture.failed("bad");
         OrFuture<String, Every<String>> result = AsyncAcc.withGood(success, fail, (a1,a2) -> "doesn't matter");
-        Or<String, Every<String>> or = result.result(10, TimeUnit.SECONDS);
+        Or<String, Every<String>> or = result.result(Duration.ofSeconds(10));
         Assert.assertEquals("bad", or.getBad().head());
     }
     
@@ -34,7 +34,7 @@ public class AsyncAccTest {
         OrFuture<String, String> s1 = OrFuture.successful("A");
         OrFuture<Integer, String> s2 = OrFuture.successful(1);
         OrFuture<String, Every<String>> result = AsyncAcc.withGood(s1, s2, (a1,a2) -> a1 + a2);
-        Or<String, Every<String>> or = result.result(10, TimeUnit.SECONDS);
+        Or<String, Every<String>> or = result.result(Duration.ofSeconds(10));
         Assert.assertEquals("A1", or.get());
     }
     
@@ -46,7 +46,7 @@ public class AsyncAccTest {
             seq = seq.append(OrFuture.of(() -> Good.of(fi)));
         }
         OrFuture<Vector<Integer>, Every<String>> sequence = AsyncAcc.combined(seq);
-        Or<Vector<Integer>, Every<String>> or = sequence.result(10, TimeUnit.SECONDS);
+        Or<Vector<Integer>, Every<String>> or = sequence.result(Duration.ofSeconds(10));
         Assert.assertTrue(or.isGood());
         String fold = or.get().foldLeft("", (s,i) -> s + i);
         Assert.assertEquals("0123456789", fold);
@@ -63,7 +63,7 @@ public class AsyncAccTest {
                 seq = seq.append(OrFuture.of(() -> Bad.of(fi)));
         }
         OrFuture<Vector<Integer>, Every<Integer>> sequence = AsyncAcc.combined(seq);
-        Or<Vector<Integer>, Every<Integer>> or = sequence.result(10, TimeUnit.SECONDS);
+        Or<Vector<Integer>, Every<Integer>> or = sequence.result(Duration.ofSeconds(10));
         Assert.assertTrue(or.isBad());
         String fold = or.getBad().foldLeft("", (s,i) -> s + i);
         Assert.assertEquals("13579", fold);
@@ -118,9 +118,9 @@ public class AsyncAccTest {
             }
             OrFuture<?, Every<String>> val = f.apply(ors);
             if(i < ors.length)
-                assertTrue(val.result(10, TimeUnit.MINUTES).isBad());
+                assertTrue(val.result(Duration.ofSeconds(10)).isBad());
             else
-                assertTrue(val.result(10, TimeUnit.MINUTES).isGood());
+                assertTrue(val.result(Duration.ofSeconds(10)).isGood());
         }
     }
     
