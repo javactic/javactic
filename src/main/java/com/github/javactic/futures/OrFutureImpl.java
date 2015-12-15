@@ -6,7 +6,6 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -28,16 +27,13 @@ class OrFutureImpl<G,B> implements OrFuture<G, B> {
     private final AtomicBoolean started = new AtomicBoolean(false);
     private final CountDownLatch finished = new CountDownLatch(1);
     private final Queue<Consumer<? super Or<G,B>>> actions = new ConcurrentLinkedQueue<>();
+    @SuppressWarnings("unused")
     private volatile Future<Or<G,B>> job = null;
 
-    public OrFutureImpl(ForkJoinPool executor) {
+    public OrFutureImpl(ExecutorService executor) {
         this.executor = executor;
     }
     
-    public OrFutureImpl() {
-        this(ForkJoinPool.commonPool());
-    }
-
     @SuppressWarnings("unchecked")
     boolean tryComplete(Or<? extends G, ? extends B>  value) {
         Objects.requireNonNull(value, "value is null");

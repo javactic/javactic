@@ -3,6 +3,8 @@ package com.github.javactic.futures;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -15,13 +17,17 @@ import javaslang.control.Option;
 
 public interface OrFuture<G,B> {
 
-    static <G,B> OrFuture<G,B> of(Supplier<? extends Or<? extends G,? extends B>> orSupplier) {
+    static <G,B> OrFuture<G,B> of(ExecutorService executor, Supplier<? extends Or<? extends G,? extends B>> orSupplier) {
         Objects.requireNonNull(orSupplier, "orSupplier is null");
-        final OrFutureImpl<G,B> future = new OrFutureImpl<>();
+        final OrFutureImpl<G,B> future = new OrFutureImpl<>(executor);
         future.run(orSupplier);
         return future;
     }
     
+    static <G,B> OrFuture<G,B> of(Supplier<? extends Or<? extends G,? extends B>> orSupplier) {
+        return of(ForkJoinPool.commonPool(), orSupplier);
+    }
+
     static <G,B> OrFuture<G,B> failed(B bad) {
         return OrPromise.<G,B>make().failure(bad).future();
     }

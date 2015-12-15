@@ -4,30 +4,40 @@ import static org.junit.Assert.assertFalse;
 
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.experimental.theories.DataPoints;
+import org.junit.experimental.theories.Theories;
+import org.junit.experimental.theories.Theory;
+import org.junit.runner.RunWith;
 
 import com.github.javactic.Bad;
 import com.github.javactic.Good;
 import com.github.javactic.Or;
 
+@RunWith(Theories.class)
 public class OrFutureImplTest {
+
+    @DataPoints
+    public static ExecutorService[] configs = {Executors.newSingleThreadExecutor(), ForkJoinPool.commonPool()};
 
     private static final String FAIL = "fail";
 
-    @Test
-    public void completions() {
-        OrFutureImpl<String,String> f = new OrFutureImpl<>();
+    @Theory
+    public void completions(ExecutorService es) {
+        OrFutureImpl<String,String> f = new OrFutureImpl<>(es);
         f.complete(Good.of("good"));
         boolean retry = f.tryComplete(Bad.of(FAIL));
         assertFalse(retry);
     }
     
-    @Test
-    public void run() throws Exception {
-        OrFutureImpl<String,String> f = new OrFutureImpl<>();
+    @Theory
+    public void run(ExecutorService es) throws Exception {
+        OrFutureImpl<String,String> f = new OrFutureImpl<>(es);
         CountDownLatch latch = new CountDownLatch(1);
         f.run(() -> {
             try {
@@ -54,9 +64,9 @@ public class OrFutureImplTest {
         Assert.assertEquals("5", result.get());
     }
     
-    @Test
-    public void resultWithBad() throws Exception {
-        OrFutureImpl<String,String> f = new OrFutureImpl<>();
+    @Theory
+    public void resultWithBad(ExecutorService es) throws Exception {
+        OrFutureImpl<String,String> f = new OrFutureImpl<>(es);
         CountDownLatch latch = new CountDownLatch(1);
         f.run(() -> {
             try {
@@ -73,9 +83,9 @@ public class OrFutureImplTest {
         Assert.assertEquals("5", succ.get());
     }
     
-    @Test
-    public void resultWithException() throws Exception {
-        OrFutureImpl<String,String> f = new OrFutureImpl<>();
+    @Theory
+    public void resultWithException(ExecutorService es) throws Exception {
+        OrFutureImpl<String,String> f = new OrFutureImpl<>(es);
         CountDownLatch latch = new CountDownLatch(1);
         f.run(() -> {
             try {

@@ -1,5 +1,7 @@
 package com.github.javactic.futures;
 
+import java.util.concurrent.ForkJoinPool;
+
 import com.github.javactic.Bad;
 import com.github.javactic.Good;
 import com.github.javactic.Or;
@@ -7,7 +9,7 @@ import com.github.javactic.Or;
 public interface OrPromise<G,B> {
 
     static <G,B> OrPromise<G,B> make() {
-        return new OrPromiseImpl<>(new OrFutureImpl<>());
+        return new OrPromiseImpl<>(new OrFutureImpl<>(ForkJoinPool.commonPool()));
     }
     
 //    static <G,B> OrPromise<G,B> failed(B bad) {
