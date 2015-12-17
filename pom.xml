@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.javactic</groupId>
 	<artifactId>javactic</artifactId>
-	<version>1.0.0-RC1</version>
+	<version>1.0.0-RC2-SNAPSHOT</version>
 
 	<name>Javactic</name>
 	<description>
@@ -26,7 +26,7 @@
 		<connection>scm:git:git@github.com:javactic/javactic.git</connection>
 		<developerConnection>scm:git:git@github.com:javactic/javactic.git</developerConnection>
 		<url>https://github.com/javactic/javactic</url>
-		<tag>javactic-1.0.0-RC1</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<dependencies>
