@@ -1,3 +1,4 @@
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.javactic/javactic/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.javactic/javactic)
 [![codecov.io](https://codecov.io/github/javactic/javactic/coverage.svg?branch=master)](https://codecov.io/github/javactic/javactic?branch=master)
 [![Build Status](https://travis-ci.org/javactic/javactic.svg?branch=master)](https://travis-ci.org/javactic/javactic)
 
