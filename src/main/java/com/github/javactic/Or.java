@@ -484,12 +484,11 @@ public interface Or<G, B> {
      * </pre>
      *
      * @param <G> the good type of the Or
-     * @param <T> the bad type of the Or, a subtype of Throwable
      * @param or an instance of {@link Or}
      * @return this {@link Good} value, wrapped in a {@link Success}, or this
      *         {@link Bad} value, wrapped in a {@link Failure}.
      */
-    static <G, T extends Throwable> Try<G> toTry(Or<G,T> or) {
+    static <G> Try<G> toTry(Or<? extends G,? extends Throwable> or) {
         if(or.isGood()) return new Success<>(or.get());
         else return new Failure<>(or.getBad());
     }
