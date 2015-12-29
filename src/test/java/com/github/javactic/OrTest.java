@@ -110,6 +110,20 @@ public class OrTest {
 	}
 	
 	@Test
+	public void contains() {
+	    Or<String, String> good1 = Good.of("1");
+	    assertTrue(good1.contains("1"));
+	    assertFalse(good1.containsBad("1"));
+	    
+	    Or<String, String> bad1 = Bad.of("bad");
+	    assertTrue(bad1.containsBad("bad"));
+	    assertFalse(bad1.contains("bad"));
+	    
+	    Or<String[], String[]> good2 = Good.of(new String[]{"1"});
+	    assertTrue(good2.contains(new String[]{"1"}));
+	}
+	
+	@Test
 	public void casts() {
 	    Bad.of("b").asOr(); 
 	}

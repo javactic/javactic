@@ -21,6 +21,7 @@
 package com.github.javactic;
 
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -126,6 +127,16 @@ public class Bad<G,B> implements Or<G,B> {
 		return Bad.of(mapper.apply(value));
 	}
 
+	@Override
+	public boolean contains(G good) {
+	    return false;
+	}
+	
+	@Override
+	public boolean containsBad(B bad) {
+	    return Objects.deepEquals(bad, value);
+	}
+	
 	@Override
 	public boolean exists(Predicate<? super G> predicate) {
 		return false;

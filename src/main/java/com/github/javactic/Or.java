@@ -243,6 +243,24 @@ public interface Or<G, B> {
     <C> Or<G, C> badMap(Function<? super B, ? extends C> mapper);
 
     /**
+     * Returns true if this Or is a Good and its value is deeply equals to the given argument 
+     * according to {@link Objects#deepEquals(Object, Object)}.
+     * 
+     * @param good the value to compare to this Or's value if it is a Good
+     * @return true if this Or is a Good and its value is deeply equals to the given argument.
+     */
+    boolean contains(G good);
+    
+    /**
+     * Returns true if this Or is a Bad and its value is deeply equals to the given argument 
+     * according to {@link Objects#deepEquals(Object, Object)}.
+     * 
+     * @param bad the value to compare to this Or's value if it is a Bad
+     * @return true if this Or is a Bad and its value is deeply equals to the given argument.
+     */
+    boolean containsBad(B bad);
+    
+    /**
      * Returns <code>true</code> if this {@link Or} is a {@link Good} and the predicate <code>p</code> returns
      * true when applied to this {@link Good}'s value.
      *
