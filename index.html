@@ -1,92 +1,63 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html>
 <head>
 <meta charset="UTF-8">
 <title>Javactic</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="icon" type="image/png" href="./favicon.png" />
-<link rel="stylesheet" type="text/css" href="stylesheets/normalize.css"
-	media="screen">
-<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700'
-	rel='stylesheet' type='text/css'>
-<link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css"
-	media="screen">
-<link rel="stylesheet" type="text/css"
-	href="stylesheets/github-light.css" media="screen">
-<link rel="stylesheet"
-	href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/default.min.css">
-<script
-	src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
-<script>
-	hljs.initHighlightingOnLoad();
-</script>
+
+<link rel='stylesheet' href="css/normalize.css">
+<link rel='stylesheet prefetch' href='//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
+<link rel='stylesheet prefetch' href='//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css'>
+<link rel='stylesheet prefetch' href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/styles/default.min.css">
+<link rel='stylesheet' href="css/style.css">
+
 </head>
 <body>
-	<section class="page-header">
-		<h1 class="project-name">
-			Ja<span class="or-color">v</span>actic
-		</h1>
-		<h2 class="project-tagline">Java port of Scalactic</h2>
-		<a href="https://github.com/javactic/javactic" class="btn">View on
-			GitHub</a> <a href="https://github.com/javactic/javactic/zipball/master"
-			class="btn">Download .zip</a> <a
-			href="https://github.com/javactic/javactic/tarball/master"
-			class="btn">Download .tar.gz</a> <a href="javadoc/" class="btn">View
-			Javadoc</a>
-	</section>
+ <div class="jumbotron">
+  <div class="container">
+   <h1 class="project-name">
+    Ja<span class="or-color">v</span>actic
+   </h1>
+   <div class="project-tagline">Java port of Scalactic</div>
+   <a href="https://github.com/javactic/javactic" class="btn">View on GitHub</a> <a
+    href="https://github.com/javactic/javactic/zipball/master" class="btn">Download .zip</a> <a
+    href="https://github.com/javactic/javactic/tarball/master" class="btn">Download .tar.gz</a> <a href="javadoc/"
+    class="btn">View Javadoc</a>
+  </div>
+ </div>
+ <!--end of .jumbotron-->
 
-	<section class="main-content">
-		<p>
-			Javactic is a Java port of <a href="http://www.scalactic.org/">Scalactic</a>'s
-			<a href="http://www.scalactic.org/user_guide/OrAndEvery">Or and
-				Every</a> mechanism. Javactic is based on the <a
-				href="http://javaslang.com/">Javaslang</a> functional library for
-			Java 8+. This documentation is directly ported from <a
-				href="http://www.scalactic.org/user_guide/OrAndEvery">here</a>.
-		</p>
+ <div class="container">
+  <div class="row">
+   <div id="scrollspy" class="col-md-3 scrollspy"></div>
 
-		<h2>Or and Every</h2>
-		<p>
-			The <a href="javadoc/com/github/javactic/Or.html">Or</a> and <a
-				href="javadoc/com/github/javactic/Every.html">Every</a> types of
-			Javactic allow you to represent errors as an “alternate return value”
-			(like <a
-				href="http://javaslang.com/javadoc/2.0.0-RC1/javaslang/control/Either.html">Either</a>)
-			and to optionally accumulate errors.
-			<code>Or</code>
-			represents a value that is one of two possible types, with one type
-			being “good” (a value wrapped in an instance of
-			<code>Good</code>
-			) and the other “bad” (a value wrapped in an instance of
-			<code>Bad</code>
-			).
-		</p>
-		<h3>The motivation for Or</h3>
-		<p>
-			<code>Or</code>
-			differs from Javaslang's (and Scala's)
-			<code>Either</code>
-			type in that
-			<code>Either</code>
-			treats both its
-			<code>Left</code>
-			and
-			<code>Right</code>
-			alternatives in an identical manner, whereas
-			<code>Or</code>
-			treats its two alternatives differently: it favors
-			<code>Good</code>
-			over
-			<code>Bad</code>
-			. Because of this, it is more convenient to work with
-			<code>Or</code>
-			s when you prefer one alternative over the other; for example, if one
-			alternative represents a valid result and another represents an
-			error. To illustrate, imagine you want to create instances this
-			<code>Person</code>
-			class from user input strings:
-		</p>
-		<pre>
+   <div class="col-md-9">
+    <section class="main-content">
+     <p>
+      Javactic is a Java port of <a href="http://www.scalactic.org/">Scalactic</a>'s <a
+       href="http://www.scalactic.org/user_guide/OrAndEvery">Or and Every</a> mechanism. Javactic is based on the <a
+       href="http://javaslang.com/">Javaslang</a> functional library for Java 8+. This documentation is directly ported
+      from <a href="http://www.scalactic.org/user_guide/OrAndEvery">here</a>.
+     </p>
+
+     <h2>Or and Every</h2>
+     <p>
+      The <a href="javadoc/com/github/javactic/Or.html">Or</a> and <a href="javadoc/com/github/javactic/Every.html">Every</a>
+      types of Javactic allow you to represent errors as an "alternate return value" (like <a
+       href="http://javaslang.com/javadoc/2.0.0-RC1/javaslang/control/Either.html">Either</a>) and to optionally
+      accumulate errors. <code>Or</code> represents a value that is one of two possible types, with one type being
+      "good" (a value wrapped in an instance of <code>Good</code> ) and the other "bad" (a value wrapped in an instance
+      of <code>Bad</code> ).
+     </p>
+     <h3>The motivation for Or</h3>
+     <p>
+      <code>Or</code> differs from Javaslang's (and Scala's) <code>Either</code> type in that <code>Either</code> treats
+      both its <code>Left</code> and <code>Right</code> alternatives in an identical manner, whereas <code>Or</code>
+      treats its two alternatives differently: it favors <code>Good</code> over <code>Bad</code> . Because of this, it
+      is more convenient to work with <code>Or</code> s when you prefer one alternative over the other; for example, if
+      one alternative represents a valid result and another represents an error. To illustrate, imagine you want to
+      create instances this <code>Person</code> class from user input strings:
+     </p>
+     <pre>
 <code class="java">
 class Person {
     private final String name;
@@ -103,17 +74,11 @@ class Person {
 </code>
 		</pre>
 
-		<p>
-			You might write a method that parses the name from user input string
-			and returns an
-			<code>Option&lt;String&gt;</code>
-			:
-			<code>None</code>
-			if the string is empty or blank, else the trimmed string wrapped in a
-			<code>Some</code>
-			:
-		</p>
-		<pre>
+     <p>
+      You might write a method that parses the name from user input string and returns an <code>Option&lt;String&gt;</code>
+      : <code>None</code> if the string is empty or blank, else the trimmed string wrapped in a <code>Some</code> :
+     </p>
+     <pre>
 <code class="java">
 Option&lt;String&gt; parseName(String name) {
     String trimmed = name.trim();
@@ -121,18 +86,12 @@ Option&lt;String&gt; parseName(String name) {
 }
 </code>
 		</pre>
-		<p>
-			You might also write a method that parses the age from user input
-			string and returns an
-			<code>Option&lt;Int&gt;</code>
-			:
-			<code>None</code>
-			if either the string is not a valid integer or it is a negative
-			integer, else the string converted to an integer wrapped in a
-			<code>Some</code>
-			:
-		</p>
-		<pre>
+     <p>
+      You might also write a method that parses the age from user input string and returns an <code>Option&lt;Int&gt;</code>
+      : <code>None</code> if either the string is not a valid integer or it is a negative integer, else the string
+      converted to an integer wrapped in a <code>Some</code> :
+     </p>
+     <pre>
 <code class="java">
 Option&lt;Integer&gt; parseAge(String input) {
     try {
@@ -144,17 +103,11 @@ Option&lt;Integer&gt; parseAge(String input) {
 }
 </code>
 		</pre>
-		<p>
-			With these building blocks you could write a method that parses name
-			and age input strings and returns either a
-			<code>Person</code>
-			, wrapped in a
-			<code>Some</code>
-			, or
-			<code>None</code>
-			if either the name or age, or both, was invalid:
-		</p>
-		<pre>
+     <p>
+      With these building blocks you could write a method that parses name and age input strings and returns either a <code>Person</code>
+      , wrapped in a <code>Some</code> , or <code>None</code> if either the name or age, or both, was invalid:
+     </p>
+     <pre>
 <code class="java">
 Option&lt;Person&gt; parsePerson(String inputName, String inputAge) {
     return parseName(inputName).flatMap(name -&gt; 
@@ -163,12 +116,10 @@ Option&lt;Person&gt; parsePerson(String inputName, String inputAge) {
 }
 </code>
 		</pre>
-		<p>
-			Here are some examples of invoking
-			<code>parsePerson</code>
-			:
-		</p>
-		<pre>
+     <p>
+      Here are some examples of invoking <code>parsePerson</code> :
+     </p>
+     <pre>
 <code class="java">
 parsePerson("Bridget Jones", "29")
 // Result: Some(Person(Bridget Jones,29))
@@ -183,20 +134,13 @@ parsePerson("", "")
 // Result: None
 </code>
 		</pre>
-		<p>
-			Now imagine you want to give an error message back if the user's
-			input is invalid. You might rewrite the parsing methods to return an
-			<code>Either</code>
-			instead. In this case, the desired result is a valid name or age,
-			which by convention should be placed on the right of the
-			<code>Either</code>
-			. The left will be a string error message. Here's the new
-			<code>parseName</code>
-			function, which returns an
-			<code>Either&lt;String, String&gt;</code>
-			:
-		</p>
-		<pre>
+     <p>
+      Now imagine you want to give an error message back if the user's input is invalid. You might rewrite the parsing
+      methods to return an <code>Either</code> instead. In this case, the desired result is a valid name or age, which
+      by convention should be placed on the right of the <code>Either</code> . The left will be a string error message.
+      Here's the new <code>parseName</code> function, which returns an <code>Either&lt;String, String&gt;</code> :
+     </p>
+     <pre>
 <code class="lang-java">
 Either&lt;String,String&gt; parseName(String input) {
     String trimmed = input.trim();
@@ -206,14 +150,10 @@ Either&lt;String,String&gt; parseName(String input) {
 }
 </code>
 		</pre>
-		<p>
-			And here's the new
-			<code>parseAge</code>
-			function, which returns an
-			<code>Either&lt;String, Int&gt;</code>
-			:
-		</p>
-		<pre>
+     <p>
+      And here's the new <code>parseAge</code> function, which returns an <code>Either&lt;String, Int&gt;</code> :
+     </p>
+     <pre>
 <code class="java">
 Either&lt;String, Integer&gt; parseAge(String input) {
     try {
@@ -225,14 +165,10 @@ Either&lt;String, Integer&gt; parseAge(String input) {
 }
 </code>
 		</pre>
-		<p>
-			The new
-			<code>parsePerson</code>
-			method will return an
-			<code>Either&lt;String, Person&gt;</code>
-			:
-		</p>
-		<pre>
+     <p>
+      The new <code>parsePerson</code> method will return an <code>Either&lt;String, Person&gt;</code> :
+     </p>
+     <pre>
 <code class="java">
 Either&lt;String, Person&gt; parsePerson(String inputName, String inputAge) {
     return parseName(inputName).right()
@@ -241,30 +177,15 @@ Either&lt;String, Person&gt; parsePerson(String inputName, String inputAge) {
 }
 </code>
 		</pre>
-		<p>
-			Note that
-			<code>Either</code>
-			requires you to add
-			<code>.right()</code>
-			at the end of each generator in the for expression. Although the
-			convention is to place the valid result on the right, you must
-			explicitly (and repetitively) indicate that you've done so by
-			transforming the
-			<code>Either</code>
-			to a
-			<code>RightProjection</code>
-			by invoking
-			<code>.right()</code>
-			at each step. Given this implementation, the
-			<code>parsePerson</code>
-			method will now short-circuit at the first sign of trouble (as it did
-			when we used an
-			<code>Option</code>
-			), but you now get the first error message returned in a
-			<code>Left</code>
-			. Here are some examples:
-		</p>
-		<pre>
+     <p>
+      Note that <code>Either</code> requires you to add <code>.right()</code> at the end of each generator in the for
+      expression. Although the convention is to place the valid result on the right, you must explicitly (and
+      repetitively) indicate that you've done so by transforming the <code>Either</code> to a <code>RightProjection</code>
+      by invoking <code>.right()</code> at each step. Given this implementation, the <code>parsePerson</code> method
+      will now short-circuit at the first sign of trouble (as it did when we used an <code>Option</code> ), but you now
+      get the first error message returned in a <code>Left</code> . Here are some examples:
+     </p>
+     <pre>
 <code class="java">
 parsePerson("Bridget Jones", "29")
 // Result: Right(Person(Bridget Jones,29))
@@ -279,31 +200,17 @@ parsePerson("", "")
 // Result: Left("" is not a valid name)
 </code>
 		</pre>
-		<h3>An Either with “attitude”</h3>
-		<p>
-			Because
-			<code>Or</code>
-			declares one alternative to be “good” and the other “bad,” it is more
-			convenient than
-			<code>Either</code>
-			in this kind of situation. One difference to note with
-			<code>Or</code>
-			is that the
-			<code>Good</code>
-			alternative is on the left,
-			<code>Bad</code>
-			on the right.
-		</p>
-		<p>
-			Here's how the
-			<code>parseName</code>
-			method might be written using an
-			<code>Or</code>
-			, where the error type is also a
-			<code>String</code>
-			:
-		</p>
-		<pre>
+     <h3>An Either with attitude</h3>
+     <p>
+      Because <code>Or</code> declares one alternative to be "good" and the other "bad," it is more convenient than <code>Either</code>
+      in this kind of situation. One difference to note with <code>Or</code> is that the <code>Good</code> alternative
+      is on the left, <code>Bad</code> on the right.
+     </p>
+     <p>
+      Here's how the <code>parseName</code> method might be written using an <code>Or</code> , where the error type is
+      also a <code>String</code> :
+     </p>
+     <pre>
 <code class="java">
 Or&lt;String, String&gt; parseName(String input) {
     String trimmed = input.trim();
@@ -313,12 +220,10 @@ Or&lt;String, String&gt; parseName(String input) {
 }
 </code>
 		</pre>
-		<p>
-			Here's how the
-			<code>parseAge</code>
-			method might be written:
-		</p>
-		<pre>
+     <p>
+      Here's how the <code>parseAge</code> method might be written:
+     </p>
+     <pre>
 <code class="java">
 Or&lt;Integer, String&gt; parseAge(String input) {
     try {
@@ -330,12 +235,10 @@ Or&lt;Integer, String&gt; parseAge(String input) {
 }
 </code>
 		</pre>
-		<p>
-			Given these implementations, here's how you'd write the
-			<code>parsePerson</code>
-			method:
-		</p>
-		<pre>
+     <p>
+      Given these implementations, here's how you'd write the <code>parsePerson</code> method:
+     </p>
+     <pre>
 <code class="java">
 Or&lt;Person, String&gt; parsePerson(String inputName, String inputAge) {
     return parseName(inputName)
@@ -345,22 +248,12 @@ Or&lt;Person, String&gt; parsePerson(String inputName, String inputAge) {
 }
 </code>
 		</pre>
-		<p>
-			Because of
-			<code>Or</code>
-			's attitude, you need not write
-			<code>.good()</code>
-			at the end of each generator.
-			<code>Or</code>
-			will keep going so long as each step produces a
-			<code>Good</code>
-			, short circuiting at the first sign of a
-			<code>Bad</code>
-			. Here are a few invocations of this
-			<code>parsePerson</code>
-			method:
-		</p>
-		<pre>
+     <p>
+      Because of <code>Or</code> 's attitude, you need not write <code>.good()</code> at the end of each generator. <code>Or</code>
+      will keep going so long as each step produces a <code>Good</code> , short circuiting at the first sign of a <code>Bad</code>
+      . Here are a few invocations of this <code>parsePerson</code> method:
+     </p>
+     <pre>
 <code class="java">
 parsePerson("Bridget Jones", "29")
 // Result: Good(Person(Bridget Jones,29))
@@ -375,52 +268,23 @@ parsePerson("", "")
 // Result: Bad("" is not a valid name)
 </code>
 		</pre>
-		<h3>Accumulating errors with Or</h3>
-		<p>
-			Another difference between
-			<code>Or</code>
-			and
-			<code>Either</code>
-			is that
-			<code>Or</code>
-			enables you to accumulate errors if the
-			<code>Bad</code>
-			type is an
-			<code>Every</code>
-			. An
-			<code>Every</code>
-			is similar to a
-			<code>Seq</code>
-			in that it contains ordered elements, but different from
-			<code>Seq</code>
-			in that it cannot be empty. An
-			<code>Every</code>
-			is either a
-			<code>One</code>
-			, which contains one and only one element, or a
-			<code>Many</code>
-			, which contains two or more elements.
-		</p>
-		<p>
-			Note: an
-			<code>Or</code>
-			whose
-			<code>Bad</code>
-			type is an
-			<code>Every</code>
-			, or one of its subtypes, is called an “accumulating Or.”
-		</p>
-		<p>
-			To rewrite the previous example so that errors can be accumulated,
-			you need first to return an
-			<code>Every</code>
-			as the
-			<code>Bad</code>
-			type. Here's how you'd change the
-			<code>parseName</code>
-			method:
-		</p>
-		<pre>
+     <h3>Accumulating errors with Or</h3>
+     <p>
+      Another difference between <code>Or</code> and <code>Either</code> is that <code>Or</code> enables you to
+      accumulate errors if the <code>Bad</code> type is an <code>Every</code> . An <code>Every</code> is similar to a <code>Seq</code>
+      in that it contains ordered elements, but different from <code>Seq</code> in that it cannot be empty. An <code>Every</code>
+      is either a <code>One</code> , which contains one and only one element, or a <code>Many</code> , which contains
+      two or more elements.
+     </p>
+     <p>
+      Note: an <code>Or</code> whose <code>Bad</code> type is an <code>Every</code> , or one of its subtypes, is called
+      an "accumulating Or."
+     </p>
+     <p>
+      To rewrite the previous example so that errors can be accumulated, you need first to return an <code>Every</code>
+      as the <code>Bad</code> type. Here's how you'd change the <code>parseName</code> method:
+     </p>
+     <pre>
 <code class="java">
 Or&lt;String, One&lt;String&gt;&gt; parseName(String input) {
     String trimmed = input.trim();
@@ -430,24 +294,12 @@ Or&lt;String, One&lt;String&gt;&gt; parseName(String input) {
 }
 </code>
 		</pre>
-		<p>
-			Because
-			<code>parseName</code>
-			will either return a valid name
-			<code>String</code>
-			wrapped in a
-			<code>Good</code>
-			, or one error message, wrapped in a
-			<code>Bad</code>
-			, you would write the
-			<code>Bad</code>
-			type as
-			<code>One&lt;ErrorMessage&gt;</code>
-			. The same is true for
-			<code>parseAge</code>
-			:
-		</p>
-		<pre>
+     <p>
+      Because <code>parseName</code> will either return a valid name <code>String</code> wrapped in a <code>Good</code>
+      , or one error message, wrapped in a <code>Bad</code> , you would write the <code>Bad</code> type as <code>One&lt;ErrorMessage&gt;</code>
+      . The same is true for <code>parseAge</code> :
+     </p>
+     <pre>
 <code class="java">
 Or&lt;Integer, One&lt;String&gt;&gt; parseAge(String input) {
     try {
@@ -459,18 +311,12 @@ Or&lt;Integer, One&lt;String&gt;&gt; parseAge(String input) {
 }
 </code>
 		</pre>
-		<p>
-			Because a for expression short-circuits on the first
-			<code>Bad</code>
-			encountered, you'll need to use a different approach to write the
-			<code>parsePerson</code>
-			method. In this example, the
-			<code>withGood</code>
-			method from class
-			<code>Accumulation</code>
-			will do the trick:
-		</p>
-		<pre>
+     <p>
+      Because a for expression short-circuits on the first <code>Bad</code> encountered, you'll need to use a different
+      approach to write the <code>parsePerson</code> method. In this example, the <code>withGood</code> method from
+      class <code>Accumulation</code> will do the trick:
+     </p>
+     <pre>
 <code class="java">
 Or&lt;Person, Every&lt;String&gt;&gt; parsePerson(String inputName, String inputAge) {
     Or&lt;String, One&lt;String&gt;&gt; name = parseName(inputName);
@@ -479,55 +325,22 @@ Or&lt;Person, Every&lt;String&gt;&gt; parsePerson(String inputName, String input
 }
 </code>
 		</pre>
-		<p>
-			Class
-			<code>Accumulation</code>
-			offers overloaded withGood methods that take 1 to 8 accumulating
-			<code>Or</code>
-			s, plus a function taking the same number of corresponding
-			<code>Good</code>
-			values. In this example, if both name and age are
-			<code>Good</code>
-			s, the
-			<code>withGood</code>
-			method will pass the good name
-			<code>String</code>
-			and age
-			<code>int</code>
-			to the
-			<code>Person</code>
-			constructor, and return the resulting Person object wrapped in a
-			<code>Good</code>
-			. If either name and age, or both, are
-			<code>Bad</code>
-			,
-			<code>withGood</code>
-			will return the accumulated errors in a
-			<code>Bad</code>
-			.
-		</p>
-		<p>
-			The result of
-			<code>parsePerson</code>
-			, if
-			<code>Bad</code>
-			, will therefore contain either one or two error messages, i.e., the
-			result will either be a
-			<code>One</code>
-			or a
-			<code>Many</code>
-			. As a result, the result type of
-			<code>parsePerson</code>
-			must be
-			<code>Or&lt;Person,&lt;Every&lt;String&gt;&gt;&gt;</code>
-			. Regardless of whether a
-			<code>Bad</code>
-			result contains one or two error messages, it will contain every
-			error message. Here's some invocations of this accumulating version
-			of
-			<code>parsePerson:</code>
-		</p>
-		<pre>
+     <p>
+      Class <code>Accumulation</code> offers overloaded withGood methods that take 1 to 8 accumulating <code>Or</code>
+      s, plus a function taking the same number of corresponding <code>Good</code> values. In this example, if both name
+      and age are <code>Good</code> s, the <code>withGood</code> method will pass the good name <code>String</code> and
+      age <code>int</code> to the <code>Person</code> constructor, and return the resulting Person object wrapped in a <code>Good</code>
+      . If either name and age, or both, are <code>Bad</code> , <code>withGood</code> will return the accumulated errors
+      in a <code>Bad</code> .
+     </p>
+     <p>
+      The result of <code>parsePerson</code> , if <code>Bad</code> , will therefore contain either one or two error
+      messages, i.e., the result will either be a <code>One</code> or a <code>Many</code> . As a result, the result type
+      of <code>parsePerson</code> must be <code>Or&lt;Person,&lt;Every&lt;String&gt;&gt;&gt;</code> . Regardless of
+      whether a <code>Bad</code> result contains one or two error messages, it will contain every error message. Here's
+      some invocations of this accumulating version of <code>parsePerson:</code>
+     </p>
+     <pre>
 <code class="java">
 parsePerson("Bridget Jones", "29")
 // Result: Good(Person(Bridget Jones,29))
@@ -542,20 +355,17 @@ parsePerson("", "")
 // Result: Bad(Many("" is not a valid name, "" is not a valid integer))
 </code>
 		</pre>
-		<p>
-			Note that in the last example, the
-			<code>Bad</code>
-			contains an error message for both name and age.
-		</p>
+     <p>
+      Note that in the last example, the <code>Bad</code> contains an error message for both name and age.
+     </p>
 
-		<h3>Working with Ors</h3>
-		<p>
-		<code>Ors</code> can be created using static constructors on either the <code>Or</code>
-		interface or the implementing <code>Good</code> and <code>Bad</code> classes. Constructors on
-		the <code>Or</code> interface will return the value as an <code>Or</code>, whereas constructors
-		on specific types will return specific types:
-		</p>
-<pre>
+     <h3>Working with Ors</h3>
+     <p>
+      <code>Ors</code> can be created using static constructors on either the <code>Or</code> interface or the
+      implementing <code>Good</code> and <code>Bad</code> classes. Constructors on the <code>Or</code> interface will
+      return the value as an <code>Or</code> , whereas constructors on specific types will return specific types:
+     </p>
+     <pre>
 <code class="java">
 Or.good(&quot;good&quot;); // Or&lt;String, Object&gt;
 Or.bad(&quot;bad&quot;);   // Or&lt;Object, String&gt;
@@ -563,12 +373,12 @@ Good.of(&quot;good&quot;); // Good&lt;String, Object&gt;
 Bad.of(&quot;bad&quot;);   // Bad&lt;Object, String&gt;
 </code>
 </pre>
-		<p>Note that since <code>Or</code> has two types, but each of its two subtypes
-			only takes a value of one or the other type, the Java compiler will
-			infer <code>Object</code> for the unspecified type. This can be changed by either
-			assigning the value to a variable with a more specific type or by
-			giving explicit type arguments:</p>
-		<pre>
+     <p>
+      Note that since <code>Or</code> has two types, but each of its two subtypes only takes a value of one or the other
+      type, the Java compiler will infer <code>Object</code> for the unspecified type. This can be changed by either
+      assigning the value to a variable with a more specific type or by giving explicit type arguments:
+     </p>
+     <pre>
 <code class="java">
 Or&lt;String, Integer&gt; good = Or.good(&quot;good&quot;); // Or&lt;String, Integer&gt;
 Or&lt;Integer, String&gt; bad = Or.bad(&quot;bad&quot;);    // Or&lt;Integer, String&gt;
@@ -577,30 +387,19 @@ Or.&lt;String, Integer&gt;good(&quot;good&quot;); // Or&lt;String, Integer&gt;
 Or.&lt;Integer, String&gt;bad(&quot;bad&quot;);   // Or&lt;Integer, String&gt;
 </code>
 		</pre>
-		<p>
-			A specific type like
-			<code>Bad</code>
-			can be widened back to an
-			<code>Or</code>
-			with the
-			<code>asOr</code>
-			method
-		</p>
-		<pre>
+     <p>
+      A specific type like <code>Bad</code> can be widened back to an <code>Or</code> with the <code>asOr</code> method
+     </p>
+     <pre>
 <code class="java">
 Bad.of(&quot;bad&quot;).asOr(); // Or&lt;Object, String&gt;
 </code>
 		</pre>
-		<p>
-			You can transform an existing
-			<code>Or</code>
-			into an accumulating one with the
-			<code>accumulating()</code>
-			method. There are also factory methods for creating accumulating
-			<code>Or</code>
-			s directly:
-		</p>
-		<pre>
+     <p>
+      You can transform an existing <code>Or</code> into an accumulating one with the <code>accumulating()</code>
+      method. There are also factory methods for creating accumulating <code>Or</code> s directly:
+     </p>
+     <pre>
 <code class="java">
 Or&lt;String, One&lt;String&gt;&gt; acc = Bad.&lt;String,String&gt;of(&quot;bad&quot;).accumulating(); // Or&lt;String, One&lt;String&gt;&gt;
 Bad&lt;String, One&lt;String&gt;&gt; ofOne = Bad.ofOne(&quot;bad&quot;); // Bad&lt;String, One&lt;String&gt;&gt;
@@ -608,67 +407,41 @@ Bad&lt;String, One&lt;String&gt;&gt; ofOneString = Bad.ofOneString(&quot;error w
 </code>
 		</pre>
 
-		<h3>Working with Everys</h3>
-		<p>
-			The previous examples demonstrate constructing a one-element
-			<code>Every</code>
-			with a factory method in the
-			<code>One</code>
-			companion object. You can similarly create an
-			<code>Every</code>
-			that contains more than one using a
-			<code>Many</code>
-			factory method. Here are some examples:
-		</p>
-		<pre>
+     <h3>Working with Everys</h3>
+     <p>
+      The previous examples demonstrate constructing a one-element <code>Every</code> with a factory method in the <code>One</code>
+      companion object. You can similarly create an <code>Every</code> that contains more than one using a <code>Many</code>
+      factory method. Here are some examples:
+     </p>
+     <pre>
 <code class="java">
 One.of(1);
 Many.of(1, 3);
 Many.of(1, 2, 3);
 </code>
 		</pre>
-		<p>
-			You can also construct an
-			<code>Every</code>
-			by passing one or more elements to the
-			<code>Every.of</code>
-			factory method:
-		</p>
-		<pre>
+     <p>
+      You can also construct an <code>Every</code> by passing one or more elements to the <code>Every.of</code> factory
+      method:
+     </p>
+     <pre>
 <code class="java">
 Every.of(1);
 Every.of(1, 2);
 Every.of(1, 2, 3);
 </code>
 		</pre>
-		<p>
-			<code>Every</code>
-			does not extend
-			<code>Seq</code>
-			or
-			<code>Traversable</code>
-			interfaces because these require that implementations may be empty.
-			For example, if you invoke
-			<code>tail()</code>
-			on a
-			<code>Seq</code>
-			that contains just one element, you'll get an empty
-			<code>Seq</code>
-		</p>
-		<p>
-			On the other hand, many useful methods exist on
-			<code>Seq</code>
-			that when invoked on a non-empty
-			<code>Seq</code>
-			are guaranteed to not result in an empty
-			<code>Seq</code>
-			. For convenience,
-			<code>Every</code>
-			defines a method corresponding to every such
-			<code>Seq</code>
-			method. Here are some examples:
-		</p>
-		<pre>
+     <p>
+      <code>Every</code> does not extend <code>Seq</code> or <code>Traversable</code> interfaces because these require
+      that implementations may be empty. For example, if you invoke <code>tail()</code> on a <code>Seq</code> that
+      contains just one element, you'll get an empty <code>Seq</code>
+     </p>
+     <p>
+      On the other hand, many useful methods exist on <code>Seq</code> that when invoked on a non-empty <code>Seq</code>
+      are guaranteed to not result in an empty <code>Seq</code> . For convenience, <code>Every</code> defines a method
+      corresponding to every such <code>Seq</code> method. Here are some examples:
+     </p>
+     <pre>
 <code class="java">
 Many.of(1, 2, 3).map(i -&gt; i + 1);                   // Result: Many(2, 3, 4)
 One.of(1).map(i -&gt; i + 1);                          // Result: One(2)
@@ -677,38 +450,28 @@ Every.of(1, 2, 3).containsSlice(Every.of(3, 4));    // Result: false
 Every.of(-1, -2, 3, 4, 5).minBy(i -&gt; Math.abs(i));  // Result: -1
 </code>
 		</pre>
-		<p>
-			<code>Every</code>
-			does not currently define any methods corresponding to
-			<code>Seq</code>
-			methods that could result in an empty
-			<code>Seq</code>
-			. However, you can convert an empty to a
-			<code>Seq</code>
-			and get hold of these methods:
-		</p>
-		<pre>
+     <p>
+      <code>Every</code> does not currently define any methods corresponding to <code>Seq</code> methods that could
+      result in an empty <code>Seq</code> . However, you can convert an empty to a <code>Seq</code> and get hold of
+      these methods:
+     </p>
+     <pre>
 <code class="java">
 Every.of(1, 2, 3).toSeq().filter(i -&gt; i &lt; 10); // Result: Vector(1, 2, 3)
 Every.of(1, 2, 3).toSeq().filter(i -&gt; i &gt; 10); // Result: Vector()
 </code>
 		</pre>
 
-		<h3>Other ways to accumulate errors</h3>
-		<p>
-			The
-			<code>Accumlation</code>
-			class also enables other ways of accumulating errors.
-		</p>
-		<h3>Using combined</h3>
-		<p>
-			If you have a collection of accumulating
-			<code>Or</code>
-			s, for example, you can combine them into one
-			<code>Or</code>
-			using combined, like this:
-		</p>
-		<pre>
+     <h3>Other ways to accumulate errors</h3>
+     <p>
+      The <code>Accumlation</code> class also enables other ways of accumulating errors.
+     </p>
+     <h3>Using combined</h3>
+     <p>
+      If you have a collection of accumulating <code>Or</code> s, for example, you can combine them into one <code>Or</code>
+      using combined, like this:
+     </p>
+     <pre>
 <code class="java">
 List&lt;Or&lt;Integer, One&lt;String&gt;&gt;&gt; list = List.ofAll(parseAge(&quot;29&quot;), parseAge(&quot;30&quot;), parseAge(&quot;31&quot;));
 Accumulation.combined(list, List.collector());  // Result: Good(List(29, 30, 31))
@@ -720,17 +483,13 @@ List&lt;Or&lt;Integer, One&lt;String&gt;&gt;&gt; list3 = List.ofAll(parseAge(&qu
 Accumulation.combined(list3, List.collector()); // Result: Bad(Many(&quot;-30&quot; is not a valid age, &quot;-31&quot; is not a valid age))
 </code>
 		</pre>
-		<h3>Using validatedBy</h3>
-		<p>
-			<code>Or</code>
-			if you have a collection of values and a function that transforms
-			that type of value into an accumulating
-			<code>Or</code>
-			s, you can validate the values using the function using
-			<code>validatedBy</code>
-			, like this:
-		</p>
-		<pre>
+     <h3>Using validatedBy</h3>
+     <p>
+      <code>Or</code> if you have a collection of values and a function that transforms that type of value into an
+      accumulating <code>Or</code> s, you can validate the values using the function using <code>validatedBy</code> ,
+      like this:
+     </p>
+     <pre>
 <code class="java">
 List&lt;String&gt; list = List.ofAll(&quot;29&quot;, &quot;30&quot;, &quot;31&quot;);
 Accumulation.validatedBy(list, this::parseAge, List.collector());  // Result: Good(List(29, 30, 31))
@@ -743,23 +502,13 @@ Accumulation.validatedBy(list3, this::parseAge, List.collector());
  	// Result: Bad(Many(&quot;-30&quot; is not a valid age, &quot;-31&quot; is not a valid age))
 </code>
 		</pre>
-		<h3>Using zip</h3>
-		<p>
-			You can also
-			<code>zip</code>
-			two accumulating
-			<code>Or</code>
-			s together. If both are
-			<code>Good</code>
-			, you'll get a
-			<code>Good</code>
-			tuple containing both original
-			<code>Good</code>
-			values. Otherwise, you'll get a
-			<code>Bad</code>
-			containing every error message. Here are some examples:
-		</p>
-		<pre>
+     <h3>Using zip</h3>
+     <p>
+      You can also <code>zip</code> two accumulating <code>Or</code> s together. If both are <code>Good</code> , you'll
+      get a <code>Good</code> tuple containing both original <code>Good</code> values. Otherwise, you'll get a <code>Bad</code>
+      containing every error message. Here are some examples:
+     </p>
+     <pre>
 <code class="java">
 Or&lt;Tuple2&lt;String, Integer&gt;, Every&lt;String&gt;&gt; zip = Accumulation.zip(parseName(&quot;Dude&quot;), parseAge(&quot;21&quot;));
 // Result: Good((Dude,21))
@@ -771,30 +520,16 @@ Accumulation.zip(parseName(&quot;&quot;), parseAge(&quot;-21&quot;));
 // Result: Bad(Many(&quot;&quot; is not a valid name, &quot;-21&quot; is not a valid age))
 </code>
 		</pre>
-		
-		<h3>Using when</h3>
-		<p>
-			In addition, given an accumulating
-			<code>Or</code>
-			, you can pass one or more validation functions to when on the
-			<code>Or</code>
-			to submit that
-			<code>Or</code>
-			to further scrutiny. A validation function accepts a
-			<code>Good</code>
-			type and returns a
-			<code>Validation&lt;E&gt;</code>
-			, where E is the type in the
-			<code>Every</code>
-			in the
-			<code>Bad</code>
-			type. For an
-			<code>Or&lt;Integer, One&lt;String&gt;</code>
-			, for example the validation function type would be
-			<code>Integer -&gt; Validation&lt;String&gt;</code>
-			. Here are a few examples:
-		</p>
-		<pre>
+
+     <h3>Using when</h3>
+     <p>
+      In addition, given an accumulating <code>Or</code> , you can pass one or more validation functions to when on the
+      <code>Or</code> to submit that <code>Or</code> to further scrutiny. A validation function accepts a <code>Good</code>
+      type and returns a <code>Validation&lt;E&gt;</code> , where E is the type in the <code>Every</code> in the <code>Bad</code>
+      type. For an <code>Or&lt;Integer, One&lt;String&gt;</code> , for example the validation function type would be <code>Integer
+       -&gt; Validation&lt;String&gt;</code> . Here are a few examples:
+     </p>
+     <pre>
 <code class="java">
 Validation&lt;String&gt; isRound(int i) {
     return (i % 10 == 0) ? Pass.instance() : Fail.of(i + &quot; was not a round number&quot;);
@@ -805,49 +540,32 @@ Validation&lt;String&gt; isDivBy3(int i) {
 }
 </code>
 		</pre>
-		<p>
-			If the
-			<code>Or</code>
-			on which you call when is already
-			<code>Bad</code>
-			, you get the same (Bad)
-			<code>Or</code>
-			back, because no
-			<code>Good</code>
-			value exists to pass to the validation functions:
-		</p>
-		<pre>
+     <p>
+      If the <code>Or</code> on which you call when is already <code>Bad</code> , you get the same (Bad) <code>Or</code>
+      back, because no <code>Good</code> value exists to pass to the validation functions:
+     </p>
+     <pre>
 <code class="java">
 Or&lt;Integer, Every&lt;String&gt;&gt; when = Accumulation.when(parseAge(&quot;-30&quot;), this::isRound, this::isDivBy3);
 //Result: Bad(One(&quot;-30&quot; is not a valid age))
 </code>
 		</pre>
-		<p>
-			If the
-			<code>Or</code>
-			on which you call when is
-			<code>Good</code>
-			, and also passes all the validation functions (i.e., the all return
-			<code>None</code>
-			), you again get the same
-			<code>Or</code>
-			back, but this time, a
-			<code>Good</code>
-			one:
-		</p>
-		<pre>
+     <p>
+      If the <code>Or</code> on which you call when is <code>Good</code> , and also passes all the validation functions
+      (i.e., the all return <code>None</code> ), you again get the same <code>Or</code> back, but this time, a <code>Good</code>
+      one:
+     </p>
+     <pre>
 <code class="java">
 Accumulation.when(parseAge(&quot;30&quot;), this::isRound, this::isDivBy3);
 //Result: Good(30)
 </code>
 		</pre>
-		<p>
-			If one or more of the validation functions fails, however, you'll get
-			a
-			<code>Bad</code>
-			back continuing every error. Here are some examples:
-		</p>
-		<pre>
+     <p>
+      If one or more of the validation functions fails, however, you'll get a <code>Bad</code> back continuing every
+      error. Here are some examples:
+     </p>
+     <pre>
 <code class="java">
 Accumulation.when(parseAge(&quot;33&quot;), this::isRound, this::isDivBy3);
 //Result: Bad(One(33 was not a round number))
@@ -859,20 +577,51 @@ Accumulation.when(parseAge(&quot;31&quot;), this::isRound, this::isDivBy3);
 //Result: Bad(Many(31 was not a round number, 31 was not divisible by 3))    
 </code>
 		</pre>
+     <h2>OrFuture and OrPromise</h2>
+     <p>
+     The OrFuture and OrPromise are not part of the original Scalactic library. So why one more future implementation? The problem with
+     futures as they are traditionally implemented is that a failure is always represented by an exception, when it's perfectly ok to
+     think that an asynchronous operation can fail in a way that is not an exception. The OrFuture represents an asynchronous version of
+     the Or type, and it doesn't complete with a success or a failure but with an instance of Or. Let's see a few examples:
+     </p>
+     
+     <h3>Working with OrFutures</h3>
+     <p>
+     An OrFuture is created with on of the static <code>.of()</code> methods.
+     </p>
+          <pre>
+<code class="java">
 
-		<footer class="site-footer">
-			<span class="site-footer-owner"><a
-				href="https://github.com/javactic/javactic">Javactic</a> is
-				maintained by <a href="https://github.com/javactic">javactic</a>.</span> <span
-				class="site-footer-credits">This page was generated by <a
-				href="https://pages.github.com">GitHub Pages</a> using the <a
-				href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by
-				<a href="https://twitter.com/jasonlong">Jason Long</a>.
-			</span>
-		</footer>
-
-	</section>
-
-
+</code>
+  </pre>
+     
+     
+    </section>
+   </div>
+  </div>
+ </div>
+</body>
+<script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+<script src='//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/js/bootstrap.min.js'></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.0.0/highlight.min.js"></script>
+<script src="js/dynamicscrollspy.js"></script>
+<script>
+    $(function() {
+      hljs.initHighlightingOnLoad();
+      $('#scrollspy').DynamicScrollspy({
+        genIDs: true,
+        testing: false,
+        ulClassNames: "hidden-xs hidden-sm"
+      });
+      /**
+      $('#nav').affix({
+	  offset: {     
+	    top: $('#nav').offset().top,
+            bottom: ($('footer').outerHeight(true) + $('.application').outerHeight(true)) + 40
+          }
+      });
+      **/
+    })
+    </script>
 </body>
 </html>

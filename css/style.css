@@ -1,0 +1,185 @@
+@import url(http://fonts.googleapis.com/css?family=Raleway:400,700);
+
+html {
+  font-size: 16px;
+}
+
+body {
+  background: white;
+  position: relative;
+  line-height: 1.5;
+  font-family: 'Raleway', sans-serif;
+  font-size: 16px;
+}
+
+h1, h2 {
+  font-weight: 700;
+}
+
+h3 span {
+  color: #286090;
+}
+
+.jumbotron {
+  border-radius: 0px;
+  margin-bottom: 0;
+  text-align: center;
+  background-image: linear-gradient(120deg, #E3E3E3, #212121);
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.jumbotron .project-name {
+  color: #8B0000;
+  font-size: 2.25rem;
+}
+
+.jumbotron .project-tagline {
+  color: white;
+  font-weight: normal;
+  opacity: 0.7;
+  margin-bottom: 2rem;
+  font-size: 1.15rem;
+}
+
+.jumbotron .btn {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 0.3rem;
+  transition: color 0.2s, background-color 0.2s, border-color 0.2s;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.9rem;
+}
+
+.scrollspy {
+  margin-top: 20px;
+}
+
+.or-color {
+ color: black;
+}
+.jumbotron button {
+  margin-top: 10px;
+}
+
+section {
+  padding: 20px 0;
+  border-bottom: 1px solid #c1e1ec;
+}
+
+.main-content pre {
+  display: flex;
+  border-radius: 2px;
+}
+
+.main-content pre>code {
+  padding: 0;
+  margin: 0;
+  word-break: normal;
+  white-space: pre;
+  background: transparent;
+  border: 0;
+}
+
+#web-development,
+#mobile-development {
+  padding-bottom: 0;
+}
+
+section:last-child {
+  border-bottom: none;
+}
+
+.nav {
+  background: #F3F3F3;
+}
+
+.nav a {
+  color: black;
+  font-style: italic;
+}
+
+.nav li a:hover,
+.nav li a:focus {
+  background: #E0E0E0;
+}
+
+.nav .active {
+  font-weight: bold;
+  background: #C2C2C2;
+}
+
+.nav .nav {
+  display: none;
+}
+
+.nav .active .nav {
+  display: block;
+}
+
+.nav .nav a {
+  font-weight: normal;
+  font-size: .85em;
+}
+
+.nav .nav span {
+  margin: 0 5px 0 2px;
+}
+
+.nav .nav .active a,
+.nav .nav .active:hover a,
+.nav .nav .active:focus a {
+  font-weight: bold;
+  padding-left: 30px;
+  border-left: 5px solid #8B0000;
+}
+
+.nav .nav .active span,
+.nav .nav .active:hover span,
+.nav .nav .active:focus span {
+  display: none;
+}
+
+.application {
+  border-top: 1px solid #c1e1ec;
+}
+
+// --- AFFIX ---
+
+.affix-top {
+  position: relative;
+}
+
+.affix {
+  top: 20px;
+}
+
+.affix, 
+.affix-bottom {
+    width: 213px;
+}
+
+.affix-bottom {
+  position: absolute;
+}
+
+footer {
+  border-top: 1px solid #c1e1ec;
+  height: 50px;
+}
+
+footer p {
+  line-height: 50px;
+  margin-bottom: 0;
+}
+
+@media (min-width:1200px) {
+  .affix, 
+  .affix-bottom {
+    width: 263px;
+  }
+}
