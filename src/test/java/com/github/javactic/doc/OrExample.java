@@ -35,9 +35,10 @@ public class OrExample {
         // Result: Bad("" is not a valid integer)
 
         or = parsePerson("Bridget Jones", "-29");
+        System.out.println(or);
         // Result: Bad("-29" is not a valid age)
 
-        parsePerson("", "");
+        or = parsePerson("", "");
         System.out.println(or);
         // Result: Bad("" is not a valid name)
     }
