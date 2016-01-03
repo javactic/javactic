@@ -21,6 +21,7 @@ import org.junit.runner.RunWith;
 import com.github.javactic.Bad;
 import com.github.javactic.Every;
 import com.github.javactic.Good;
+import com.github.javactic.One;
 import com.github.javactic.Or;
 
 import javaslang.collection.Seq;
@@ -35,8 +36,8 @@ public class AccumulationTest {
 
     @Test
     public void withGoodFail() throws Exception {
-        OrFuture<String, String> success = OrFuture.successful("good");
-        OrFuture<String, String> fail = OrFuture.failed("bad");
+        OrFuture<String, One<String>> success = OrFuture.ofGood("good");
+        OrFuture<String, One<String>> fail = OrFuture.ofOneBad("bad");
         OrFuture<String, Every<String>> result = OrFuture.withGood(success, fail, (a1,a2) -> "doesn't matter");
         Or<String, Every<String>> or = result.result(Duration.ofSeconds(10));
         Assert.assertEquals("bad", or.getBad().head());
@@ -44,8 +45,8 @@ public class AccumulationTest {
     
     @Test
     public void withGoodSuccess() throws Exception {
-        OrFuture<String, String> s1 = OrFuture.successful("A");
-        OrFuture<Integer, String> s2 = OrFuture.successful(1);
+        OrFuture<String, One<String>> s1 = OrFuture.ofGood("A");
+        OrFuture<Integer, One<String>> s2 = OrFuture.ofGood(1);
         OrFuture<String, Every<String>> result = OrFuture.withGood(s1, s2, (a1,a2) -> a1 + a2);
         Or<String, Every<String>> or = result.result(Duration.ofSeconds(10));
         Assert.assertEquals("A1", or.get());
@@ -53,7 +54,7 @@ public class AccumulationTest {
     
     @Theory
     public void sequenceSuccess(ExecutorService es) throws Exception {
-        Seq<OrFuture<Integer,String>> seq = Vector.empty();
+        Seq<OrFuture<Integer,Every<String>>> seq = Vector.empty();
         for(int i = 0; i < 10; i++) {
             final int fi = i;
             seq = seq.append(OrFuture.of(es, () -> Good.of(fi)));
@@ -67,13 +68,13 @@ public class AccumulationTest {
     
     @Theory
     public void sequenceFailure(ExecutorService es) throws Exception {
-        Seq<OrFuture<Integer,Integer>> seq = Vector.empty();
+        Seq<OrFuture<Integer,Every<Integer>>> seq = Vector.empty();
         for(int i = 0; i < 10; i++) {
             final int fi = i;
             if(i % 2 == 0)
                 seq = seq.append(OrFuture.of(es, () -> Good.of(fi)));
             else
-                seq = seq.append(OrFuture.of(es, () -> Bad.of(fi)));
+                seq = seq.append(OrFuture.of(es, () -> Bad.ofOne(fi)));
         }
         OrFuture<Vector<Integer>, Every<Integer>> sequence = OrFuture.combined(seq);
         Or<Vector<Integer>, Every<Integer>> or = sequence.result(Duration.ofSeconds(10));
@@ -94,7 +95,7 @@ public class AccumulationTest {
             return Good.of("1");
         });
         OrFuture<String,String> f2 = OrFuture.of(() -> Good.of("2"));
-        OrFuture<Vector<String>, Every<String>> combined = OrFuture.combined(Vector.of(f1,f2));
+        OrFuture<Vector<String>, Every<String>> combined = OrFuture.combined(Vector.of(f1.accumulating(),f2.accumulating()));
         f2.onComplete(or -> latch.countDown());
         Or<Vector<String>, Every<String>> or = combined.result(Duration.ofSeconds(10));
         Assert.assertTrue(or.isGood());
@@ -114,7 +115,7 @@ public class AccumulationTest {
             }
             return Good.of("2");
         });
-        OrFuture<Vector<String>, Every<String>> combined = OrFuture.combined(Vector.of(f1,f2));
+        OrFuture<Vector<String>, Every<String>> combined = OrFuture.combined(Vector.of(f1.accumulating(),f2.accumulating()));
         f1.onComplete(or -> latch.countDown());
         Or<Vector<String>, Every<String>> or = combined.result(Duration.ofSeconds(10));
         Assert.assertTrue(or.isGood());
@@ -124,7 +125,7 @@ public class AccumulationTest {
     
     @Theory
     public void withGood(ExecutorService es) throws Exception {
-        Function<OrFuture<String, String>[], OrFuture<?, Every<String>>> fun = 
+        Function<? super OrFuture<String, ? extends Every<String>>[], OrFuture<?, Every<String>>> fun = 
                 ors -> OrFuture.withGood(ors[0], ors[1], (a,b) -> "");
         testWithF(es, fun, 2);
         fun = o -> OrFuture.withGood(o[0], o[1], o[2], (a, b, c) -> "");
@@ -143,7 +144,7 @@ public class AccumulationTest {
 
     @Theory
     public void zips(ExecutorService es) throws Exception {
-        Function<OrFuture<String, String>[], OrFuture<?, Every<String>>> fun = 
+        Function<? super OrFuture<String, ? extends Every<String>>[], OrFuture<?, Every<String>>> fun = 
                 ors -> OrFuture.zip(ors[0], ors[1]);
         testWithF(es, fun, 2);
         fun = o -> OrFuture.zip3(o[0], o[1], o[2]);
@@ -161,12 +162,12 @@ public class AccumulationTest {
         
     }
         
-    private void testWithF(ExecutorService es, Function<OrFuture<String, String>[], OrFuture<?, Every<String>>> f, int size) throws Exception {
+    private void testWithF(ExecutorService es, Function<? super OrFuture<String, ? extends Every<String>>[], OrFuture<?, Every<String>>> f, int size) throws Exception {
         @SuppressWarnings("unchecked")
-        OrFuture<String, String>[] ors = new OrFuture[size];
+        OrFuture<String, One<String>>[] ors = new OrFuture[size];
         for(int i = 0; i <= ors.length; i++){
             for(int j = 0; j < ors.length; j++) {
-                if(j == i) ors[j] = OrFuture.of(es, () -> Bad.of("bad"));
+                if(j == i) ors[j] = OrFuture.of(es, () -> Bad.ofOne("bad"));
                 else ors[j] = OrFuture.of(es, () -> Good.of("good"));
             }
             OrFuture<?, Every<String>> val = f.apply(ors);

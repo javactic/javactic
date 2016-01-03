@@ -11,7 +11,7 @@ public class OrPromiseTest {
 
     @Test
     public void doubleComplete() {
-        OrPromise<String,String> p = OrPromise.make();
+        OrPromise<String,String> p = OrPromise.create();
         OrFuture<String, String> future = p.complete(Good.of("good")).future();
         try {
             p.complete(Bad.of("bad"));
@@ -24,9 +24,9 @@ public class OrPromiseTest {
     
     @Test
     public void tries() {
-        OrPromise<String,String> p = OrPromise.make();
-        Assert.assertTrue(p.tryFailure("bad"));
-        Assert.assertFalse(p.trySuccess("good"));
+        OrPromise<String,String> p = OrPromise.create();
+        Assert.assertTrue(p.tryBad("bad"));
+        Assert.assertFalse(p.tryGood("good"));
         OrFuture<String, String> future = p.future();
         Assert.assertEquals("bad", future.value().get().getBad());
     }

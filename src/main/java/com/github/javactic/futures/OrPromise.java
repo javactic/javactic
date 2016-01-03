@@ -8,17 +8,9 @@ import com.github.javactic.Or;
 
 public interface OrPromise<G,B> {
 
-    static <G,B> OrPromise<G,B> make() {
+    static <G,B> OrPromise<G,B> create() {
         return new OrPromiseImpl<>(new OrFutureImpl<>(ForkJoinPool.commonPool()));
     }
-    
-//    static <G,B> OrPromise<G,B> failed(B bad) {
-//        return OrPromise.<G,B>make().failure(bad);
-//    }
-//    
-//    static <G,B> OrPromise<G,B> successful(G good) {
-//        return OrPromise.<G,B>make().success(good);
-//    }
     
     OrFuture<G,B> future();
     
@@ -41,19 +33,19 @@ public interface OrPromise<G,B> {
         return this;
     }
 
-    default OrPromise<G,B> failure(B failure) {
+    default OrPromise<G,B> bad(B failure) {
         return complete(Bad.of(failure));
     }
     
-    default OrPromise<G,B> success(G success) {
+    default OrPromise<G,B> good(G success) {
         return complete(Good.of(success));
     }
     
-    default boolean tryFailure(B failure) {
+    default boolean tryBad(B failure) {
         return tryComplete(Bad.of(failure));
     }
     
-    default boolean trySuccess(G success) {
+    default boolean tryGood(G success) {
         return tryComplete(Good.of(success));
     }
 }

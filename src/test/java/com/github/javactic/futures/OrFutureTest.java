@@ -70,28 +70,28 @@ public class OrFutureTest {
                 .flatMap(i -> OrFuture.of(es, () -> Good.of(i + "")));
         Assert.assertEquals("5", orFuture.result(Duration.ofSeconds(10)).get());
         
-        orFuture = getF(es, 5).flatMap(i -> OrFuture.failed(FAIL));
+        orFuture = getF(es, 5).flatMap(i -> OrFuture.ofBad(FAIL));
         Assert.assertEquals(FAIL, orFuture.result(Duration.ofSeconds(10)).getBad());
         
-        orFuture = OrFuture.<String, String>failed(FAIL).flatMap(i -> OrFuture.successful("5"));
+        orFuture = OrFuture.<String, String>ofBad(FAIL).flatMap(i -> OrFuture.ofGood("5"));
         assertEquals(FAIL, orFuture.result(Duration.ofSeconds(10)).getBad());
     }
 
     @Test
     public void recover() throws Exception {
-        OrFuture<String, String> recover = OrFuture.<String,String>failed(FAIL).recover(f -> "5");
+        OrFuture<String, String> recover = OrFuture.<String,String>ofBad(FAIL).recover(f -> "5");
         assertEquals("5", recover.result(Duration.ofSeconds(10)).get());
     }
     
     @Test
     public void recoverWith() throws Exception {
-        OrFuture<String, String> recover = OrFuture.<String,String>failed(FAIL).recoverWith(f -> OrFuture.successful("5"));
+        OrFuture<String, String> recover = OrFuture.<String,String>ofBad(FAIL).recoverWith(f -> OrFuture.ofGood("5"));
         assertEquals("5", recover.result(Duration.ofSeconds(10)).get());
     }
     
     @Test
     public void transform() throws Exception {
-        OrFuture<String, String> or = OrFuture.failed(FAIL);
+        OrFuture<String, String> or = OrFuture.ofBad(FAIL);
         OrFuture<Integer, Integer> transform = or.transform(s -> 5, f -> -5);
         assertEquals(-5, transform.result(Duration.ofSeconds(10)).getBad().intValue());
     }
