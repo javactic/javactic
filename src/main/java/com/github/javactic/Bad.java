@@ -1,17 +1,17 @@
 /**
- *    ___                       _   _      
- *   |_  |                     | | (_)     
- *     | | __ ___   ____ _  ___| |_ _  ___ 
- *     | |/ _` \ \ / / _` |/ __| __| |/ __|
+ * ___                       _   _
+ * |_  |                     | | (_)
+ * | | __ ___   ____ _  ___| |_ _  ___
+ * | |/ _` \ \ / / _` |/ __| __| |/ __|
  * /\__/ / (_| |\ V / (_| | (__| |_| | (__   -2015-
  * \____/ \__,_| \_/ \__,_|\___|\__|_|\___|
- *                                          
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,6 +19,10 @@
  * limitations under the License.
  **/
 package com.github.javactic;
+
+import javaslang.control.Either;
+import javaslang.control.Left;
+import javaslang.control.Option;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -28,260 +32,255 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import javaslang.control.Either;
-import javaslang.control.Left;
-import javaslang.control.Option;
-
 /**
  * Contains a "bad" value.
- * 
+ *
  * You can decide what "bad" means, but it is expected Bad will be commonly used
  * to hold descriptions of an error (or several, accumulated errors). Some
  * examples of possible error descriptions are String error messages, Int error
  * codes, Throwable exceptions, or enums designed to describe errors.
- * 
+ *
  * @author mvh
  *
  * @param <G> the good type of the Or
  * @param <B> the bad type of the Or
  */
-public class Bad<G,B> implements Or<G,B> {
-	
-	final B value;
-	
-	Bad(B bad) {
-		value = bad;
-	}
-	
-	/**
-	 * Creates a Bad of type B.
-	 * 
-	 * @param <G> the good type of the Or
-     * @param <B> the bad type of the Or
-	 * @param value the value of the Bad
-	 * @return an instance of Bad
-	 */
-	public static <G,B> Bad<G,B> of(B value) {
-		return new Bad<>(value);
-	}
-	
-    /**
-     * Creates a Bad with a bad type of String based on the given message. The
-     * message can be a slf4j string with {} placeholders that will be replaced
-     * by the given optional arguments.
-     * 
-     * @param <G>
-     *            the good type of the Or
-     * @param msg the message string with possible placeholders
-     * @param args the values to replace the placeholders with
-     * @return a Bad
-     */
-    public static <G> Bad<G,String> ofString(String msg, Object... args) {
-        return new Bad<>(Helper.parse(msg, args));
-    }
+public class Bad<G, B> implements Or<G, B> {
 
-    /**
-     * Helper method to get a {@link One} wrapped in a {@link Bad} directly.
-     * Equivalent to <code>Bad.of(One.of(value))</code>
-     * 
-     * @param <G> the good type of the Or
-     * @param <B> the bad type of the Or
-     * @param value
-     *            the value to put in the One
-     * @return a One inside a Bad
-     */
-    public static <G,B> Bad<G,One<B>> ofOne(B value) {
-        return new Bad<>(One.of(value));
-    }
+  final B value;
 
-    /**
-     * Creates a Bad with a bad type of One&lt;String&gt; based on the given
-     * message. The message can be a slf4j string with {} placeholders that will
-     * be replaced by the given optional arguments.
-     * 
-     * @param <G>
-     *            the good type of the Or
-     * @param msg
-     *            the message string with possible placeholders
-     * @param args
-     *            the values to replace the placeholders with
-     * @return a Bad
-     */
-    public static <G> Bad<G,One<String>> ofOneString(String msg, Object... args) {
-        return new Bad<>(One.of(Helper.parse(msg, args)));
-    }
+  Bad(B bad) {
+    value = bad;
+  }
 
-	@Override
-	public Or<G, One<B>> accumulating() {
-		return Bad.ofOne(value);
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public <H> Or<H, B> map(Function<? super G, ? extends H> mapper) {
-		return (Or<H, B>) this;
-	}
+  /**
+   * Creates a Bad of type B.
+   *
+   * @param <G> the good type of the Or
+   * @param <B> the bad type of the Or
+   * @param value the value of the Bad
+   * @return an instance of Bad
+   */
+  public static <G, B> Bad<G, B> of(B value) {
+    return new Bad<>(value);
+  }
 
-	@Override
-	public <C> Or<G, C> badMap(Function<? super B, ? extends C> mapper) {
-		return Bad.of(mapper.apply(value));
-	}
+  /**
+   * Creates a Bad with a bad type of String based on the given message. The
+   * message can be a slf4j string with {} placeholders that will be replaced
+   * by the given optional arguments.
+   *
+   * @param <G>
+   *            the good type of the Or
+   * @param msg the message string with possible placeholders
+   * @param args the values to replace the placeholders with
+   * @return a Bad
+   */
+  public static <G> Bad<G, String> ofString(String msg, Object... args) {
+    return new Bad<>(Helper.parse(msg, args));
+  }
 
-	@Override
-	public boolean contains(G good) {
-	    return false;
-	}
-	
-	@Override
-	public boolean containsBad(B bad) {
-	    return Objects.deepEquals(bad, value);
-	}
-	
-	@Override
-	public boolean exists(Predicate<? super G> predicate) {
-		return false;
-	}
+  /**
+   * Helper method to get a {@link One} wrapped in a {@link Bad} directly.
+   * Equivalent to <code>Bad.of(One.of(value))</code>
+   *
+   * @param <G> the good type of the Or
+   * @param <B> the bad type of the Or
+   * @param value
+   *            the value to put in the One
+   * @return a One inside a Bad
+   */
+  public static <G, B> Bad<G, One<B>> ofOne(B value) {
+    return new Bad<>(One.of(value));
+  }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public <H> Or<H, B> flatMap(Function<? super G, Or<H, ? extends B>> func) {
-		return (Or<H, B>) this;
-	}
+  /**
+   * Creates a Bad with a bad type of One&lt;String&gt; based on the given
+   * message. The message can be a slf4j string with {} placeholders that will
+   * be replaced by the given optional arguments.
+   *
+   * @param <G>
+   *            the good type of the Or
+   * @param msg
+   *            the message string with possible placeholders
+   * @param args
+   *            the values to replace the placeholders with
+   * @return a Bad
+   */
+  public static <G> Bad<G, One<String>> ofOneString(String msg, Object... args) {
+    return new Bad<>(One.of(Helper.parse(msg, args)));
+  }
 
-	@Override
-	public <V> V fold(Function<? super G, ? extends V> good, Function<? super B, ? extends V> bad) {
-		return bad.apply(value);
-	}
+  @Override
+  public Or<G, One<B>> accumulating() {
+    return Bad.ofOne(value);
+  }
 
-	@Override
-	public boolean forAll(Predicate<? super G> predicate) {
-		return true;
-	}
+  @SuppressWarnings("unchecked")
+  @Override
+  public <H> Or<H, B> map(Function<? super G, ? extends H> mapper) {
+    return (Or<H, B>) this;
+  }
 
-	@Override
-	public void forEach(Consumer<? super G> action) {
-		// does nothing
-	}
+  @Override
+  public <C> Or<G, C> badMap(Function<? super B, ? extends C> mapper) {
+    return Bad.of(mapper.apply(value));
+  }
 
-	@Override
-	public G get() {
-		throw new NoSuchElementException();
-	}
+  @Override
+  public boolean contains(G good) {
+    return false;
+  }
 
-	@Override
-	public B getBad() {
-		return value;
-	}
+  @Override
+  public boolean containsBad(B bad) {
+    return Objects.deepEquals(bad, value);
+  }
 
-	@Override
-	public G getOrElse(G alt) {
-		return alt;
-	}
+  @Override
+  public boolean exists(Predicate<? super G> predicate) {
+    return false;
+  }
 
-	@Override
-	public G getOrElse(Function<? super B, ? extends G> alt) {
-		return alt.apply(value);
-	}
+  @SuppressWarnings("unchecked")
+  @Override
+  public <H> Or<H, B> flatMap(Function<? super G, Or<H, ? extends B>> func) {
+    return (Or<H, B>) this;
+  }
 
-	@SuppressWarnings("unchecked")
-    @Override
-	public Or<G,B> orElse(Supplier<? extends Or<? extends G,? extends B>> alt) {
-		return (Or<G, B>) alt.get();
-	}
-	
-	@SuppressWarnings("unchecked")
-    @Override
-	public Or<G, B> orElse(Or<? extends G, ? extends B> alt) {
-	    return (Or<G, B>) alt;
-	}
-	
-	@Override
-	public Or<G, B> recover(Function<? super B, ? extends G> func) {
-		return Good.of(func.apply(value));
-	}
+  @Override
+  public <V> V fold(Function<? super G, ? extends V> good, Function<? super B, ? extends V> bad) {
+    return bad.apply(value);
+  }
 
-	@SuppressWarnings("unchecked")
-    @Override
-	public <C> Or<G, C> recoverWith(Function<? super B, ? extends Or<? extends G, C>> func) {
-		return (Or<G, C>) func.apply(value);
-	}
+  @Override
+  public boolean forAll(Predicate<? super G> predicate) {
+    return true;
+  }
 
-	@Override
-	public Or<B, G> swap() {
-		return Good.of(value);
-	}
+  @Override
+  public void forEach(Consumer<? super G> action) {
+    // does nothing
+  }
 
-	@Override
-	public Optional<G> toJavaOptional() {
-		return Optional.empty();
-	}
+  @Override
+  public G get() {
+    throw new NoSuchElementException();
+  }
 
-	@Override
-	public Option<G> toOption() {
-		return Option.none();
-	}
+  @Override
+  public B getBad() {
+    return value;
+  }
 
-	@Override
-	public Either<B, G> toEither() {
-		return new Left<>(value);
-	}
+  @Override
+  public G getOrElse(G alt) {
+    return alt;
+  }
 
-	@Override
-	public boolean isGood() {
-		return false;
-	}
+  @Override
+  public G getOrElse(Function<? super B, ? extends G> alt) {
+    return alt.apply(value);
+  }
 
-	@Override
-	public boolean isBad() {
-		return true;
-	}
+  @SuppressWarnings("unchecked")
+  @Override
+  public Or<G, B> orElse(Supplier<? extends Or<? extends G, ? extends B>> alt) {
+    return (Or<G, B>) alt.get();
+  }
 
-	@Override
-	public <H, C> Or<H, C> transform(Function<? super G, ? extends H> gf, Function<? super B, ? extends C> bf) {
-		return Bad.of(bf.apply(value));
-	}
+  @SuppressWarnings("unchecked")
+  @Override
+  public Or<G, B> orElse(Or<? extends G, ? extends B> alt) {
+    return (Or<G, B>) alt;
+  }
 
-	@Override
-	public void forEach(Consumer<? super G> gc, Consumer<? super B> bc) {
-		bc.accept(value);
-	}
+  @Override
+  public Or<G, B> recover(Function<? super B, ? extends G> func) {
+    return Good.of(func.apply(value));
+  }
 
-	@Override
-	public String toString() {
-		return "Bad(" + value + ")";
-	}
+  @SuppressWarnings("unchecked")
+  @Override
+  public <C> Or<G, C> recoverWith(Function<? super B, ? extends Or<? extends G, C>> func) {
+    return (Or<G, C>) func.apply(value);
+  }
 
-	@Override
-	public Or<G, B> filter(Function<? super G, ? extends Validation<? extends B>> validator) {
-		return this;
-	}
+  @Override
+  public Or<B, G> swap() {
+    return Good.of(value);
+  }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((value == null) ? 0 : value.hashCode());
-        return result;
-    }
+  @Override
+  public Optional<G> toJavaOptional() {
+    return Optional.empty();
+  }
 
-    @SuppressWarnings("rawtypes")
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Bad other = (Bad) obj;
-        if (value == null) {
-            if (other.value != null)
-                return false;
-        } else if (!value.equals(other.value))
-            return false;
-        return true;
-    }
-	
-	
+  @Override
+  public Option<G> toOption() {
+    return Option.none();
+  }
+
+  @Override
+  public Either<B, G> toEither() {
+    return new Left<>(value);
+  }
+
+  @Override
+  public boolean isGood() {
+    return false;
+  }
+
+  @Override
+  public boolean isBad() {
+    return true;
+  }
+
+  @Override
+  public <H, C> Or<H, C> transform(Function<? super G, ? extends H> gf, Function<? super B, ? extends C> bf) {
+    return Bad.of(bf.apply(value));
+  }
+
+  @Override
+  public void forEach(Consumer<? super G> gc, Consumer<? super B> bc) {
+    bc.accept(value);
+  }
+
+  @Override
+  public String toString() {
+    return "Bad(" + value + ")";
+  }
+
+  @Override
+  public Or<G, B> filter(Function<? super G, ? extends Validation<? extends B>> validator) {
+    return this;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((value == null) ? 0 : value.hashCode());
+    return result;
+  }
+
+  @SuppressWarnings("rawtypes")
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    Bad other = (Bad) obj;
+    if (value == null) {
+      if (other.value != null)
+        return false;
+    } else if (!value.equals(other.value))
+      return false;
+    return true;
+  }
+
 
 }

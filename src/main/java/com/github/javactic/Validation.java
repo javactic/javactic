@@ -1,17 +1,17 @@
 /**
- *    ___                       _   _      
- *   |_  |                     | | (_)     
- *     | | __ ___   ____ _  ___| |_ _  ___ 
- *     | |/ _` \ \ / / _` |/ __| __| |/ __|
+ * ___                       _   _
+ * |_  |                     | | (_)
+ * | | __ ___   ____ _  ___| |_ _  ___
+ * | |/ _` \ \ / / _` |/ __| __| |/ __|
  * /\__/ / (_| |\ V / (_| | (__| |_| | (__   -2015-
  * \____/ \__,_| \_/ \__,_|\___|\__|_|\___|
- *                                          
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,7 +35,7 @@ import java.util.NoSuchElementException;
  * Validation<String> isRound(int i) {
  *   return (i % 10 == 0) ? Pass.instance() : Fail.of(i + " was not a round number");
  * }
- * 
+ *
  * Validation<String> isDivBy3(int i) {
  *   return (i % 3 == 0) ? Pass.instance() : Fail.of(i + " was not divisible by 3");
  * }}</pre>
@@ -59,7 +59,7 @@ import java.util.NoSuchElementException;
  * <pre>{@code
  * Accumulation.when(Or.good(3), this::isRound, this::isDivBy3);
  * // Result: Bad(One(3 was not a round number))
- * 
+ *
  * Accumulation.when(Or.good(4), this::isRound, this::isDivBy3);
  * // Result: Bad(Many(4 was not a round number, 4 was not divisible by 3))
  * }</pre>
@@ -69,51 +69,52 @@ import java.util.NoSuchElementException;
  * a <code>None</code> that indicates validation success and <code>Fail</code> is a <code>Some</code> whose value describes 
  * the validation failure.
  * </p>
- * 
+ *
  * @param <E> the type of error value describing a validation failure for this <code>Validation</code>
  */
 public interface Validation<E> {
 
-    /**
-     * Returns the {@link Pass} instance.
-     * @param <E> the type of a failed validation.
-     * @return the {@link Pass} instance.
-     */
-	public static <E> Pass<E> pass() {
-		return Pass.instance();
-	}
-	
-	/**
-	 * Creates a {@link Fail} with the given reason.
-	 * @param <E> the type of a failed validation.
-	 * @param reason reason for failure
-	 * @return a new {@link Fail} object.
-	 */
-	public static <E> Fail<E> fail(E reason) {
-		return Fail.of(reason);
-	}
-	
-    /**
-     * Ands this Validation with another, passed, Validation.
-     * 
-     * @param other
-     *            the other validation
-     * @return a validation that is a {@link Fail} or a {@link Pass} according
-     *         to the truth-functional operator of logical conjunction
-     */
-	public abstract Validation<E> and(Validation<E> other);
-	
-	/**
-	 * @return true if this is a {@link Pass}
-	 */
-	abstract boolean isPass();
-	/**
-	 * @return true if this is a {@link Fail}
-	 */
-	abstract boolean isFail();
-	
-	/**
-	 * @return the failure reason this is a {@link Fail} or throws a {@link NoSuchElementException} if this is a {@link Pass}
-	 */
-	abstract E getError();
+  /**
+   * Returns the {@link Pass} instance.
+   * @param <E> the type of a failed validation.
+   * @return the {@link Pass} instance.
+   */
+  static <E> Pass<E> pass() {
+    return Pass.instance();
+  }
+
+  /**
+   * Creates a {@link Fail} with the given reason.
+   * @param <E> the type of a failed validation.
+   * @param reason reason for failure
+   * @return a new {@link Fail} object.
+   */
+  static <E> Fail<E> fail(E reason) {
+    return Fail.of(reason);
+  }
+
+  /**
+   * Ands this Validation with another, passed, Validation.
+   *
+   * @param other
+   *            the other validation
+   * @return a validation that is a {@link Fail} or a {@link Pass} according
+   *         to the truth-functional operator of logical conjunction
+   */
+  Validation<E> and(Validation<E> other);
+
+  /**
+   * @return true if this is a {@link Pass}
+   */
+  boolean isPass();
+
+  /**
+   * @return true if this is a {@link Fail}
+   */
+  boolean isFail();
+
+  /**
+   * @return the failure reason this is a {@link Fail} or throws a {@link NoSuchElementException} if this is a {@link Pass}
+   */
+  E getError();
 }
