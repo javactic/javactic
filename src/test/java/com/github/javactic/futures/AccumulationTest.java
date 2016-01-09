@@ -20,10 +20,12 @@ import org.junit.runner.RunWith;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.time.Duration;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 
@@ -128,9 +130,47 @@ public class AccumulationTest {
 //    assertEquals("12", fold);
 //  }
 
+  @Test
+  public void combined() throws TimeoutException, InterruptedException {
+    int total = 0;
+    for (int i = 0; i < 50; i++) {
+      total += testCombined();
+    }
+    System.out.println("total futures: " + total);
+  }
+
+  private int testCombined() throws TimeoutException, InterruptedException {
+    CountDownLatch latch = new CountDownLatch(1);
+    int size = ThreadLocalRandom.current().nextInt(40,100);
+    Vector<OrFuture<String, One<String>>> vector = Vector.empty();
+    for (int i = 0; i < size; i++) {
+      vector = vector.append(createRandomWaitingFuture(latch));
+    }
+    OrFuture<Vector<String>, Every<String>> combined = OrFuture.combined(vector);
+    latch.countDown();
+    Or<Vector<String>, Every<String>> or = combined.get(Duration.ofSeconds(2));
+    Assert.assertTrue(or.isGood());
+    return size;
+  }
+
+  private OrFuture<String, One<String>> createRandomWaitingFuture(CountDownLatch latch) {
+    if (ThreadLocalRandom.current().nextBoolean()) {
+      return ff.newFuture(() -> {
+        try {
+          latch.await();
+        } catch (Exception e) {
+          Assert.fail();
+        }
+        return Good.of("waiting");
+      }).accumulating();
+    } else {
+      return ff.newFuture(() -> Good.of("direct")).accumulating();
+    }
+  }
+
   @Theory
   public void validatedBy(ExecutorService es) throws InterruptedException, ExecutionException, TimeoutException {
-    Vector<Integer> vec = Vector.of(1,2,3);
+    Vector<Integer> vec = Vector.of(1,2,3,4);
     Function<Integer, OrFuture<Integer, One<String>>> f = i ->
       ffAcc.newFuture(es, () -> {
         if(i < 10) return Good.of(i);

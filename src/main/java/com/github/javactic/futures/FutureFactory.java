@@ -71,7 +71,7 @@ public class FutureFactory<B> {
    * @return a new future factory
    */
   public static <B> FutureFactory<B> of(Function<? super Throwable, ? extends B> exceptionConverter) {
-    return new FutureFactory<>(ForkJoinPool.commonPool(), exceptionConverter);
+    return of(ForkJoinPool.commonPool(), exceptionConverter);
   }
 
   /**
