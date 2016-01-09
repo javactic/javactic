@@ -37,7 +37,6 @@ public class AccumulationTest {
 
   @Test
   public void combined() {
-    System.out.println("available processors on this system: " + Runtime.getRuntime().availableProcessors());
     Vector<Or<String, Every<String>>> vec = Vector.of(Good.of("A"), Good.of("B"));
     Or<Vector<String>, Every<String>> result = Accumulation.combined(vec);
     assertTrue(result.isGood());
