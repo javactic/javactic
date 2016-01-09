@@ -12,5 +12,3 @@ before_install:
 
 after_success:
   - codecov
-
-sudo: false
