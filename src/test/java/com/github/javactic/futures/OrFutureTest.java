@@ -15,7 +15,6 @@ import org.junit.runner.RunWith;
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 
 import static org.junit.Assert.assertEquals;
@@ -26,7 +25,7 @@ public class OrFutureTest {
   private FutureFactory<String> ff = FutureFactory.OF_EXCEPTION_MESSAGE;
 
   @DataPoints
-  public static ExecutorService[] configs = {Executors.newSingleThreadExecutor(), ForkJoinPool.commonPool()};
+  public static ExecutorService[] configs = {ForkJoinPool.commonPool()};
 
   private static final String FAIL = "fail";
 

@@ -67,7 +67,7 @@ class OrFutureImpl<G, B> implements OrFuture<G, B> {
       throw new IllegalStateException("the future is already completed.");
     } else if (started.compareAndSet(false, true)) {
       // we got the right to start the job
-      executor.submit(() -> complete((Or<G,B>) orSupplier.get()));
+      executor.execute(() -> complete((Or<G,B>) orSupplier.get()));
     } else {
       throw new IllegalStateException("the future is already running.");
     }

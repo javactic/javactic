@@ -12,20 +12,16 @@ import org.junit.runner.RunWith;
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
 
 import static org.junit.Assert.assertFalse;
 
 @RunWith(Theories.class)
 public class OrFutureImplTest {
-  private FutureFactory<String> ff = FutureFactory.OF_EXCEPTION_MESSAGE;
-  private Function<Throwable, String> converter = Throwable::getMessage;
 
   @DataPoints
-  public static ExecutorService[] configs = {Executors.newSingleThreadExecutor(), ForkJoinPool.commonPool()};
+  public static ExecutorService[] configs = {ForkJoinPool.commonPool()};
 
   private static final String FAIL = "fail";
 

@@ -38,7 +38,7 @@ public class AccumulationTest {
   private FutureFactory<One<String>> ffAcc = ff.accumulating();
 
   @DataPoints
-  public static ExecutorService[] configs = {Executors.newSingleThreadExecutor(), ForkJoinPool.commonPool()};
+  public static ExecutorService[] configs = {ForkJoinPool.commonPool()};
 
   @Test
   public void withGoodFail() throws Exception {
