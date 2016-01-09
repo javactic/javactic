@@ -9,10 +9,13 @@ import com.github.javactic.One;
 import com.github.javactic.Or;
 import com.github.javactic.Pass;
 import com.github.javactic.Validation;
+import com.github.javactic.futures.FutureFactory;
 import com.github.javactic.futures.OrFuture;
 
 import javaslang.Tuple2;
 import javaslang.collection.List;
+
+import java.util.function.Function;
 
 public class AccumulatingOrFutureExample {
 
@@ -33,52 +36,58 @@ public class AccumulatingOrFutureExample {
   Or<Person, Every<String>> parsePerson(String inputName, String inputAge) {
     Or<String, One<String>> name = parseName(inputName);
     Or<Integer, One<String>> age = parseAge(inputAge);
-    return Accumulation.withGood(name, age, (n, a) -> new Person(n, a));
+    return Accumulation.withGood(name, age, Person::new);
   }
 
   // ---
 
+  Function<Throwable, One<String>> converter = throwable -> One.of(throwable.getMessage());
+  FutureFactory<One<String>> ff = FutureFactory.of(converter);
+
   OrFuture<String, One<String>> parseNameAsync(String input) {
-    return OrFuture.of(() -> parseName(input));
+    return ff.newFuture(() -> parseName(input));
   }
 
   OrFuture<Integer, One<String>> parseAgeAsync(String input) {
-    return OrFuture.of(() -> parseAge(input));
+    return ff.newFuture(() -> parseAge(input));
   }
 
   OrFuture<Person, Every<String>> parsePersonAsync(String inputName, String inputAge) {
     OrFuture<String, One<String>> name = parseNameAsync(inputName);
     OrFuture<Integer, One<String>> age = parseAgeAsync(inputAge);
-    return OrFuture.withGood(name, age, (n, a) -> new Person(n, a));
+    return OrFuture.withGood(name, age, Person::new);
   }
 
   void print() {
     OrFuture<Person, Every<String>> orFuture = parsePersonAsync("Bridget Jones", "29");
-    orFuture.onComplete(or -> System.out.println(or));
+    orFuture.onComplete(System.out::println);
     // Result: Good(Person(Bridget Jones,29))
 
     orFuture = parsePersonAsync("Bridget Jones", "");
-    orFuture.onComplete(or -> System.out.println(or));
-    // Result: Bad(One("" is not a valid integer))
+    orFuture.onComplete(System.out::println);
+    // Result: Bad(One('' is not a valid integer))
 
     orFuture = parsePersonAsync("Bridget Jones", "-29");
-    orFuture.onComplete(or -> System.out.println(or));
-    // Result: Bad(One("-29" is not a valid age))
+    orFuture.onComplete(System.out::println);
+    // Result: Bad(One('-29' is not a valid age))
 
     orFuture = parsePersonAsync("", "");
-    orFuture.onComplete(or -> System.out.println(or));
-    // Result: Bad(Many("" is not a valid name, "" is not a valid integer))
+    orFuture.onComplete(System.out::println);
+    // Result: Bad(Many('' is not a valid name, '' is not a valid integer))
   }
 
   void combined() {
     List<OrFuture<Integer, One<String>>> list = List.of(parseAgeAsync("29"), parseAgeAsync("30"), parseAgeAsync("31"));
-    OrFuture.combined(list, List.collector());  // Result: Good(List(29, 30, 31))
+    OrFuture.combined(list, List.collector());
+    // Result: Good(List(29, 30, 31))
 
     List<OrFuture<Integer, One<String>>> list2 = List.of(parseAgeAsync("29"), parseAgeAsync("-30"), parseAgeAsync("31"));
-    OrFuture.combined(list2, List.collector()); // Result: Bad(One("-30" is not a valid age))
+    OrFuture.combined(list2, List.collector());
+    // Result: Bad(One("-30" is not a valid age))
 
     List<OrFuture<Integer, One<String>>> list3 = List.of(parseAgeAsync("29"), parseAgeAsync("-30"), parseAgeAsync("-31"));
-    OrFuture.combined(list3, List.collector()); // Result: Bad(Many("-30" is not a valid age, "-31" is not a valid age))
+    OrFuture.combined(list3, List.collector());
+    // Result: Bad(Many("-30" is not a valid age, "-31" is not a valid age))
   }
 
   void validatedBy() {
@@ -130,8 +139,18 @@ public class AccumulatingOrFutureExample {
 
   }
 
-  public static void main(String[] args) {
-    new AccumulatingOrFutureExample().print();
+  public static void main(String[] args) throws InterruptedException {
+    AccumulatingOrFutureExample example = new AccumulatingOrFutureExample();
+    example.print();
+    Thread.sleep(100);
+    example.combined();
+    Thread.sleep(100);
+    example.validatedBy();
+    Thread.sleep(100);
+    example.zip();
+    Thread.sleep(100);
+    example.when();
+    Thread.sleep(100);
   }
 
 }

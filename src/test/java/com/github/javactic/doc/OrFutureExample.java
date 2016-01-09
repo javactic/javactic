@@ -1,13 +1,12 @@
 package com.github.javactic.doc;
 
-import java.time.Duration;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
-
 import com.github.javactic.Bad;
 import com.github.javactic.Good;
 import com.github.javactic.Or;
+import com.github.javactic.futures.FutureFactory;
 import com.github.javactic.futures.OrFuture;
+
+import java.util.function.Function;
 
 public class OrFutureExample {
     
@@ -30,13 +29,15 @@ public class OrFutureExample {
     }
 
     // --- async ---
-    
+    Function<Throwable, String> converter = Throwable::getMessage;
+    FutureFactory<String> ff = FutureFactory.of(converter);
+
     OrFuture<String, String> parseNameAsync(String input) {
-        return OrFuture.of(() -> parseName(input));
+        return ff.newFuture(() -> parseName(input));
     }
     
     OrFuture<Integer, String> parseAgeAsync(String input) {
-        return OrFuture.of(() -> parseAge(input));
+        return ff.newFuture(() -> parseAge(input));
     }
     
     OrFuture<Person, String> parsePersonAsync(String inputName, String inputAge) {
@@ -47,20 +48,20 @@ public class OrFutureExample {
 
     void print() throws Exception {
         OrFuture<Person, String> asyncOr = parsePersonAsync("Bridget Jones", "29");
-        asyncOr.onComplete(or -> System.out.println(or));
+        asyncOr.onComplete(System.out::println);
         // Result: Good(Person(Bridget Jones,29))
 
         asyncOr = parsePersonAsync("Bridget Jones", "");
-        asyncOr.onComplete(or -> System.out.println(or));
-        // Result: Bad("" is not a valid integer)
+        asyncOr.onComplete(System.out::println);
+        // Result: Bad('' is not a valid integer)
 
         asyncOr = parsePersonAsync("Bridget Jones", "-29");
-        asyncOr.onComplete(or -> System.out.println(or));
-        // Result: Bad("-29" is not a valid age)
+        asyncOr.onComplete(System.out::println);
+        // Result: Bad('-29' is not a valid age)
 
         asyncOr = parsePersonAsync("", "");
-        asyncOr.onComplete(or -> System.out.println(or));
-        // Result: Bad("" is not a valid name)
+        asyncOr.onComplete(System.out::println);
+    // Result: Bad('' is not a valid name)
     }
 
     

@@ -1,31 +1,30 @@
 package com.github.javactic.futures;
 
-import java.time.Duration;
-
+import com.github.javactic.Good;
+import com.github.javactic.Or;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.javactic.Good;
-import com.github.javactic.Or;
+import java.time.Duration;
 
 public class FutureFactoryTest {
     
-    private final String bad = "bad";
-    private final String good = "good";
+    private final String bad = "failure";
+    private final String good = "success";
     
     @Test
     public void fail() throws Exception {
         FutureFactory<String> f = FutureFactory.OF_EXCEPTION_MESSAGE;
-        OrFuture<String, String> orFuture = f.future(() -> get());
-        Or<String, String> result = orFuture.result(Duration.ofSeconds(10));
+        OrFuture<String, String> orFuture = f.newFuture(this::get);
+        Or<String, String> result = orFuture.get(Duration.ofSeconds(10));
         Assert.assertEquals(bad, result.getBad());
     }
     
     @Test
     public void success() throws Exception {
         FutureFactory<String> f = FutureFactory.OF_EXCEPTION_MESSAGE;
-        OrFuture<String, String> orFuture = f.future(() -> Good.of(good));
-        Or<String, String> result = orFuture.result(Duration.ofSeconds(10));
+        OrFuture<String, String> orFuture = f.newFuture(() -> Good.of(good));
+        Or<String, String> result = orFuture.get(Duration.ofSeconds(10));
         Assert.assertEquals(good, result.get());
     }
     

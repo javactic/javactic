@@ -1,24 +1,24 @@
-/**
- * ___                       _   _
- * |_  |                     | | (_)
- * | | __ ___   ____ _  ___| |_ _  ___
- * | |/ _` \ \ / / _` |/ __| __| |/ __|
+package com.github.javactic;
+/*
+ *    ___                       _   _
+ *   |_  |                     | | (_)
+ *     | | __ ___   ____ _  ___| |_ _  ___
+ *     | |/ _` \ \ / / _` |/ __| __| |/ __|
  * /\__/ / (_| |\ V / (_| | (__| |_| | (__   -2015-
  * \____/ \__,_| \_/ \__,_|\___|\__|_|\___|
- * <p>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- **/
-package com.github.javactic;
+ */
 
 import javaslang.control.Either;
 import javaslang.control.Left;
@@ -33,17 +33,17 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
- * Contains a "bad" value.
+ * Contains a "failure" value.
  *
- * You can decide what "bad" means, but it is expected Bad will be commonly used
+ * You can decide what "failure" means, but it is expected Bad will be commonly used
  * to hold descriptions of an error (or several, accumulated errors). Some
  * examples of possible error descriptions are String error messages, Int error
  * codes, Throwable exceptions, or enums designed to describe errors.
  *
  * @author mvh
  *
- * @param <G> the good type of the Or
- * @param <B> the bad type of the Or
+ * @param <G> the success type of the Or
+ * @param <B> the failure type of the Or
  */
 public class Bad<G, B> implements Or<G, B> {
 
@@ -56,8 +56,8 @@ public class Bad<G, B> implements Or<G, B> {
   /**
    * Creates a Bad of type B.
    *
-   * @param <G> the good type of the Or
-   * @param <B> the bad type of the Or
+   * @param <G> the success type of the Or
+   * @param <B> the failure type of the Or
    * @param value the value of the Bad
    * @return an instance of Bad
    */
@@ -66,12 +66,12 @@ public class Bad<G, B> implements Or<G, B> {
   }
 
   /**
-   * Creates a Bad with a bad type of String based on the given message. The
+   * Creates a Bad with a failure type of String based on the given message. The
    * message can be a slf4j string with {} placeholders that will be replaced
    * by the given optional arguments.
    *
    * @param <G>
-   *            the good type of the Or
+   *            the success type of the Or
    * @param msg the message string with possible placeholders
    * @param args the values to replace the placeholders with
    * @return a Bad
@@ -84,8 +84,8 @@ public class Bad<G, B> implements Or<G, B> {
    * Helper method to get a {@link One} wrapped in a {@link Bad} directly.
    * Equivalent to <code>Bad.of(One.of(value))</code>
    *
-   * @param <G> the good type of the Or
-   * @param <B> the bad type of the Or
+   * @param <G> the success type of the Or
+   * @param <B> the failure type of the Or
    * @param value
    *            the value to put in the One
    * @return a One inside a Bad
@@ -95,12 +95,12 @@ public class Bad<G, B> implements Or<G, B> {
   }
 
   /**
-   * Creates a Bad with a bad type of One&lt;String&gt; based on the given
+   * Creates a Bad with a failure type of One&lt;String&gt; based on the given
    * message. The message can be a slf4j string with {} placeholders that will
    * be replaced by the given optional arguments.
    *
    * @param <G>
-   *            the good type of the Or
+   *            the success type of the Or
    * @param msg
    *            the message string with possible placeholders
    * @param args

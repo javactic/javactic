@@ -1,24 +1,24 @@
-/**
- * ___                       _   _
- * |_  |                     | | (_)
- * | | __ ___   ____ _  ___| |_ _  ___
- * | |/ _` \ \ / / _` |/ __| __| |/ __|
+package com.github.javactic;
+/*
+ *    ___                       _   _
+ *   |_  |                     | | (_)
+ *     | | __ ___   ____ _  ___| |_ _  ___
+ *     | |/ _` \ \ / / _` |/ __| __| |/ __|
  * /\__/ / (_| |\ V / (_| | (__| |_| | (__   -2015-
  * \____/ \__,_| \_/ \__,_|\___|\__|_|\___|
- * <p>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- **/
-package com.github.javactic;
+ */
 
 import javaslang.control.Either;
 import javaslang.control.Option;
@@ -33,16 +33,16 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
- * Contains a "good" value.
+ * Contains a "success" value.
  *
- * You can decide what "good" means, but it is expected Good will be commonly
+ * You can decide what "success" means, but it is expected Good will be commonly
  * used to hold valid results for processes that may fail with an error instead
  * of producing a valid result.
  *
  * @author mvh
  *
- * @param <G> the good type of the Or
- * @param <B> the bad type of the Or
+ * @param <G> the success type of the Or
+ * @param <B> the failure type of the Or
  */
 public class Good<G, B> implements Or<G, B> {
 
@@ -59,7 +59,7 @@ public class Good<G, B> implements Or<G, B> {
   @SuppressWarnings("unchecked")
   @Override
   public Or<G, One<B>> accumulating() {
-    // not a bad, so we can cast the bad side to anything.
+    // not a failure, so we can cast the failure side to anything.
     return (Or<G, One<B>>) this;
   }
 

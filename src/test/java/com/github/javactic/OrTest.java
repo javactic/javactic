@@ -20,57 +20,53 @@
  **/
 package com.github.javactic;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import javaslang.control.Failure;
 import javaslang.control.Left;
 import javaslang.control.Option;
 import javaslang.control.Right;
 import javaslang.control.Success;
 import javaslang.control.Try;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+
+import static org.junit.Assert.*;
 
 public class OrTest {
 	
 	@Test
 	public void from() {
-		Or<String, String> good = Or.fromJavaOptional(Optional.of("good"), "bad");
-		assertEquals("good", good.get());
-		good = Or.fromJavaOptional(Optional.of("good"), () -> "fool");
-		assertEquals("good", good.get());
-		Or<String, String> bad = Or.fromJavaOptional(Optional.empty(), "bad");
-		assertEquals("bad", bad.getBad());
-		bad = Or.fromJavaOptional(Optional.empty(), () -> "bad");
-		assertEquals("bad", bad.getBad());
+		Or<String, String> good = Or.fromJavaOptional(Optional.of("success"), "failure");
+		assertEquals("success", good.get());
+		good = Or.fromJavaOptional(Optional.of("success"), () -> "fool");
+		assertEquals("success", good.get());
+		Or<String, String> bad = Or.fromJavaOptional(Optional.empty(), "failure");
+		assertEquals("failure", bad.getBad());
+		bad = Or.fromJavaOptional(Optional.empty(), () -> "failure");
+		assertEquals("failure", bad.getBad());
 		
-		Or<String, String> any = Or.fromAny(Optional.of("good"), toOr("bad"));
-		assertEquals("good", any.get());
-		assertEquals("bad", bad.toAny(bad2 -> bad2.getBad()));
+		Or<String, String> any = Or.fromAny(Optional.of("success"), toOr("failure"));
+		assertEquals("success", any.get());
+		assertEquals("failure", bad.toAny(Or::getBad));
 		
-		good = Or.from(new Right<>("good"));
-		assertEquals("good", good.get());
-		bad = Or.from(new Left<>("bad"));
-		assertEquals("bad", bad.getBad());
+		good = Or.from(new Right<>("success"));
+		assertEquals("success", good.get());
+		bad = Or.from(new Left<>("failure"));
+		assertEquals("failure", bad.getBad());
 		
-		good = Or.from(Option.some("good"), "bad");
-		assertEquals("good", good.get());
-		bad = Or.from(Option.none(), "bad");
-		assertEquals("bad", bad.getBad());
-        bad = Or.from(Option.none(), () -> "bad");
-        assertEquals("bad", bad.getBad());		
+		good = Or.from(Option.some("success"), "failure");
+		assertEquals("success", good.get());
+		bad = Or.from(Option.none(), "failure");
+		assertEquals("failure", bad.getBad());
+        bad = Or.from(Option.none(), () -> "failure");
+        assertEquals("failure", bad.getBad());
 		
-		Or<String, Throwable> goodTry = Or.from(new Success<>("good"));
-		assertEquals("good", goodTry.get());
+		Or<String, Throwable> goodTry = Or.from(new Success<>("success"));
+		assertEquals("success", goodTry.get());
 		RuntimeException ex = new RuntimeException();
         Or<String, Throwable> badTry = Or.from(new Failure<>(ex));
         assertEquals(ex, badTry.getBad());
@@ -94,19 +90,19 @@ public class OrTest {
 	@Test
 	public void map(){
 		Or<String, String> good = Good.of("1");
-		Or<Integer, String> goodI = good.map(s -> Integer.parseInt(s));
+		Or<Integer, String> goodI = good.map(Integer::parseInt);
 		assertEquals(1, goodI.get().intValue());
 		Or<String, String> bad = Bad.of("2");
-		Or<Integer, String> badI = bad.map(s -> Integer.parseInt(s));
+		Or<Integer, String> badI = bad.map(Integer::parseInt);
 		assertTrue(badI.isBad());
 	}
 	
 	@Test
 	public void badMap() {
 		Or<String, String> good = Good.of("1");
-		assertTrue(good.badMap(b -> b.toLowerCase()).isGood());
+		assertTrue(good.badMap(String::toLowerCase).isGood());
 		Or<String, String> bad = Bad.of("foo");
-		assertEquals("bad", bad.badMap(s -> "bad").getBad());
+		assertEquals("failure", bad.badMap(s -> "failure").getBad());
 	}
 	
 	@Test
@@ -115,9 +111,9 @@ public class OrTest {
 	    assertTrue(good1.contains("1"));
 	    assertFalse(good1.containsBad("1"));
 	    
-	    Or<String, String> bad1 = Bad.of("bad");
-	    assertTrue(bad1.containsBad("bad"));
-	    assertFalse(bad1.contains("bad"));
+	    Or<String, String> bad1 = Bad.of("failure");
+	    assertTrue(bad1.containsBad("failure"));
+	    assertFalse(bad1.contains("failure"));
 	    
 	    Or<String[], String[]> good2 = Good.of(new String[]{"1"});
 	    assertTrue(good2.contains(new String[]{"1"}));
@@ -142,40 +138,40 @@ public class OrTest {
 	public void exists() {
 		Or<String, String> good = Good.of("1");
 		assertTrue(good.exists(s -> s.equals("1")));
-		Or<String, String> bad = Bad.of("bad");
-		assertFalse(bad.exists(s -> s.equals("bad")));
+		Or<String, String> bad = Bad.of("failure");
+		assertFalse(bad.exists(s -> s.equals("failure")));
 	}
 	
 	@Test
 	public void forall() {
 		Or<String, String> good = Good.of("1");
 		assertTrue(good.forAll(s -> s.equals("1")));
-		Or<String, String> bad = Bad.of("bad");
-		assertTrue(bad.forAll(s -> s.equals("bad")));
+		Or<String, String> bad = Bad.of("failure");
+		assertTrue(bad.forAll(s -> s.equals("failure")));
 	}
 	
 	@Test
 	public void fold() {
-		Or<String, String> good = Good.of("good");
-		assertEquals("good", good.fold(s -> s, s -> "bad"));
-		Or<String, String> bad = Bad.of("bad");
-		assertEquals("bad", bad.fold(s -> "good", s -> s));
+		Or<String, String> good = Good.of("success");
+		assertEquals("success", good.fold(s -> s, s -> "failure"));
+		Or<String, String> bad = Bad.of("failure");
+		assertEquals("failure", bad.fold(s -> "success", s -> s));
 	}
 	
 	@Test
 	public void forEach() {
-		AtomicReference<String> foo = new AtomicReference<String>("bar");
+		AtomicReference<String> foo = new AtomicReference<>("bar");
 		Or<String, String> good = Good.of("foo");
-		good.forEach(s -> foo.set(s));
+		good.forEach(foo::set);
 		assertEquals("foo", foo.get());
 		Or<String, String> bad = Bad.of("baad");
-		bad.forEach(s -> foo.set(s));
+		bad.forEach(foo::set);
 		assertEquals("foo", foo.get());
 	}
 	
 	@Test
 	public void getForBad() {
-		Or<String, String> bad = Bad.of("bad");
+		Or<String, String> bad = Bad.of("failure");
 		try {
 			bad.get();
 			Assert.fail("should throw exception");
@@ -187,7 +183,7 @@ public class OrTest {
 	
 	@Test
 	public void getBadForGood() {
-		Or<String, String> good = Good.of("good");
+		Or<String, String> good = Good.of("success");
 		try {
 			good.getBad();
 			Assert.fail("should throw exception");
@@ -199,52 +195,52 @@ public class OrTest {
 	
 	@Test
 	public void getOrElse() {
-		Or<String, String> good = Good.of("good");
-		assertEquals("good", good.getOrElse("bad"));
-		assertEquals("good", good.getOrElse(b -> "bad"));
+		Or<String, String> good = Good.of("success");
+		assertEquals("success", good.getOrElse("failure"));
+		assertEquals("success", good.getOrElse(b -> "failure"));
 		Or<String, String> bad = Bad.of("foo");
-		assertEquals("bad", bad.getOrElse("bad"));
+		assertEquals("failure", bad.getOrElse("failure"));
 		assertEquals("bad2", bad.getOrElse(b -> "bad2"));
 	}
 	
 	@Test
 	public void orElse() {
-		Or<String, String> or = Good.of("good");
-		assertEquals("good", or.orElse(() -> Bad.of("bad")).get());
-		assertEquals("good", or.orElse(Bad.of("bad")).get());
+		Or<String, String> or = Good.of("success");
+		assertEquals("success", or.orElse(() -> Bad.of("failure")).get());
+		assertEquals("success", or.orElse(Bad.of("failure")).get());
 		or = Bad.of("foo");
-		assertEquals("bad", or.orElse(() -> Bad.of("bad")).getBad());
-		assertEquals("bad", or.orElse(Bad.of("bad")).getBad());
+		assertEquals("failure", or.orElse(() -> Bad.of("failure")).getBad());
+		assertEquals("failure", or.orElse(Bad.of("failure")).getBad());
 	}
 	
 	@Test
 	public void recover() {
-		Or<String, String> or = Good.of("good");
-		assertEquals("good", or.recover(bad -> "recovered-bad").get());
-		or = Bad.of("bad");
+		Or<String, String> or = Good.of("success");
+		assertEquals("success", or.recover(bad -> "recovered-failure").get());
+		or = Bad.of("failure");
 		assertEquals("recovered", or.recover(bad -> "recovered").get());
 	}
 	
 	@Test
 	public void recoverWith() {
-		Or<String, String> or = Good.of("good");
-		assertEquals("good", or.recoverWith(bad -> Bad.of(123)).get());
-		or = Bad.of("bad");
+		Or<String, String> or = Good.of("success");
+		assertEquals("success", or.recoverWith(bad -> Bad.of(123)).get());
+		or = Bad.of("failure");
 		assertEquals(123, or.recoverWith(bad -> Bad.of(123)).getBad().intValue());
 	}
 	
 	@Test
 	public void swap() {
-		Or<String, Integer> or = Good.of("good");
-		assertEquals("good", or.swap().getBad());
+		Or<String, Integer> or = Good.of("success");
+		assertEquals("success", or.swap().getBad());
 		or = Bad.of(123);
 		assertEquals(123, or.swap().get().intValue());
 	}
 	
 	@Test
 	public void toOptional() {
-		Or<String, Integer> or = Good.of("good");
-		assertEquals("good", or.toOption().get());
+		Or<String, Integer> or = Good.of("success");
+		assertEquals("success", or.toOption().get());
 		or = Bad.of(123);
 		assertFalse(or.toOption().isDefined());
 	}
@@ -252,10 +248,10 @@ public class OrTest {
 	@Test
 	public void transform() {
 		Or<String, Integer> or = Good.of("good");
-		Or<String, Integer> tr = or.transform(g -> g.toUpperCase(), b -> b - 100);
+		Or<String, Integer> tr = or.transform(String::toUpperCase, b -> b - 100);
 		assertEquals("GOOD", tr.get());
 		or = Bad.of(123);
-		tr = or.transform(g -> g.toUpperCase(), b -> b - 100);
+		tr = or.transform(String::toUpperCase, b -> b - 100);
 		assertEquals(23, tr.getBad().intValue());
 	}
 	
@@ -273,45 +269,45 @@ public class OrTest {
 	
 	@Test
 	public void misc() {
-		assertTrue(Good.of("good").isGood());
-		assertFalse(Good.of("good").isBad());
+		assertTrue(Good.of("success").isGood());
+		assertFalse(Good.of("success").isBad());
 		
-		assertTrue(Bad.of("bad").isBad());
-		assertFalse(Bad.of("bad").isGood());
+		assertTrue(Bad.of("failure").isBad());
+		assertFalse(Bad.of("failure").isGood());
 		
-		assertEquals("Good(good)", Good.of("good").toString());
-		assertEquals("Bad(bad)", Bad.of("bad").toString());
+		assertEquals("Good(success)", Good.of("success").toString());
+		assertEquals("Bad(failure)", Bad.of("failure").toString());
 	}
 	
 	@Test
 	public void toStuff() {
-		assertEquals("good", Good.of("good").toJavaOptional().get());
+		assertEquals("success", Good.of("success").toJavaOptional().get());
 		assertFalse(Bad.of("string").toJavaOptional().isPresent());
 		
-		assertEquals("good", Good.of("good").toEither().right().get());
-		assertEquals("bad", Bad.of("bad").toEither().left().get());
+		assertEquals("success", Good.of("success").toEither().right().get());
+		assertEquals("failure", Bad.of("failure").toEither().left().get());
 		
-		Try<Object> try1 = Or.toTry(Good.<String, RuntimeException>of("good"));
-		assertEquals(Try.of(() -> "good"), try1);
+		Try<Object> try1 = Or.toTry(Good.<String, RuntimeException>of("success"));
+		assertEquals(Try.of(() -> "success"), try1);
 		assertEquals(
-				new RuntimeException().getClass(), 
+      RuntimeException.class,
 				Or.toTry(Bad.of(new RuntimeException())).getCause().getClass());
 	}
 	
 	@Test
 	public void withValues() {
 		AtomicReference<String> value = new AtomicReference<>("empty");
-		Good.<String, String>of("good").forEach(g -> value.set(g), b -> value.set(b));
-		assertEquals("good", value.get());
-		Bad.<String, String>of("bad").forEach(g -> value.set(g), b -> value.set(b));
-		assertEquals("bad", value.get());
+		Good.<String, String>of("success").forEach(value::set, value::set);
+		assertEquals("success", value.get());
+		Bad.<String, String>of("failure").forEach(value::set, value::set);
+		assertEquals("failure", value.get());
 	}
 	
 	@Test
 	public void hashCodeEqualsToString() {
 	    Bad<Object, String> bad1 = Bad.of("b");
 	    Bad<Object, String> bad2 = Bad.ofString("b");
-	    Bad<Object, String> bad3 = Bad.ofString("too {}", "bad");
+	    Bad<Object, String> bad3 = Bad.ofString("too {}", "failure");
 	    assertEquals(bad1, bad2);
 	    assertEquals(bad1, bad1);
 	    assertNotEquals(bad1, bad3);

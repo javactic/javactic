@@ -1,4 +1,4 @@
-package com.github.javactic;
+package com.github.javactic.doc;
 /*
  *    ___                       _   _
  *   |_  |                     | | (_)
@@ -20,24 +20,20 @@ package com.github.javactic;
  * limitations under the License.
  */
 
-import javaslang.collection.IndexedSeq;
+import com.github.javactic.futures.OrFuture;
 
-import java.util.regex.Pattern;
+public class FutureFactoryExample {
 
-class Helper {
+  public static void main(String[] args) throws InterruptedException {
+//    Function<Throwable, String> converter = Throwable::getMessage;
+//    FutureFactory<String> factory = FutureFactory.of(converter);
 
-  private static final String REPLACE = Pattern.quote("{}");
+    OrFuture<String, String> foobis = OrFuture.of(() -> {
+      throw new RuntimeException("foobis");
+    });
+    foobis.onComplete(or -> System.out.println("jee"));
+    Thread.sleep(100);
 
-  static <E> Every<E> fromNonEmptySeq(IndexedSeq<E> seq) {
-    return Every.of(seq.head(), seq.tail());
+
   }
-
-  static String parse(String msg, Object... args) {
-    if (msg == null) return null;
-    for (Object arg : args) {
-      msg = msg.replaceFirst(REPLACE, arg.toString());
-    }
-    return msg;
-  }
-
 }

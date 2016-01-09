@@ -46,22 +46,22 @@ public class OrExample {
     public static void main(String[] args) {
         new OrExample().print();
         
-        Or.good("good"); // Or<String, Object>
-        Or.bad("bad");   // Or<Object, String>
+        Or.good("success"); // Or<String, Object>
+        Or.bad("failure");   // Or<Object, String>
         
-        Or.<String, Integer>good("good"); // Or<String, Integer>
-        Or.<Integer, String>bad("bad");   // Or<Integer, String>
+        Or.<String, Integer>good("success"); // Or<String, Integer>
+        Or.<Integer, String>bad("failure");   // Or<Integer, String>
         
-        Or<String, Integer> good = Or.good("good"); // Or<String, Integer>
-        Or<Integer, String> bad = Or.bad("bad");    // Or<Integer, String>
+        Or<String, Integer> good = Or.good("success"); // Or<String, Integer>
+        Or<Integer, String> bad = Or.bad("failure");    // Or<Integer, String>
         
-        Good.of("good"); // Good<String, Object>
-        Bad.of("bad");   // Bad<Object, String>
+        Good.of("success"); // Good<String, Object>
+        Bad.of("failure");   // Bad<Object, String>
         
-        Bad.of("bad").asOr(); // Or<Object, String>
+        Bad.of("failure").asOr(); // Or<Object, String>
         
-        Or<String, One<String>> acc = Bad.<String,String>of("bad").accumulating(); // Or<String, One<String>>
-        Bad<String, One<String>> ofOne = Bad.ofOne("bad"); // Bad<String, One<String>>
+        Or<String, One<String>> acc = Bad.<String,String>of("failure").accumulating(); // Or<String, One<String>>
+        Bad<String, One<String>> ofOne = Bad.ofOne("failure"); // Bad<String, One<String>>
         Bad<String, One<String>> ofOneString = Bad.ofOneString("error with value {}", 12); // Bad<String, One<String>>
         
     }

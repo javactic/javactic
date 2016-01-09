@@ -1,24 +1,24 @@
-/**
- * ___                       _   _
- * |_  |                     | | (_)
- * | | __ ___   ____ _  ___| |_ _  ___
- * | |/ _` \ \ / / _` |/ __| __| |/ __|
+package com.github.javactic;
+/*
+ *    ___                       _   _
+ *   |_  |                     | | (_)
+ *     | | __ ___   ____ _  ___| |_ _  ___
+ *     | |/ _` \ \ / / _` |/ __| __| |/ __|
  * /\__/ / (_| |\ V / (_| | (__| |_| | (__   -2015-
  * \____/ \__,_| \_/ \__,_|\___|\__|_|\___|
- * <p>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- **/
-package com.github.javactic;
+ */
 
 import javaslang.control.Either;
 import javaslang.control.Failure;
@@ -40,10 +40,10 @@ import java.util.function.Supplier;
 
 /**
  * Represents a value that is one of two possible types, with one type being
- * "good" and the other "bad."
+ * "success" and the other "failure."
  *
- * An Or will either be a "good" value wrapped in an instance of {@link Good} or
- * a "bad" value wrapped in an instance of {@link Bad}.
+ * An Or will either be a "success" value wrapped in an instance of {@link Good} or
+ * a "failure" value wrapped in an instance of {@link Bad}.
  *
  * <h1>Motivation for Or</h1>
  *
@@ -57,9 +57,9 @@ import java.util.function.Supplier;
  * @author mvh
  *
  * @param <G>
- *            the good type of the Or
+ *            the success type of the Or
  * @param <B>
- *            the bad type of the Or
+ *            the failure type of the Or
  */
 public interface Or<G, B> {
 
@@ -69,7 +69,7 @@ public interface Or<G, B> {
    * @param <G> the {@link Good} type
    * @param <B> the {@link Bad} type
    * @param option the Option to transform
-   * @param bad a Supplier used to get the bad value if the given Option is None
+   * @param bad a Supplier used to get the failure value if the given Option is None
    * @return an Or
    */
   static <G, B> Or<G, B> from(Option<G> option, Supplier<B> bad) {
@@ -164,7 +164,7 @@ public interface Or<G, B> {
    *
    * @param <G> the {@link Good} type
    * @param <B> the {@link Bad} type
-   * @param value the good value
+   * @param value the success value
    * @return an instance of {@link Good}
    */
   static <G, B> Or<G, B> good(G value) {
@@ -176,7 +176,7 @@ public interface Or<G, B> {
    *
    * @param <G> the {@link Good} type
    * @param <B> the {@link Bad} type
-   * @param value the bad value
+   * @param value the failure value
    * @return an instance of {@link Bad}
    */
   static <G, B> Or<G, B> bad(B value) {
@@ -465,7 +465,7 @@ public interface Or<G, B> {
    *
    * <pre class="stHighlighted">Scalactic: def toOption: Option[G] </pre>
    *
-   * @return the contained &ldquo;good&rdquo; value wrapped in a {@link Some}, if this {@link Or} is a
+   * @return the contained &ldquo;success&rdquo; value wrapped in a {@link Some}, if this {@link Or} is a
    *         {@link Good}; {@link None} if this {@link Or} is a {@link Bad}.
    */
   Option<G> toOption();
@@ -478,8 +478,8 @@ public interface Or<G, B> {
    * Note that values effectively <code>switch sides</code> when converting an {@link Or} to an
    * {@link Either}. If the type of the {@link Or} on which you invoke this method is
    * <code>Or&lt;Int,ErrorMessage&gt;</code> for example, the result will be an <code>Either&lt;ErrorMessage,Int&gt;</code>.
-   * The reason is that the convention for {@link Either} is that {@link Left} is used for <code>bad</code>
-   * values and {@link Right} is used for <code>good</code> ones.
+   * The reason is that the convention for {@link Either} is that {@link Left} is used for <code>failure</code>
+   * values and {@link Right} is used for <code>success</code> ones.
    *
    * <pre class="stHighlighted">Scalactic: def toEither: Either[B, G] </pre>
    *
@@ -501,7 +501,7 @@ public interface Or<G, B> {
    * Scalactic: def toTry(implicit ev: &lt;:&lt;[B, Throwable]): Try[G]
    * </pre>
    *
-   * @param <G> the good type of the Or
+   * @param <G> the success type of the Or
    * @param or an instance of {@link Or}
    * @return this {@link Good} value, wrapped in a {@link Success}, or this
    *         {@link Bad} value, wrapped in a {@link Failure}.
@@ -539,7 +539,7 @@ public interface Or<G, B> {
   <H, C> Or<H, C> transform(Function<? super G, ? extends H> gf, Function<? super B, ? extends C> bf);
 
   /**
-   * A terminal operation to handle both good and bad cases.
+   * A terminal operation to handle both success and failure cases.
    * @param gc a function to be executed if this {@link Or} is a {@link Good}
    * @param bc a function to be executed if this {@link Or} is a {@link Bad}
    */

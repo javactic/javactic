@@ -20,8 +20,8 @@
  **/
 package com.github.javactic;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import javaslang.collection.Vector;
+import org.junit.Test;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
@@ -30,9 +30,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.junit.Test;
-
-import javaslang.collection.Vector;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class AccumulationTest {
 
@@ -70,8 +69,8 @@ public class AccumulationTest {
 	public void when() {
 		Function<String, Validation<String>> f1 = f -> f.startsWith("s") ? Pass.instance() : Fail.of("does not start with s");
 		Function<String, Validation<String>> f2 = f -> f.length() > 4 ? Fail.of("too long") : Pass.instance();
-		Or<String, Every<String>> res = Accumulation.when(Bad.of(One.of("bad")), f1, f2);
-		assertEquals("bad", res.getBad().get(0));
+		Or<String, Every<String>> res = Accumulation.when(Bad.of(One.of("failure")), f1, f2);
+		assertEquals("failure", res.getBad().get(0));
 		res = Accumulation.when(Good.of("sub"), f1, f2);
 		assertTrue(res.isGood());
 		res = Accumulation.when(Good.of("fubiluuri"), f1, f2);
@@ -103,17 +102,6 @@ public class AccumulationTest {
 		testWithF(fun, 2);
 		fun = o -> Accumulation.zip3(o[0], o[1], o[2]);
 		testWithF(fun, 3);
-		fun = o -> Accumulation.zip4(o[0],o[1],o[2],o[3]);
-		testWithF(fun, 4);
-		fun = o -> Accumulation.zip5(o[0],o[1],o[2],o[3],o[4]);
-		testWithF(fun, 5);
-		fun = o -> Accumulation.zip6(o[0],o[1],o[2],o[3],o[4],o[5]);
-		testWithF(fun, 6);
-		fun = o -> Accumulation.zip7(o[0],o[1],o[2],o[3],o[4],o[5],o[6]);
-		testWithF(fun, 7);
-		fun = o -> Accumulation.zip8(o[0],o[1],o[2],o[3],o[4],o[5],o[6],o[7]);
-		testWithF(fun, 8);
-		
 	}
 	
     @Test
@@ -131,8 +119,8 @@ public class AccumulationTest {
 		Or<String, ? extends Every<String>>[] ors = new Or[size];
 		for(int i = 0; i <= ors.length; i++){
 			for(int j = 0; j < ors.length; j++) {
-				if(j == i) ors[j] = Bad.ofOne("bad");
-				else ors[j] = Good.of("good");
+				if(j == i) ors[j] = Bad.ofOne("failure");
+				else ors[j] = Good.of("success");
 			}
 			Or<?, Every<String>> val = f.apply(ors);
 			if(i < ors.length)
