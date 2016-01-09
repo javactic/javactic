@@ -12,12 +12,17 @@ import javaslang.collection.Seq;
 import javaslang.collection.Vector;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.theories.DataPoints;
+import org.junit.experimental.theories.Theories;
+import org.junit.experimental.theories.Theory;
+import org.junit.runner.RunWith;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.time.Duration;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
@@ -26,13 +31,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 
-//@RunWith(Theories.class)
+@RunWith(Theories.class)
 public class AccumulationTest {
   private FutureFactory<String> ff = FutureFactory.OF_EXCEPTION_MESSAGE;
   private FutureFactory<One<String>> ffAcc = ff.accumulating();
 
-//  @DataPoints
-  public static ExecutorService[] configs = {ForkJoinPool.commonPool()};
+  @DataPoints
+  public static ExecutorService[] configs = {Executors.newSingleThreadExecutor(), ForkJoinPool.commonPool()};
 
   @Test
   public void withGoodFail() throws Exception {
@@ -52,14 +57,12 @@ public class AccumulationTest {
     assertEquals("A1", or.get());
   }
 
-//  @Theory
-  @Test
-  public void sequenceSuccess() throws Exception {
+  @Theory
+  public void sequenceSuccess(ExecutorService es) throws Exception {
     Seq<OrFuture<Integer, One<String>>> seq = Vector.empty();
     for (int i = 0; i < 10; i++) {
       final int fi = i;
-//      seq = seq.append(ff.newFuture(es, () -> Good.of(fi)).accumulating());
-      seq = seq.append(ff.newFuture(() -> Good.of(fi)).accumulating());
+      seq = seq.append(ff.newFuture(es, () -> Good.of(fi)).accumulating());
     }
     OrFuture<Vector<Integer>, Every<String>> sequence = OrFuture.combined(seq);
     Or<Vector<Integer>, Every<String>> or = sequence.get(Duration.ofSeconds(10));
@@ -68,20 +71,15 @@ public class AccumulationTest {
     assertEquals("0123456789", fold);
   }
 
-//  @Theory
-  @Test
-  public void sequenceFailure() throws Exception {
+  @Theory
+  public void sequenceFailure(ExecutorService es) throws Exception {
     Seq<OrFuture<Integer, One<String>>> seq = Vector.empty();
     for (int i = 0; i < 10; i++) {
       final int fi = i;
-//      if (i % 2 == 0)
-//        seq = seq.append(ffAcc.newFuture(es, () -> Good.of(fi)));
-//      else
-//        seq = seq.append(ffAcc.newFuture(es, () -> Bad.ofOne(fi+ "")));
       if (i % 2 == 0)
-        seq = seq.append(ffAcc.newFuture(() -> Good.of(fi)));
+        seq = seq.append(ffAcc.newFuture(es, () -> Good.of(fi)));
       else
-        seq = seq.append(ffAcc.newFuture(() -> Bad.ofOne(fi+ "")));
+        seq = seq.append(ffAcc.newFuture(es, () -> Bad.ofOne(fi+ "")));
     }
     OrFuture<Vector<Integer>, Every<String>> sequence = OrFuture.combined(seq);
     Or<Vector<Integer>, Every<String>> or = sequence.get(Duration.ofSeconds(10));
@@ -130,12 +128,11 @@ public class AccumulationTest {
 //    assertEquals("12", fold);
 //  }
 
-//  @Theory
-  @Test
-  public void validatedBy() throws InterruptedException, ExecutionException, TimeoutException {
+  @Theory
+  public void validatedBy(ExecutorService es) throws InterruptedException, ExecutionException, TimeoutException {
     Vector<Integer> vec = Vector.of(1,2,3);
     Function<Integer, OrFuture<Integer, One<String>>> f = i ->
-      ffAcc.newFuture(() -> {
+      ffAcc.newFuture(es, () -> {
         if(i < 10) return Good.of(i);
         else return Bad.ofOne("wasn't under 10");
       });
@@ -147,26 +144,23 @@ public class AccumulationTest {
     assertTrue(res.getBad() instanceof One);
   }
 
-//  @Theory
-  @Test
-  public void when() throws InterruptedException, ExecutionException, TimeoutException {
+  @Theory
+  public void when(ExecutorService es) throws InterruptedException, ExecutionException, TimeoutException {
     Function<String, Validation<String>> f1 = f -> f.startsWith("s") ? Pass.instance() : Fail.of("does not start with s");
     Function<String, Validation<String>> f2 = f -> f.length() > 4 ? Fail.of("too long") : Pass.instance();
-    OrFuture<String, One<String>> orFuture = ff.newFuture(() -> Bad.<String,String>of("failure")).accumulating();
+    OrFuture<String, One<String>> orFuture = ff.newFuture(es, () -> Bad.<String,String>of("failure")).accumulating();
     OrFuture<String, Every<String>> res = OrFuture.when(orFuture, f1, f2);
     assertEquals("failure", res.get(Duration.ofSeconds(10)).getBad().get(0));
-    orFuture = ff.newFuture(() -> Good.of("sub")).accumulating();
+    orFuture = ff.newFuture(es, () -> Good.of("sub")).accumulating();
     res = OrFuture.when(orFuture, f1, f2);
     assertTrue(res.get(Duration.ofSeconds(10)).isGood());
-    orFuture = ff.newFuture(() -> Good.of("fubiluuri")).accumulating();
+    orFuture = ff.newFuture(es, () -> Good.of("fubiluuri")).accumulating();
     res = OrFuture.when(orFuture, f1, f2);
     assertTrue(res.get(Duration.ofSeconds(10)).isBad());
   }
 
-//  @Theory
-  @Test
-  public void withGood() throws Exception {
-    ExecutorService es = ForkJoinPool.commonPool();
+  @Theory
+  public void withGood(ExecutorService es) throws Exception {
     Function<? super OrFuture<String, ? extends Every<String>>[], OrFuture<?, Every<String>>> fun =
       ors -> OrFuture.withGood(ors[0], ors[1], (a, b) -> "");
     testWithF(es, fun, 2);
@@ -184,10 +178,8 @@ public class AccumulationTest {
     testWithF(es, fun, 8);
   }
 
-//  @Theory
-  @Test
-  public void zips() throws Exception {
-    ExecutorService es = ForkJoinPool.commonPool();
+  @Theory
+  public void zips(ExecutorService es) throws Exception {
     Function<? super OrFuture<String, ? extends Every<String>>[], OrFuture<?, Every<String>>> fun =
       ors -> OrFuture.zip(ors[0], ors[1]);
     testWithF(es, fun, 2);
