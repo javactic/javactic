@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeoutException;
 
@@ -21,7 +22,7 @@ import static org.junit.Assert.assertFalse;
 public class OrFutureImplTest {
 
   @DataPoints
-  public static ExecutorService[] configs = {ForkJoinPool.commonPool()};
+  public static ExecutorService[] configs = {Executors.newSingleThreadExecutor(), ForkJoinPool.commonPool()};
 
   private static final String FAIL = "fail";
 
