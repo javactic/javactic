@@ -26,7 +26,7 @@ import com.github.javactic.Or;
 import javaslang.Lazy;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -62,8 +62,8 @@ public class FutureFactory<B> {
   }
 
   /**
-   * Creates a new FutureFactory that will return futures that run their tasks using
-   * {@link ForkJoinPool#commonPool()} and transform unhandled exceptions
+   * Creates a new FutureFactory that will return futures that run their tasks using a common
+   * {@link Executors#newCachedThreadPool()} and transform unhandled exceptions
    * into instances of Bad using the provided converter.
    *
    * @param exceptionConverter a function to convert exceptions into instances of Bad
@@ -71,7 +71,7 @@ public class FutureFactory<B> {
    * @return a new future factory
    */
   public static <B> FutureFactory<B> of(Function<? super Throwable, ? extends B> exceptionConverter) {
-    return of(ForkJoinPool.commonPool(), exceptionConverter);
+    return of(Helper.DEFAULT_EXECUTOR_SERVICE, exceptionConverter);
   }
 
   /**
@@ -117,7 +117,7 @@ public class FutureFactory<B> {
   }
 
   /**
-   * A default FutureFactory that will execute its tasks with the {@link ForkJoinPool#commonPool()}
+   * A default FutureFactory that will execute its tasks with the {@link Executors#newCachedThreadPool()}
    * and that will transform any potential exceptions into Strings using {@link Throwable#getMessage()}
    */
   public static final FutureFactory<String> OF_EXCEPTION_MESSAGE = of(Throwable::getMessage);

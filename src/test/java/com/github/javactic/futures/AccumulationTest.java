@@ -24,7 +24,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
@@ -39,7 +38,7 @@ public class AccumulationTest {
   private FutureFactory<One<String>> ffAcc = ff.accumulating();
 
   @DataPoints
-  public static ExecutorService[] configs = {Executors.newSingleThreadExecutor(), ForkJoinPool.commonPool()};
+  public static ExecutorService[] configs = {Executors.newSingleThreadExecutor(), Helper.DEFAULT_EXECUTOR_SERVICE};
 
   @Test
   public void withGoodFail() throws Exception {
@@ -93,7 +92,7 @@ public class AccumulationTest {
   @Test
   public void combinedSecondFinishesFirst() throws Exception {
     CountDownLatch latch = new CountDownLatch(1);
-    OrFuture<String, One<String>> f1 = ff.newFuture(Executors.newCachedThreadPool(), () -> {
+    OrFuture<String, One<String>> f1 = ff.newFuture(() -> {
       try {
         latch.await();
       } catch (Exception e) {
@@ -112,27 +111,27 @@ public class AccumulationTest {
     assertEquals("1234", fold);
   }
 
-//  @Test
-//  public void combinedSecondFinishesLast() throws Exception {
-//    CountDownLatch latch = new CountDownLatch(1);
-//    OrFuture<String, One<String>> f1 = ff.newFuture(() -> Good.of("1")).accumulating();
-//    OrFuture<String, One<String>> f2 = ff.newFuture(() -> Good.of("2")).accumulating();
-//    OrFuture<String, One<String>> f3 = ff.newFuture(() -> Good.of("3")).accumulating();
-//    OrFuture<String, One<String>> f4 = ff.newFuture(() -> {
-//      try {
-//        latch.await();
-//      } catch (Exception e) {
-//        Assert.fail();
-//      }
-//      return Good.of("4");
-//    }).accumulating();
-//    OrFuture<Vector<String>, Every<String>> combined = OrFuture.combined(Vector.of(f1, f2, f3, f4));
-//    f1.onComplete(or -> latch.countDown());
-//    Or<Vector<String>, Every<String>> or = combined.get(Duration.ofSeconds(10));
-//    Assert.assertTrue(or.isGood());
-//    String fold = or.get().foldLeft("", (s, i) -> s + i);
-//    assertEquals("1234", fold);
-//  }
+  @Test
+  public void combinedSecondFinishesLast() throws Exception {
+    CountDownLatch latch = new CountDownLatch(1);
+    OrFuture<String, One<String>> f1 = ff.newFuture(() -> Good.of("1")).accumulating();
+    OrFuture<String, One<String>> f2 = ff.newFuture(() -> Good.of("2")).accumulating();
+    OrFuture<String, One<String>> f3 = ff.newFuture(() -> Good.of("3")).accumulating();
+    OrFuture<String, One<String>> f4 = ff.newFuture(() -> {
+      try {
+        latch.await();
+      } catch (Exception e) {
+        Assert.fail();
+      }
+      return Good.of("4");
+    }).accumulating();
+    OrFuture<Vector<String>, Every<String>> combined = OrFuture.combined(Vector.of(f1, f2, f3, f4));
+    f1.onComplete(or -> latch.countDown());
+    Or<Vector<String>, Every<String>> or = combined.get(Duration.ofSeconds(10));
+    Assert.assertTrue(or.isGood());
+    String fold = or.get().foldLeft("", (s, i) -> s + i);
+    assertEquals("1234", fold);
+  }
 
   @Test
   public void combined() throws TimeoutException, InterruptedException {
@@ -150,9 +149,12 @@ public class AccumulationTest {
     for (int i = 0; i < size; i++) {
       vector = vector.append(createRandomWaitingFuture(latch));
     }
+    vector = vector.append(ff.newFuture(() -> Good.of("direct")).accumulating());
     OrFuture<Vector<String>, Every<String>> combined = OrFuture.combined(vector);
-    latch.countDown();
-    Or<Vector<String>, Every<String>> or = combined.get(Duration.ofSeconds(2));
+    vector.last().onComplete(stringOneOr -> {
+      latch.countDown();
+    });
+    Or<Vector<String>, Every<String>> or = combined.get(Duration.ofSeconds(20));
     Assert.assertTrue(or.isGood());
     return size;
   }

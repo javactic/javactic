@@ -45,7 +45,7 @@ import javaslang.control.Some;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -55,6 +55,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
+import static com.github.javactic.futures.Helper.DEFAULT_EXECUTOR_SERVICE;
 import static com.github.javactic.futures.Helper.accumulate;
 import static com.github.javactic.futures.Helper.withPromise;
 
@@ -101,7 +102,7 @@ public interface OrFuture<G, B> {
   }
 
   /**
-   * Creates an OrFuture that will execute the supplied task with the {@link ForkJoinPool#commonPool()}.
+   * Creates an OrFuture that will execute the supplied task with the {@link Executors#newCachedThreadPool()}.
    * Handling of uncaught exceptions will be specific this {@link ExecutorService}.
    *
    * @param task asynchronous computation to execute
@@ -111,7 +112,7 @@ public interface OrFuture<G, B> {
    * @see FutureFactory
    **/
   static <G, B> OrFuture<G, B> of(Supplier<? extends Or<? extends G, ? extends B>> task) {
-    return of(ForkJoinPool.commonPool(), task);
+    return of(DEFAULT_EXECUTOR_SERVICE, task);
   }
 
   /**
