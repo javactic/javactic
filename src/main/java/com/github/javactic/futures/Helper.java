@@ -34,7 +34,7 @@ import java.util.stream.Collector;
 class Helper {
 
   /**
-   * The default executor service is {@link Executors#newCachedThreadPool()}.
+   * The default executor service {@link Executors#newCachedThreadPool()}.
    */
   static ExecutorService DEFAULT_EXECUTOR_SERVICE = Executors.newCachedThreadPool();
 

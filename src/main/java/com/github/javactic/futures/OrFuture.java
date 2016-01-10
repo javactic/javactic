@@ -102,8 +102,9 @@ public interface OrFuture<G, B> {
   }
 
   /**
-   * Creates an OrFuture that will execute the supplied task with the {@link Executors#newCachedThreadPool()}.
-   * Handling of uncaught exceptions will be specific this {@link ExecutorService}.
+   * Creates an OrFuture that will execute the supplied task with the common
+   * {@link Executors#newCachedThreadPool()}. Handling of uncaught exceptions
+   * will be specific this {@link ExecutorService}.
    *
    * @param task asynchronous computation to execute
    * @param <G>  the success type

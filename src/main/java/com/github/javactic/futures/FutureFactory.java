@@ -30,6 +30,8 @@ import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static com.github.javactic.futures.Helper.DEFAULT_EXECUTOR_SERVICE;
+
 /**
  * A factory for creating OrFutures that will transform unhandled exceptions
  * into instances of Bad using the provided converter.
@@ -71,7 +73,7 @@ public class FutureFactory<B> {
    * @return a new future factory
    */
   public static <B> FutureFactory<B> of(Function<? super Throwable, ? extends B> exceptionConverter) {
-    return of(Helper.DEFAULT_EXECUTOR_SERVICE, exceptionConverter);
+    return of(DEFAULT_EXECUTOR_SERVICE, exceptionConverter);
   }
 
   /**
@@ -117,7 +119,7 @@ public class FutureFactory<B> {
   }
 
   /**
-   * A default FutureFactory that will execute its tasks with the {@link Executors#newCachedThreadPool()}
+   * A default FutureFactory that will execute its tasks with the common {@link Executors#newCachedThreadPool()}
    * and that will transform any potential exceptions into Strings using {@link Throwable#getMessage()}
    */
   public static final FutureFactory<String> OF_EXCEPTION_MESSAGE = of(Throwable::getMessage);

@@ -76,20 +76,6 @@ public class OrFutureTest {
     assertEquals(FAIL, orFuture.get(Duration.ofSeconds(10)).getBad());
   }
 
-//  @Test
-//  public void andThen() throws Exception {
-//    AtomicReference<Or<String,String>> value = new AtomicReference<>();
-//    CountDownLatch latch = new CountDownLatch(1);
-//    OrFuture.<String, String>ofBad(FAIL)
-//      .andThen(or -> { throw new RuntimeException("yaaa");})
-//      .andThen(or -> {
-//        value.set(or);
-//        latch.countDown();
-//      });
-//    latch.await();
-//    assertEquals(FAIL, value.get().getBad());
-//  }
-
   @Test
   public void recover() throws Exception {
     OrFuture<String, String> recover = OrFuture.<String, String>ofBad(FAIL).recover(f -> "5");
