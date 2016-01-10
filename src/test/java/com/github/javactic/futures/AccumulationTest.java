@@ -93,7 +93,7 @@ public class AccumulationTest {
   @Test
   public void combinedSecondFinishesFirst() throws Exception {
     CountDownLatch latch = new CountDownLatch(1);
-    OrFuture<String, One<String>> f1 = ff.newFuture(() -> {
+    OrFuture<String, One<String>> f1 = ff.newFuture(Executors.newCachedThreadPool(), () -> {
       try {
         latch.await();
       } catch (Exception e) {
