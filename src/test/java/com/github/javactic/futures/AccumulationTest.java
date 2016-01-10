@@ -90,45 +90,49 @@ public class AccumulationTest {
     assertEquals("13579", fold);
   }
 
-//  @Test
-//  public void combinedSecondFinishesFirst() throws Exception {
-//    CountDownLatch latch = new CountDownLatch(1);
-//    OrFuture<String, String> f1 = ff.newFuture(() -> {
-//      try {
-//        latch.await();
-//      } catch (Exception e) {
-//        Assert.fail();
-//      }
-//      return Good.of("1");
-//    });
-//    OrFuture<String, String> f2 = ff.newFuture(() -> Good.of("2"));
-//    OrFuture<Vector<String>, Every<String>> combined = OrFuture.combined(Vector.of(f1.accumulating(), f2.accumulating()));
-//    f2.onComplete(or -> latch.countDown());
-//    Or<Vector<String>, Every<String>> or = combined.get(Duration.ofSeconds(10));
-//    Assert.assertTrue(or.isGood());
-//    String fold = or.get().foldLeft("", (s, i) -> s + i);
-//    assertEquals("12", fold);
-//  }
-//
-//  @Test
-//  public void combinedSecondFinishesLast() throws Exception {
-//    CountDownLatch latch = new CountDownLatch(1);
-//    OrFuture<String, String> f1 = ff.newFuture(() -> Good.of("1"));
-//    OrFuture<String, String> f2 = ff.newFuture(() -> {
-//      try {
-//        latch.await();
-//      } catch (Exception e) {
-//        Assert.fail();
-//      }
-//      return Good.of("2");
-//    });
-//    OrFuture<Vector<String>, Every<String>> combined = OrFuture.combined(Vector.of(f1.accumulating(), f2.accumulating()));
-//    f1.onComplete(or -> latch.countDown());
-//    Or<Vector<String>, Every<String>> or = combined.get(Duration.ofSeconds(10));
-//    Assert.assertTrue(or.isGood());
-//    String fold = or.get().foldLeft("", (s, i) -> s + i);
-//    assertEquals("12", fold);
-//  }
+  @Test
+  public void combinedSecondFinishesFirst() throws Exception {
+    CountDownLatch latch = new CountDownLatch(1);
+    OrFuture<String, One<String>> f1 = ff.newFuture(() -> {
+      try {
+        latch.await();
+      } catch (Exception e) {
+        Assert.fail();
+      }
+      return Good.of("1");
+    }).accumulating();
+    OrFuture<String, One<String>> f2 = ff.newFuture(() -> Good.of("2")).accumulating();
+    OrFuture<String, One<String>> f3 = ff.newFuture(() -> Good.of("3")).accumulating();
+    OrFuture<String, One<String>> f4 = ff.newFuture(() -> Good.of("4")).accumulating();
+    OrFuture<Vector<String>, Every<String>> combined = OrFuture.combined(Vector.of(f1, f2, f3, f4));
+    f4.onComplete(or -> latch.countDown());
+    Or<Vector<String>, Every<String>> or = combined.get(Duration.ofSeconds(10));
+    Assert.assertTrue(or.isGood());
+    String fold = or.get().foldLeft("", (s, i) -> s + i);
+    assertEquals("1234", fold);
+  }
+
+  @Test
+  public void combinedSecondFinishesLast() throws Exception {
+    CountDownLatch latch = new CountDownLatch(1);
+    OrFuture<String, One<String>> f1 = ff.newFuture(() -> Good.of("1")).accumulating();
+    OrFuture<String, One<String>> f2 = ff.newFuture(() -> Good.of("2")).accumulating();
+    OrFuture<String, One<String>> f3 = ff.newFuture(() -> Good.of("3")).accumulating();
+    OrFuture<String, One<String>> f4 = ff.newFuture(() -> {
+      try {
+        latch.await();
+      } catch (Exception e) {
+        Assert.fail();
+      }
+      return Good.of("4");
+    }).accumulating();
+    OrFuture<Vector<String>, Every<String>> combined = OrFuture.combined(Vector.of(f1, f2, f3, f4));
+    f1.onComplete(or -> latch.countDown());
+    Or<Vector<String>, Every<String>> or = combined.get(Duration.ofSeconds(10));
+    Assert.assertTrue(or.isGood());
+    String fold = or.get().foldLeft("", (s, i) -> s + i);
+    assertEquals("1234", fold);
+  }
 
   @Test
   public void combined() throws TimeoutException, InterruptedException {
