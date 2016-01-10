@@ -170,7 +170,7 @@ public class AccumulationTest {
         return Good.of("waiting");
       }).accumulating();
     } else {
-      return ff.newFuture(() -> Good.of("direct")).accumulating();
+      return OrFuture.<String, String>of(() -> Good.of("direct")).accumulating();
     }
   }
 
