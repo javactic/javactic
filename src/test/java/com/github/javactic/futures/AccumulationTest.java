@@ -114,7 +114,7 @@ public class AccumulationTest {
   @Test
   public void combinedSecondFinishesLast() throws Exception {
     CountDownLatch latch = new CountDownLatch(1);
-    OrFuture<String, One<String>> f1 = ff.newFuture(() -> Good.of("1")).accumulating();
+    OrFuture<String, One<String>> f1 = OrFuture.<String,String>of(() -> Good.of("1")).accumulating();
     OrFuture<String, One<String>> f2 = ff.newFuture(() -> Good.of("2")).accumulating();
     OrFuture<String, One<String>> f3 = ff.newFuture(() -> Good.of("3")).accumulating();
     OrFuture<String, One<String>> f4 = ff.newFuture(() -> {
