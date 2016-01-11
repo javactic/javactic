@@ -135,19 +135,20 @@ public class AccumulationTest {
 
   @Test
   public void combined() throws TimeoutException, InterruptedException {
+    ExecutorService es = Helper.DEFAULT_EXECUTOR_SERVICE;
     int total = 0;
     for (int i = 0; i < 50; i++) {
-      total += testCombined();
+      total += testCombined(es);
     }
     System.out.println("total futures: " + total);
   }
 
-  private int testCombined() throws TimeoutException, InterruptedException {
+  private int testCombined(ExecutorService es) throws TimeoutException, InterruptedException {
     CountDownLatch latch = new CountDownLatch(1);
     int size = ThreadLocalRandom.current().nextInt(40,100);
     Vector<OrFuture<String, One<String>>> vector = Vector.empty();
     for (int i = 0; i < size; i++) {
-      vector = vector.append(createRandomWaitingFuture(latch));
+      vector = vector.append(createRandomWaitingFuture(es, latch));
     }
     vector = vector.append(ff.newFuture(() -> Good.of("direct")).accumulating());
     OrFuture<Vector<String>, Every<String>> combined = OrFuture.combined(vector);
@@ -159,9 +160,9 @@ public class AccumulationTest {
     return size;
   }
 
-  private OrFuture<String, One<String>> createRandomWaitingFuture(CountDownLatch latch) {
+  private OrFuture<String, One<String>> createRandomWaitingFuture(ExecutorService es, CountDownLatch latch) {
     if (ThreadLocalRandom.current().nextBoolean()) {
-      return ff.newFuture(() -> {
+      return ff.newFuture(es, () -> {
         try {
           latch.await();
         } catch (Exception e) {
@@ -170,7 +171,7 @@ public class AccumulationTest {
         return Good.of("waiting");
       }).accumulating();
     } else {
-      return OrFuture.<String, String>of(() -> Good.of("direct")).accumulating();
+      return OrFuture.<String, String>of(es, () -> Good.of("direct")).accumulating();
     }
   }
 

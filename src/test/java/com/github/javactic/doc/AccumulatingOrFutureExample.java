@@ -1,6 +1,5 @@
 package com.github.javactic.doc;
 
-import com.github.javactic.Accumulation;
 import com.github.javactic.Bad;
 import com.github.javactic.Every;
 import com.github.javactic.Fail;
@@ -11,7 +10,6 @@ import com.github.javactic.Pass;
 import com.github.javactic.Validation;
 import com.github.javactic.futures.FutureFactory;
 import com.github.javactic.futures.OrFuture;
-
 import javaslang.Tuple2;
 import javaslang.collection.List;
 
@@ -31,12 +29,6 @@ public class AccumulatingOrFutureExample {
     } catch (NumberFormatException e) {
       return Bad.ofOneString("'{}' is not a valid integer", input);
     }
-  }
-
-  Or<Person, Every<String>> parsePerson(String inputName, String inputAge) {
-    Or<String, One<String>> name = parseName(inputName);
-    Or<Integer, One<String>> age = parseAge(inputAge);
-    return Accumulation.withGood(name, age, Person::new);
   }
 
   // ---
