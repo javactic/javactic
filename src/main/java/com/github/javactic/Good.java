@@ -24,6 +24,7 @@ import javaslang.control.Either;
 import javaslang.control.Option;
 import javaslang.control.Right;
 
+import java.io.Serializable;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
@@ -44,7 +45,9 @@ import java.util.function.Supplier;
  * @param <G> the success type of the Or
  * @param <B> the failure type of the Or
  */
-public class Good<G, B> implements Or<G, B> {
+public class Good<G, B> implements Or<G, B>, Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   private final G value;
 

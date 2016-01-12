@@ -23,6 +23,7 @@ package com.github.javactic;
 import javaslang.collection.Seq;
 import javaslang.collection.Vector;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -32,7 +33,9 @@ import java.util.Objects;
  *
  * @param <T> the type of the many
  */
-public final class Many<T> implements Every<T> {
+public final class Many<T> implements Every<T>, Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   private final Vector<T> elements;
 

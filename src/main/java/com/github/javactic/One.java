@@ -22,6 +22,7 @@ package com.github.javactic;
 
 import javaslang.collection.Vector;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -31,7 +32,9 @@ import java.util.Objects;
  *
  * @param <T> the type of the element.
  */
-public final class One<T> implements Every<T> {
+public final class One<T> implements Every<T>, Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   private final Vector<T> elements;
 

@@ -39,8 +39,7 @@ public class Pass<T> implements Validation<T>, Serializable {
     return (Pass<T>) PASS;
   }
 
-  private Pass() {
-  }
+  private Pass() {}
 
   private final static Pass<?> PASS = new Pass<>();
 
