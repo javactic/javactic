@@ -6,6 +6,7 @@ import com.github.javactic.Or;
 import com.github.javactic.futures.FutureFactory;
 import com.github.javactic.futures.OrFuture;
 
+import java.util.concurrent.Executors;
 import java.util.function.Function;
 
 public class OrFutureExample {
@@ -29,6 +30,9 @@ public class OrFutureExample {
   }
 
   // --- async ---
+  OrFuture<String, String> future = OrFuture.of(() -> Or.good("good value"));
+  OrFuture<String, String> future2 = OrFuture.of(Executors.newSingleThreadExecutor(), () -> Or.good("good value"));
+
   Function<Throwable, String> converter = Throwable::getMessage;
   FutureFactory<String> ff = FutureFactory.of(converter);
 
