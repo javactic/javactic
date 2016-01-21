@@ -130,13 +130,13 @@ Option&lt;Person&gt; parsePerson(String inputName, String inputAge) {
         </p>
      <pre>
 <code class="java">
-parsePerson("Bridget Jones", "29")
-// Some(Person(Bridget Jones,29))
+parsePerson("Tyler Durden", "29")
+// Some(Person(Tyler Durden,29))
 
-parsePerson("Bridget Jones", "")
+parsePerson("Tyler Durden", "")
 // None
 
-parsePerson("Bridget Jones", "-29")
+parsePerson("Tyler Durden", "-29")
 // None
 
 parsePerson("", "")
@@ -202,13 +202,13 @@ Either&lt;String, Person&gt; parsePerson(String inputName, String inputAge) {
         </p>
      <pre>
 <code class="java">
-parsePerson("Bridget Jones", "29")
-// Right(Person(Bridget Jones,29))
+parsePerson("Tyler Durden", "29")
+// Right(Person(Tyler Durden,29))
 
-parsePerson("Bridget Jones", "")
+parsePerson("Tyler Durden", "")
 // Left("" is not a valid integer)
 
-parsePerson("Bridget Jones", "-29")
+parsePerson("Tyler Durden", "-29")
 // Left("-29" is not a valid age)
 
 parsePerson("", "")
@@ -275,13 +275,13 @@ Or&lt;Person, String&gt; parsePerson(String inputName, String inputAge) {
         </p>
      <pre>
 <code class="java">
-parsePerson("Bridget Jones", "29")
-// Good(Person(Bridget Jones,29))
+parsePerson("Tyler Durden", "29")
+// Good(Person(Tyler Durden,29))
 
-parsePerson("Bridget Jones", "")
+parsePerson("Tyler Durden", "")
 // Bad("" is not a valid integer)
 
-parsePerson("Bridget Jones", "-29")
+parsePerson("Tyler Durden", "-29")
 // Bad("-29" is not a valid age)
 
 parsePerson("", "")
@@ -376,13 +376,13 @@ Or&lt;Person, Every&lt;String&gt;&gt; parsePerson(String inputName, String input
         </p>
      <pre>
 <code class="java">
-parsePerson("Bridget Jones", "29")
-// Good(Person(Bridget Jones,29))
+parsePerson("Tyler Durden", "29")
+// Good(Person(Tyler Durden,29))
 
-parsePerson("Bridget Jones", "")
+parsePerson("Tyler Durden", "")
 // Bad(One("" is not a valid integer))
 
-parsePerson("Bridget Jones", "-29")
+parsePerson("Tyler Durden", "-29")
 // Bad(One("-29" is not a valid age))
 
 parsePerson("", "")
@@ -629,7 +629,7 @@ Accumulation.when(parseAge(&quot;31&quot;), this::isRound, this::isDivBy3);
 // Bad(Many(31 was not a round number, 31 was not divisible by 3))
 </code>
 		</pre>
-        <h2>OrFuture and OrPromise</h2>
+        <h2>OrFuture</h2>
         <p>
           The OrFuture and OrPromise are not part of the original Scalactic library. So why one more future
           implementation? The problem with
@@ -647,17 +647,105 @@ Accumulation.when(parseAge(&quot;31&quot;), this::isRound, this::isDivBy3);
         </p>
           <pre>
 <code class="java">
-
+OrFuture&lt;String, String&gt; f = OrFuture.of(() -&gt; Or.good(&quot;good value&quot;));
+OrFuture&lt;String, String&gt; f =
+  OrFuture.of(Executors.newSingleThreadExecutor(), () -&gt; Or.good(&quot;good value&quot;));
 </code>
           </pre>
-
+        <p>
+          OrFutures can also be created through a <code>FutureFactory</code> that automatically handles uncaught
+          exceptions and transforms them to Bad values through the provided exception translator:
+        </p>
           <pre>
 <code class="java">
-
+FutureFactory&lt;String&gt; factory = FutureFactory.of(Throwable::getMessage);
+OrFuture&lt;String, String&gt; future =
+  factory.newFuture(() -&gt; throw new RuntimeException(&quot;runtime exception&quot;));
+future.onComplete(System.out::println);
+// Bad(runtime exception)
 </code>
           </pre>
+        <p>
+          It is advised to create all OrFutures through a factory, exceptions that leak out of the asynchronous
+          computation will be handled by the executor in its ThreadGroup's UncaughtExceptionHandler and might not be
+          visible anywhere. You can think of the exception translator as a much less obtrusive way of handling an
+          ExecutionException.
+        </p>
+        <p>
+          Here are the same parsing examples we saw for Or's implemented asynchronously using OrFutures:
+        </p>
+          <pre>
+<code class="java">
+Function&lt;Throwable, String&gt; converter = Throwable::getMessage;
+FutureFactory&lt;String&gt; ff = FutureFactory.of(converter);
 
+OrFuture&lt;String, String&gt; parseNameAsync(String input) {
+    return ff.newFuture(() -&gt; parseName(input));
+}
 
+OrFuture&lt;Integer, String&gt; parseAgeAsync(String input) {
+    return ff.newFuture(() -&gt; parseAge(input));
+}
+
+OrFuture&lt;Person, String&gt; parsePersonAsync(String inputName, String inputAge) {
+    return parseNameAsync(inputName)
+            .flatMap(name -&gt; parseAgeAsync(inputAge)
+                    .map(age -&gt; new Person(name, age)));
+}
+</code>
+        </pre>
+        <p>
+          Running these methods will provide the same results:
+        </p>
+        <pre>
+<code class="java">
+OrFuture&lt;Person, String&gt; asyncOr = parsePersonAsync(&quot;Tyler Durden&quot;, &quot;29&quot;);
+asyncOr.onComplete(System.out::println);
+// Good(Person(Tyler Durden,29))
+
+asyncOr = parsePersonAsync(&quot;Tyler Durden&quot;, &quot;&quot;);
+asyncOr.onComplete(System.out::println);
+// Bad('' is not a valid integer)
+
+asyncOr = parsePersonAsync(&quot;Tyler Durden&quot;, &quot;-29&quot;);
+asyncOr.onComplete(System.out::println);
+// Bad('-29' is not a valid age)
+
+asyncOr = parsePersonAsync(&quot;&quot;, &quot;&quot;);
+asyncOr.onComplete(System.out::println);
+// Bad('' is not a valid name)
+</code>
+        </pre>
+        <h3>Accumulating errors with OrFutures</h3>
+        <p>
+          Like we saw with vanilla Ors, the <code>parsePersonAsync</code> only returned the error for the first failing
+          argument. This can be corrected by implementing accumulating versions of the parse methods and using the helper
+          methods on the OrFuture interface to accumulate potential errors:
+        </p>
+        <pre>
+<code class="java">
+Function&lt;Throwable, One&lt;String&gt;&gt; converter = throwable -&gt; One.of(throwable.getMessage());
+FutureFactory&lt;One&lt;String&gt;&gt; ff = FutureFactory.of(converter);
+
+OrFuture&lt;String, One&lt;String&gt;&gt; parseNameAsync(String input) {
+  return ff.newFuture(() -&gt; parseName(input));
+}
+
+OrFuture&lt;Integer, One&lt;String&gt;&gt; parseAgeAsync(String input) {
+  return ff.newFuture(() -&gt; parseAge(input));
+}
+
+OrFuture&lt;Person, Every&lt;String&gt;&gt; parsePersonAsync(String inputName, String inputAge) {
+  OrFuture&lt;String, One&lt;String&gt;&gt; name = parseNameAsync(inputName);
+  OrFuture&lt;Integer, One&lt;String&gt;&gt; age = parseAgeAsync(inputAge);
+  return OrFuture.withGood(name, age, Person::new);
+}
+</code>
+        </pre>
+        <p>
+          Methods <code>combined</code>, <code>validatedBy</code> & <code>zip</code> also exist as with the
+          Accumulation class for Ors.
+        </p>
       </section>
     </div>
   </div>
@@ -673,20 +761,10 @@ Accumulation.when(parseAge(&quot;31&quot;), this::isRound, this::isDivBy3);
       $('#scrollspy').DynamicScrollspy({
         genIDs: true,
         testing: false,
+        offset: 100,
         ulClassNames: "hidden-xs hidden-sm"
       });
-      /**
-      $('#nav').affix({
-	  offset: {     
-	    top: $('#nav').offset().top,
-            bottom: ($('footer').outerHeight(true) + $('.application').outerHeight(true)) + 40
-          }
-      });
-      **/
     })
-
-
-
 </script>
 </body>
 </html>

@@ -228,17 +228,9 @@
         });
 
       }
-
-
-
       return self;
-
     }
-
-
-
     return init();
-
   };
 
 }(jQuery));
