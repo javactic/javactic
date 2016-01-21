@@ -20,18 +20,18 @@ package com.github.javactic.doc;
  * limitations under the License.
  */
 
+import com.github.javactic.futures.FutureFactory;
 import com.github.javactic.futures.OrFuture;
 
 public class FutureFactoryExample {
 
   public static void main(String[] args) throws InterruptedException {
-//    Function<Throwable, String> converter = Throwable::getMessage;
-//    FutureFactory<String> factory = FutureFactory.of(converter);
+    FutureFactory<String> factory = FutureFactory.of(Throwable::getMessage);
 
-    OrFuture<String, String> foobis = OrFuture.of(() -> {
-      throw new RuntimeException("foobis");
+    OrFuture<String, String> future = factory.newFuture(() -> {
+      throw new RuntimeException("runtime exception");
     });
-    foobis.onComplete(or -> System.out.println("jee"));
+    future.onComplete(System.out::println);
     Thread.sleep(100);
 
 
