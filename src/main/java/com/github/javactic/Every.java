@@ -441,7 +441,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         predicate, or None if none exists.
    */
   default Option<T> find(Predicate<? super T> predicate) {
-    return toVector().findFirst(predicate);
+    return toVector().find(predicate);
   }
 
   /**
@@ -1973,7 +1973,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return A new Every containing pairs consisting of all elements of this
    *         Every paired with their index. Indices start at 0.
    */
-  default Every<Tuple2<T, Integer>> zipWithIndex() {
+  default Every<Tuple2<T, Long>> zipWithIndex() {
     return fromNonEmptySeq(toVector().zipWithIndex());
   }
 

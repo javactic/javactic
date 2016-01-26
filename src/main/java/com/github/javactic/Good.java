@@ -22,7 +22,6 @@ package com.github.javactic;
 
 import javaslang.control.Either;
 import javaslang.control.Option;
-import javaslang.control.Right;
 
 import java.io.Serializable;
 import java.util.NoSuchElementException;
@@ -171,7 +170,7 @@ public class Good<G, B> implements Or<G, B>, Serializable {
 
   @Override
   public Either<B, G> toEither() {
-    return new Right<>(value);
+    return Either.right(value);
   }
 
   @Override

@@ -21,7 +21,6 @@ package com.github.javactic;
  */
 
 import javaslang.control.Either;
-import javaslang.control.Left;
 import javaslang.control.Option;
 
 import java.io.Serializable;
@@ -226,7 +225,7 @@ public class Bad<G, B> implements Or<G, B>, Serializable {
 
   @Override
   public Either<B, G> toEither() {
-    return new Left<>(value);
+    return Either.left(value);
   }
 
   @Override

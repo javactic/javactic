@@ -41,7 +41,7 @@ import java.util.function.Supplier;
 class OrFutureImpl<G, B> implements OrFuture<G, B> {
 
   private final ExecutorService executor;
-  private final AtomicReference<Or<G, B>> value = new AtomicReference<>();
+          final AtomicReference<Or<G, B>> value = new AtomicReference<>();
   private final AtomicBoolean started = new AtomicBoolean(false);
   private final CountDownLatch finished = new CountDownLatch(1);
   private final Queue<Consumer<? super Or<G, B>>> actions = new ConcurrentLinkedQueue<>();
@@ -90,11 +90,16 @@ class OrFutureImpl<G, B> implements OrFuture<G, B> {
   @Override
   public void onComplete(Consumer<? super Or<G, B>> action) {
     Objects.requireNonNull(action, "action is null");
-    // sync necessary so onComplete does not get called twice for an action
-    synchronized (actions) {
-      actions.add(action);
-      if (isCompleted()) {
-        perform(action);
+    if (isCompleted()) {
+      perform(action);
+    } else {
+      // sync necessary so onComplete does not get called twice for an action
+      synchronized (actions) {
+        if (isCompleted()) {
+          perform(action);
+        } else {
+          actions.add(action);
+        }
       }
     }
   }

@@ -61,9 +61,9 @@ class Helper {
         bads = bads.appendAll(or.getBad());
     }
 
-    if (bads.isEmpty()) {
+    if (bads.isEmpty())
       return Good.of(collector.finisher().apply(goods));
-    } else
+    else
       return Bad.of(Every.of(bads.head(), bads.tail()));
   }
 

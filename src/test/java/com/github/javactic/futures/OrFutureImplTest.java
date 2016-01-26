@@ -4,6 +4,7 @@ import com.github.javactic.Bad;
 import com.github.javactic.Good;
 import com.github.javactic.Or;
 import org.junit.Assert;
+import org.junit.Test;
 import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
@@ -104,4 +105,13 @@ public class OrFutureImplTest {
     Assert.assertEquals("5", succ.get());
   }
 
+  @Test
+  public void getOption() {
+    OrPromise<String,String> p = OrPromise.create();
+    OrFuture<String, String> future = p.future();
+    Assert.assertTrue(future.getOption().isEmpty());
+    p.complete(Or.good(""));
+    Assert.assertTrue(future.getOption().isDefined());
+  }
+  
 }

@@ -20,11 +20,8 @@
  **/
 package com.github.javactic;
 
-import javaslang.control.Failure;
-import javaslang.control.Left;
+import javaslang.control.Either;
 import javaslang.control.Option;
-import javaslang.control.Right;
-import javaslang.control.Success;
 import javaslang.control.Try;
 import org.junit.Assert;
 import org.junit.Test;
@@ -53,9 +50,9 @@ public class OrTest {
 		assertEquals("success", any.get());
 		assertEquals("failure", bad.toAny(Or::getBad));
 		
-		good = Or.from(new Right<>("success"));
+		good = Or.from(Either.right("success"));
 		assertEquals("success", good.get());
-		bad = Or.from(new Left<>("failure"));
+		bad = Or.from(Either.left("failure"));
 		assertEquals("failure", bad.getBad());
 		
 		good = Or.from(Option.some("success"), "failure");
@@ -65,10 +62,10 @@ public class OrTest {
         bad = Or.from(Option.none(), () -> "failure");
         assertEquals("failure", bad.getBad());
 		
-		Or<String, Throwable> goodTry = Or.from(new Success<>("success"));
+		Or<String, Throwable> goodTry = Or.from(Try.success("success"));
 		assertEquals("success", goodTry.get());
 		RuntimeException ex = new RuntimeException();
-        Or<String, Throwable> badTry = Or.from(new Failure<>(ex));
+        Or<String, Throwable> badTry = Or.from(Try.failure(ex));
         assertEquals(ex, badTry.getBad());
         
 	}

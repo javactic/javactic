@@ -8,6 +8,9 @@ import com.github.javactic.One;
 import com.github.javactic.Or;
 import com.github.javactic.Pass;
 import com.github.javactic.Validation;
+import javaslang.Tuple;
+import javaslang.Tuple2;
+import javaslang.collection.List;
 import javaslang.collection.Seq;
 import javaslang.collection.Vector;
 import org.junit.Assert;
@@ -26,6 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 import static org.junit.Assert.assertEquals;
@@ -140,7 +144,6 @@ public class AccumulationTest {
     for (int i = 0; i < 50; i++) {
       total += testCombined(es);
     }
-    System.out.println("total futures: " + total);
   }
 
   private int testCombined(ExecutorService es) throws TimeoutException, InterruptedException {
@@ -250,6 +253,99 @@ public class AccumulationTest {
       else
         assertTrue(val.get(Duration.ofSeconds(10)).isGood());
     }
+  }
+
+  @Theory
+  public void sequenceWithErrors(ExecutorService es) throws TimeoutException, InterruptedException {
+    Tuple2<Iterable<OrFuture<String, One<String>>>, AtomicInteger> t2 = iterable(es, 1000, true);
+    OrFuture<Vector<String>, Every<String>> withErrorsF = OrFuture.sequence(t2._1);
+    Or<Vector<String>, Every<String>> withErrors = withErrorsF.get(Duration.ofSeconds(10));
+    if(t2._2.get() > 0) {
+      Assert.assertTrue(withErrors.isBad());
+    } else {
+      Assert.assertTrue(withErrors.isGood());
+    }
+  }
+
+  @Theory
+  public void sequenceWithoutErrors(ExecutorService es) throws TimeoutException, InterruptedException {
+    int COUNT = 1000;
+    Tuple2<Iterable<OrFuture<String, One<String>>>, AtomicInteger> t2 = iterable(es, COUNT, false);
+    OrFuture<Vector<String>, Every<String>> withoutErrorsF = OrFuture.sequence(t2._1);
+    Or<Vector<String>, Every<String>> withoutErrors = withoutErrorsF.get(Duration.ofSeconds(10));
+    Assert.assertEquals(0, t2._2.get());
+    Assert.assertTrue(withoutErrors.isGood());
+    Assert.assertEquals(COUNT, withoutErrors.get().length());
+  }
+
+  private Tuple2<Iterable<OrFuture<String, One<String>>>, AtomicInteger> iterable(ExecutorService es, int count, boolean errors) {
+    List<OrFuture<String, One<String>>> list = List.empty();
+    AtomicInteger errorCount = new AtomicInteger();
+    for (int i = 0; i < count; i++) {
+      int value = i;
+      OrFuture<String, One<String>> future = OrFuture.of(es, () -> {
+        if (errors && ThreadLocalRandom.current().nextBoolean()) {
+          errorCount.incrementAndGet();
+          return Bad.ofOne("bad " + value);
+        } else {
+          return Or.good("good " + value);
+        }
+      });
+      list = list.prepend(future);
+    }
+    return Tuple.of(list, errorCount);
+  }
+
+  @Test
+  public void sequence() {
+    CountDownLatch second = new CountDownLatch(1);
+    Iterable<OrFuture<String, One<String>>> iterable = Vector.of(getBad(new CountDownLatch(0)), getBad(second));
+    OrFuture<Vector<String>, Every<String>> sequence = OrFuture.sequence(iterable);
+    try {
+      Or<Vector<String>, Every<String>> or = sequence.get(Duration.ofSeconds(10));
+      Assert.assertTrue(or.isBad());
+    } catch (TimeoutException | InterruptedException e) {
+      Assert.fail(e.getMessage());
+    } finally {
+      second.countDown();
+    }
+  }
+
+  private OrFuture<String, One<String>> getBad(CountDownLatch latch) {
+    return OrFuture.of(() -> {
+      try {
+        latch.await();
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+      return Bad.ofOne("bad");
+    });
+  }
+
+  @Test
+  public void firstCompletedOf() {
+    CountDownLatch first = new CountDownLatch(1);
+    Iterable<OrFuture<String, String>> iterable = Vector.of(getGood(first, "a"), getGood(new CountDownLatch(0), "b"));
+    OrFuture<String, String> completed = OrFuture.firstCompletedOf(iterable);
+    try {
+      Or<String, String> or = completed.get(Duration.ofSeconds(10));
+      Assert.assertEquals("b", or.get());
+    } catch (TimeoutException | InterruptedException e) {
+      Assert.fail(e.getMessage());
+    } finally {
+      first.countDown();
+    }
+  }
+
+  private OrFuture<String, String> getGood(CountDownLatch latch, String value) {
+    return OrFuture.of(() -> {
+      try {
+        latch.await();
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+      return Good.of(value);
+    });
   }
 
   @Test

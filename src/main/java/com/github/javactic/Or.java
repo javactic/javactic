@@ -21,13 +21,7 @@ package com.github.javactic;
  */
 
 import javaslang.control.Either;
-import javaslang.control.Failure;
-import javaslang.control.Left;
-import javaslang.control.None;
 import javaslang.control.Option;
-import javaslang.control.Right;
-import javaslang.control.Some;
-import javaslang.control.Success;
 import javaslang.control.Try;
 
 import java.util.NoSuchElementException;
@@ -74,7 +68,7 @@ public interface Or<G, B> {
    */
   static <G, B> Or<G, B> from(Option<G> option, Supplier<B> bad) {
     Objects.requireNonNull(option, "option cannot be null");
-    return option.map(Or::<G, B>good).orElseGet(() -> Bad.of(bad.get()));
+    return option.map(Or::<G, B>good).getOrElse(() -> Bad.of(bad.get()));
   }
 
   /**
@@ -88,7 +82,7 @@ public interface Or<G, B> {
    */
   static <G, B> Or<G, B> from(Option<G> option, B bad) {
     Objects.requireNonNull(option, "option cannot be null");
-    return option.map(Or::<G, B>good).orElse(Bad.of(bad));
+    return option.map(Or::<G, B>good).getOrElse(Bad.of(bad));
   }
 
   /**
@@ -460,37 +454,36 @@ public interface Or<G, B> {
   Optional<G> toJavaOptional();
 
   /**
-   * Returns a {@link Some} containing the {@link Good} value, if this {@link Or} is a
-   * {@link Good}, else {@link None}.
+   * Returns a {@link Option} containing the {@link Good} value, if this {@link Or} is a
+   * {@link Good}, else none.
    *
    * <pre class="stHighlighted">Scalactic: def toOption: Option[G] </pre>
    *
-   * @return the contained &ldquo;success&rdquo; value wrapped in a {@link Some}, if this {@link Or} is a
-   *         {@link Good}; {@link None} if this {@link Or} is a {@link Bad}.
+   * @return the contained &ldquo;success&rdquo; value wrapped in an {@link Option}.
    */
   Option<G> toOption();
 
   /**
-   * Returns an {@link Either}: a {@link Right} containing the {@link Good} value, if this is a
-   * {@link Good}; a {@link Left} containing the {@link Bad} value, if this is a {@link Bad}.
+   * Returns an {@link Either}: a right {@link Either} containing the {@link Good} value, if this is a
+   * {@link Good}; a left {@link Either} containing the {@link Bad} value, if this is a {@link Bad}.
    *
    * <p>
    * Note that values effectively <code>switch sides</code> when converting an {@link Or} to an
    * {@link Either}. If the type of the {@link Or} on which you invoke this method is
    * <code>Or&lt;Int,ErrorMessage&gt;</code> for example, the result will be an <code>Either&lt;ErrorMessage,Int&gt;</code>.
-   * The reason is that the convention for {@link Either} is that {@link Left} is used for <code>failure</code>
-   * values and {@link Right} is used for <code>success</code> ones.
+   * The reason is that the convention for {@link Either} is that left {@link Either} is used for <code>failure</code>
+   * values and right {@link Either} is used for <code>success</code> ones.
    *
    * <pre class="stHighlighted">Scalactic: def toEither: Either[B, G] </pre>
    *
-   * @return this {@link Good} value, wrapped in a {@link Right}, or this {@link Bad} value, wrapped in
-   *         a {@link Left}.
+   * @return this {@link Good} value, wrapped in a right {@link Either}, or this {@link Bad} value, wrapped in
+   *         a left {@link Either}.
    */
   Either<B, G> toEither();
 
   /**
-   * Returns a {@link Try}: a {@link Success} containing the {@link Good}
-   * value if the given Or is a {@link Good}; a {@link Failure} containing
+   * Returns a {@link Try}: a success containing the {@link Good}
+   * value if the given Or is a {@link Good}; a failure containing
    * the {@link Bad} value if it's a {@link Bad}.
    *
    * <p>
@@ -503,12 +496,12 @@ public interface Or<G, B> {
    *
    * @param <G> the success type of the Or
    * @param or an instance of {@link Or}
-   * @return this {@link Good} value, wrapped in a {@link Success}, or this
-   *         {@link Bad} value, wrapped in a {@link Failure}.
+   * @return this {@link Good} value, wrapped in a success {@link Try}, or this
+   *         {@link Bad} value, wrapped in a failure {@link Try}.
    */
   static <G> Try<G> toTry(Or<? extends G, ? extends Throwable> or) {
-    if (or.isGood()) return new Success<>(or.get());
-    else return new Failure<>(or.getBad());
+    if (or.isGood()) return Try.success(or.get());
+    else return Try.failure(or.getBad());
   }
 
   /**

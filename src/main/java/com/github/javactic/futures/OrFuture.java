@@ -38,9 +38,7 @@ import javaslang.Tuple2;
 import javaslang.Tuple3;
 import javaslang.collection.Iterator;
 import javaslang.collection.Vector;
-import javaslang.control.None;
 import javaslang.control.Option;
-import javaslang.control.Some;
 
 import java.time.Duration;
 import java.util.Objects;
@@ -55,9 +53,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
-import static com.github.javactic.futures.Helper.DEFAULT_EXECUTOR_SERVICE;
-import static com.github.javactic.futures.Helper.accumulate;
-import static com.github.javactic.futures.Helper.withPromise;
+import static com.github.javactic.futures.Helper.*;
 
 /**
  * <p>
@@ -170,8 +166,8 @@ public interface OrFuture<G, B> {
   void onComplete(Consumer<? super Or<G, B>> action);
 
   /**
-   * Returns a {@link Some} with an Or representing the value of this future if
-   * the future is completed, {@link None} otherwise.
+   * Returns a some {@link Option} with an Or representing the value of this future if
+   * the future is completed, none {@link Option} otherwise.
    *
    * @return an {@link Option} representing this future's value at this point.
    */
@@ -531,6 +527,51 @@ public interface OrFuture<G, B> {
   }
 
   // ----------------------------------------------------------------------------------------------
+  // FIRST COMPLETED OF
+  // ----------------------------------------------------------------------------------------------
+
+  static <G, ERR> OrFuture<G, ERR>
+  firstCompletedOf(Iterable<? extends OrFuture<? extends G, ? extends ERR>> input) {
+    OrPromise<G, ERR> promise = OrPromise.create();
+    input.forEach(future -> future.onComplete(promise::tryComplete));
+    return promise.future();
+  }
+
+  // ----------------------------------------------------------------------------------------------
+  // SEQUENCE
+  // ----------------------------------------------------------------------------------------------
+
+  static <G, ERR> OrFuture<Vector<G>, Every<ERR>>
+  sequence(Iterable<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> input) {
+    return sequence(input, Vector.collector());
+  }
+
+  @SuppressWarnings("unchecked")
+  static <G, ERR, A, I extends Iterable<? extends G>> OrFuture<I, Every<ERR>>
+  sequence(Iterable<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> input,
+           Collector<? super G, A, I> collector) {
+
+    OrPromise<I, Every<ERR>> promise = OrPromise.create();
+    AtomicInteger count = new AtomicInteger(0);
+    AtomicBoolean finished = new AtomicBoolean(false);
+    AtomicBoolean failed = new AtomicBoolean(false);
+    java.util.Iterator<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> iterator = input.iterator();
+    while (iterator.hasNext()) {
+      count.incrementAndGet();
+      OrFuture<? extends G, ? extends Every<? extends ERR>> future = iterator.next();
+      if (!iterator.hasNext()) finished.set(true);
+      future.onComplete(or -> {
+        if (or.isBad() && !failed.getAndSet(true)) {
+          promise.failure((Every<ERR>) or.getBad());
+        } else if (!failed.get() && count.decrementAndGet() == 0 && finished.get()) {
+          promise.complete(accumulate(input, collector));
+        }
+      });
+    }
+    return promise.future();
+  }
+
+  // ----------------------------------------------------------------------------------------------
   // COMBINED
   // ----------------------------------------------------------------------------------------------
 
@@ -574,9 +615,7 @@ public interface OrFuture<G, B> {
     while (iterator.hasNext()) {
       count.incrementAndGet();
       OrFuture<? extends G, ? extends Every<? extends ERR>> future = iterator.next();
-      if (!iterator.hasNext()) {
-        finished.set(true);
-      }
+      if (!iterator.hasNext()) finished.set(true);
       future.onComplete(or -> {
         if (count.decrementAndGet() == 0 && finished.get()) {
           promise.complete(accumulate(input, collector));
