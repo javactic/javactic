@@ -81,7 +81,7 @@
                     <use>true</use>
                     <version>true</version>
                     <links>
-                        <link>http://javaslang.com/javadoc/2.0.0-RC2/</link>
+                        <link>http://javaslang.com/javadoc/2.0.0-RC3/</link>
                         <link>https://docs.oracle.com/javase/8/docs/api/</link>
                     </links>
                 </configuration>
