@@ -14,7 +14,7 @@ import org.junit.runner.RunWith;
 
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertEquals;
@@ -25,12 +25,12 @@ public class OrFutureTest {
   private FutureFactory<String> ff = FutureFactory.OF_EXCEPTION_MESSAGE;
 
   @DataPoints
-  public static ExecutorService[] configs = {Executors.newSingleThreadExecutor(), Helper.DEFAULT_EXECUTOR_SERVICE};
+  public static Executor[] configs = {Executors.newSingleThreadExecutor(), Helper.DEFAULT_EXECUTOR};
 
   private static final String FAIL = "fail";
 
   @Theory
-  public void create(ExecutorService es) throws InterruptedException {
+  public void create(Executor es) throws InterruptedException {
     CountDownLatch latch = new CountDownLatch(1);
     OrFuture<String, Object> orf = OrFuture.of(es, () -> {
       try {
@@ -49,7 +49,7 @@ public class OrFutureTest {
   }
 
   @Theory
-  public void filter(ExecutorService es) throws Exception {
+  public void filter(Executor es) throws Exception {
     OrFuture<Integer, String> orFuture = getF(es, 5)
       .filter(i -> (i > 10) ? Pass.instance() : Fail.of(FAIL));
     Or<Integer, String> or = orFuture.get(Duration.ofSeconds(10));
@@ -57,14 +57,14 @@ public class OrFutureTest {
   }
 
   @Theory
-  public void map(ExecutorService es) throws Exception {
+  public void map(Executor es) throws Exception {
     OrFuture<String, String> orFuture = getF(es, 5)
       .map(i -> "" + i);
     Assert.assertEquals("5", orFuture.get(Duration.ofSeconds(10)).get());
   }
 
   @Theory
-  public void flatMap(ExecutorService es) throws Exception {
+  public void flatMap(Executor es) throws Exception {
     OrFuture<String, String> orFuture = getF(es, 5)
       .flatMap(i -> ff.newFuture(es, () -> Good.of(i + "")));
     Assert.assertEquals("5", orFuture.get(Duration.ofSeconds(10)).get());
@@ -95,7 +95,7 @@ public class OrFutureTest {
     assertEquals(-5, transform.get(Duration.ofSeconds(10)).getBad().intValue());
   }
 
-  private <G> OrFuture<G, String> getF(ExecutorService es, G g) {
+  private <G> OrFuture<G, String> getF(Executor es, G g) {
     return ff.newFuture(es, () -> Good.of(g));
   }
 }

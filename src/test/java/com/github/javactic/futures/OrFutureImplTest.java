@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
 
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 
@@ -22,12 +22,12 @@ import static org.junit.Assert.assertFalse;
 public class OrFutureImplTest {
 
   @DataPoints
-  public static ExecutorService[] configs = {Executors.newSingleThreadExecutor(), Helper.DEFAULT_EXECUTOR_SERVICE};
+  public static Executor[] configs = {Executors.newSingleThreadExecutor(), Helper.DEFAULT_EXECUTOR};
 
   private static final String FAIL = "fail";
 
   @Theory
-  public void completions(ExecutorService es) {
+  public void completions(Executor es) {
     OrFutureImpl<String, String> f = new OrFutureImpl<>(es);
     f.complete(Good.of("success"));
     boolean retry = f.tryComplete(Bad.of(FAIL));
@@ -35,7 +35,7 @@ public class OrFutureImplTest {
   }
 
   @Theory
-  public void run(ExecutorService es) throws Exception {
+  public void run(Executor es) throws Exception {
     OrFutureImpl<String, String> f = new OrFutureImpl<>(es);
     CountDownLatch latch = new CountDownLatch(1);
     f.run(() -> {
@@ -64,7 +64,7 @@ public class OrFutureImplTest {
   }
 
   @Theory
-  public void resultWithBad(ExecutorService es) throws Exception {
+  public void resultWithBad(Executor es) throws Exception {
     OrFutureImpl<String, String> f = new OrFutureImpl<>(es);
     CountDownLatch latch = new CountDownLatch(1);
     f.run(() -> {
@@ -83,7 +83,7 @@ public class OrFutureImplTest {
   }
 
   @Theory
-  public void resultWithException(ExecutorService es) throws Exception {
+  public void resultWithException(Executor es) throws Exception {
     OrFutureImpl<String, String> f = new OrFutureImpl<>(es);
     CountDownLatch latch = new CountDownLatch(1);
     f.run(() -> {

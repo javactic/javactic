@@ -25,12 +25,12 @@ import com.github.javactic.One;
 import com.github.javactic.Or;
 import javaslang.Lazy;
 
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static com.github.javactic.futures.Helper.DEFAULT_EXECUTOR_SERVICE;
+import static com.github.javactic.futures.Helper.DEFAULT_EXECUTOR;
 
 /**
  * A factory for creating OrFutures that will transform unhandled exceptions
@@ -41,10 +41,10 @@ import static com.github.javactic.futures.Helper.DEFAULT_EXECUTOR_SERVICE;
 public class FutureFactory<B> {
 
   private final Function<? super Throwable, ? extends B> converter;
-  private final ExecutorService executor;
+  private final Executor executor;
   private final Lazy<FutureFactory<One<B>>> accumulating;
 
-  private FutureFactory(ExecutorService executor, Function<? super Throwable, ? extends B> exceptionConverter) {
+  private FutureFactory(Executor executor, Function<? super Throwable, ? extends B> exceptionConverter) {
     this.executor = executor;
     this.converter = exceptionConverter;
     this.accumulating = Lazy.of(() -> new FutureFactory<>(executor, exceptionConverter.andThen(One::of)));
@@ -59,7 +59,7 @@ public class FutureFactory<B> {
    * @param <B> the bad type
    * @return a new future factory
    */
-  public static <B> FutureFactory<B> of(ExecutorService executor, Function<? super Throwable, ? extends B> exceptionConverter) {
+  public static <B> FutureFactory<B> of(Executor executor, Function<? super Throwable, ? extends B> exceptionConverter) {
     return new FutureFactory<>(executor, exceptionConverter);
   }
 
@@ -73,7 +73,7 @@ public class FutureFactory<B> {
    * @return a new future factory
    */
   public static <B> FutureFactory<B> of(Function<? super Throwable, ? extends B> exceptionConverter) {
-    return of(DEFAULT_EXECUTOR_SERVICE, exceptionConverter);
+    return of(DEFAULT_EXECUTOR, exceptionConverter);
   }
 
   /**
@@ -99,7 +99,7 @@ public class FutureFactory<B> {
    * task throws an exception, that exception will be handled with this factory's exception converter.
    */
   @SuppressWarnings("unchecked")
-  public <G> OrFuture<G, B> newFuture(ExecutorService executor, Supplier<? extends Or<? extends G, ? extends B>> task) {
+  public <G> OrFuture<G, B> newFuture(Executor executor, Supplier<? extends Or<? extends G, ? extends B>> task) {
     return OrFuture.of(executor, () -> {
       try {
         return task.get();

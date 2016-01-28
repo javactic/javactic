@@ -25,7 +25,7 @@ import java.lang.reflect.Modifier;
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeoutException;
@@ -42,7 +42,7 @@ public class AccumulationTest {
   private FutureFactory<One<String>> ffAcc = ff.accumulating();
 
   @DataPoints
-  public static ExecutorService[] configs = {Executors.newSingleThreadExecutor(), Helper.DEFAULT_EXECUTOR_SERVICE};
+  public static Executor[] configs = {Executors.newSingleThreadExecutor(), Helper.DEFAULT_EXECUTOR};
 
   @Test
   public void withGoodFail() throws Exception {
@@ -63,7 +63,7 @@ public class AccumulationTest {
   }
 
   @Theory
-  public void sequenceSuccess(ExecutorService es) throws Exception {
+  public void sequenceSuccess(Executor es) throws Exception {
     Seq<OrFuture<Integer, One<String>>> seq = Vector.empty();
     for (int i = 0; i < 10; i++) {
       final int fi = i;
@@ -77,7 +77,7 @@ public class AccumulationTest {
   }
 
   @Theory
-  public void sequenceFailure(ExecutorService es) throws Exception {
+  public void sequenceFailure(Executor es) throws Exception {
     Seq<OrFuture<Integer, One<String>>> seq = Vector.empty();
     for (int i = 0; i < 10; i++) {
       final int fi = i;
@@ -139,14 +139,14 @@ public class AccumulationTest {
 
   @Test
   public void combined() throws TimeoutException, InterruptedException {
-    ExecutorService es = Helper.DEFAULT_EXECUTOR_SERVICE;
+    Executor es = Helper.DEFAULT_EXECUTOR;
     int total = 0;
     for (int i = 0; i < 50; i++) {
       total += testCombined(es);
     }
   }
 
-  private int testCombined(ExecutorService es) throws TimeoutException, InterruptedException {
+  private int testCombined(Executor es) throws TimeoutException, InterruptedException {
     CountDownLatch latch = new CountDownLatch(1);
     int size = ThreadLocalRandom.current().nextInt(40,100);
     Vector<OrFuture<String, One<String>>> vector = Vector.empty();
@@ -163,7 +163,7 @@ public class AccumulationTest {
     return size;
   }
 
-  private OrFuture<String, One<String>> createRandomWaitingFuture(ExecutorService es, CountDownLatch latch) {
+  private OrFuture<String, One<String>> createRandomWaitingFuture(Executor es, CountDownLatch latch) {
     if (ThreadLocalRandom.current().nextBoolean()) {
       return ff.newFuture(es, () -> {
         try {
@@ -179,7 +179,7 @@ public class AccumulationTest {
   }
 
   @Theory
-  public void validatedBy(ExecutorService es) throws InterruptedException, ExecutionException, TimeoutException {
+  public void validatedBy(Executor es) throws InterruptedException, ExecutionException, TimeoutException {
     Vector<Integer> vec = Vector.of(1,2,3,4);
     Function<Integer, OrFuture<Integer, One<String>>> f = i ->
       ffAcc.newFuture(es, () -> {
@@ -195,7 +195,7 @@ public class AccumulationTest {
   }
 
   @Theory
-  public void when(ExecutorService es) throws InterruptedException, ExecutionException, TimeoutException {
+  public void when(Executor es) throws InterruptedException, ExecutionException, TimeoutException {
     Function<String, Validation<String>> f1 = f -> f.startsWith("s") ? Pass.instance() : Fail.of("does not start with s");
     Function<String, Validation<String>> f2 = f -> f.length() > 4 ? Fail.of("too long") : Pass.instance();
     OrFuture<String, One<String>> orFuture = ff.newFuture(es, () -> Bad.<String,String>of("failure")).accumulating();
@@ -210,7 +210,7 @@ public class AccumulationTest {
   }
 
   @Theory
-  public void withGood(ExecutorService es) throws Exception {
+  public void withGood(Executor es) throws Exception {
     Function<? super OrFuture<String, ? extends Every<String>>[], OrFuture<?, Every<String>>> fun =
       ors -> OrFuture.withGood(ors[0], ors[1], (a, b) -> "");
     testWithF(es, fun, 2);
@@ -229,7 +229,7 @@ public class AccumulationTest {
   }
 
   @Theory
-  public void zips(ExecutorService es) throws Exception {
+  public void zips(Executor es) throws Exception {
     Function<? super OrFuture<String, ? extends Every<String>>[], OrFuture<?, Every<String>>> fun =
       ors -> OrFuture.zip(ors[0], ors[1]);
     testWithF(es, fun, 2);
@@ -237,7 +237,7 @@ public class AccumulationTest {
     testWithF(es, fun, 3);
   }
 
-  private void testWithF(ExecutorService es,
+  private void testWithF(Executor es,
                          Function<? super OrFuture<String, ? extends Every<String>>[], OrFuture<?, Every<String>>> f,
                          int size) throws Exception {
     @SuppressWarnings("unchecked")
@@ -256,7 +256,7 @@ public class AccumulationTest {
   }
 
   @Theory
-  public void sequenceWithErrors(ExecutorService es) throws TimeoutException, InterruptedException {
+  public void sequenceWithErrors(Executor es) throws TimeoutException, InterruptedException {
     Tuple2<Iterable<OrFuture<String, One<String>>>, AtomicInteger> t2 = iterable(es, 1000, true);
     OrFuture<Vector<String>, Every<String>> withErrorsF = OrFuture.sequence(t2._1);
     Or<Vector<String>, Every<String>> withErrors = withErrorsF.get(Duration.ofSeconds(10));
@@ -268,7 +268,7 @@ public class AccumulationTest {
   }
 
   @Theory
-  public void sequenceWithoutErrors(ExecutorService es) throws TimeoutException, InterruptedException {
+  public void sequenceWithoutErrors(Executor es) throws TimeoutException, InterruptedException {
     int COUNT = 1000;
     Tuple2<Iterable<OrFuture<String, One<String>>>, AtomicInteger> t2 = iterable(es, COUNT, false);
     OrFuture<Vector<String>, Every<String>> withoutErrorsF = OrFuture.sequence(t2._1);
@@ -278,7 +278,7 @@ public class AccumulationTest {
     Assert.assertEquals(COUNT, withoutErrors.get().length());
   }
 
-  private Tuple2<Iterable<OrFuture<String, One<String>>>, AtomicInteger> iterable(ExecutorService es, int count, boolean errors) {
+  private Tuple2<Iterable<OrFuture<String, One<String>>>, AtomicInteger> iterable(Executor es, int count, boolean errors) {
     List<OrFuture<String, One<String>>> list = List.empty();
     AtomicInteger errorCount = new AtomicInteger();
     for (int i = 0; i < count; i++) {

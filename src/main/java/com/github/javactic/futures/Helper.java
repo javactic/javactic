@@ -26,7 +26,7 @@ import com.github.javactic.Good;
 import com.github.javactic.Or;
 import javaslang.collection.Vector;
 
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.stream.Collector;
@@ -36,7 +36,7 @@ class Helper {
   /**
    * The default executor service {@link Executors#newCachedThreadPool()}.
    */
-  static ExecutorService DEFAULT_EXECUTOR_SERVICE = Executors.newCachedThreadPool();
+  static Executor DEFAULT_EXECUTOR = Executors.newCachedThreadPool();
 
   private Helper() {}
 

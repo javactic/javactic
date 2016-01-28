@@ -30,7 +30,7 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -40,13 +40,13 @@ import java.util.function.Supplier;
 
 class OrFutureImpl<G, B> implements OrFuture<G, B> {
 
-  private final ExecutorService executor;
+  private final Executor executor;
   private final AtomicReference<Or<G, B>> value = new AtomicReference<>();
   private final AtomicBoolean started = new AtomicBoolean(false);
   private final CountDownLatch finished = new CountDownLatch(1);
   private final Queue<Consumer<? super Or<G, B>>> actions = new ConcurrentLinkedQueue<>();
 
-  public OrFutureImpl(ExecutorService executor) {
+  public OrFutureImpl(Executor executor) {
     this.executor = executor;
   }
 

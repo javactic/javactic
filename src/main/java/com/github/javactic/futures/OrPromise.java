@@ -24,7 +24,7 @@ import com.github.javactic.Bad;
 import com.github.javactic.Good;
 import com.github.javactic.Or;
 
-import static com.github.javactic.futures.Helper.DEFAULT_EXECUTOR_SERVICE;
+import static com.github.javactic.futures.Helper.DEFAULT_EXECUTOR;
 
 /**
  * A write-once wrapper that can complete an underlying OrFuture.
@@ -42,7 +42,7 @@ public interface OrPromise<G, B> {
    * @return an instance of OrPromise
    */
   static <G, B> OrPromise<G, B> create() {
-    return new OrPromiseImpl<>(new OrFutureImpl<>(DEFAULT_EXECUTOR_SERVICE));
+    return new OrPromiseImpl<>(new OrFutureImpl<>(DEFAULT_EXECUTOR));
   }
 
   /**

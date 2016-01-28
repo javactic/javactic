@@ -42,6 +42,7 @@ import javaslang.control.Option;
 
 import java.time.Duration;
 import java.util.Objects;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
@@ -89,7 +90,7 @@ public interface OrFuture<G, B> {
    * @return an instance of OrFuture
    * @see FutureFactory
    */
-  static <G, B> OrFuture<G, B> of(ExecutorService executor,
+  static <G, B> OrFuture<G, B> of(Executor executor,
                                   Supplier<? extends Or<? extends G, ? extends B>> task) {
     Objects.requireNonNull(task, "task is null");
     final OrFutureImpl<G, B> future = new OrFutureImpl<>(executor);
@@ -109,7 +110,7 @@ public interface OrFuture<G, B> {
    * @see FutureFactory
    **/
   static <G, B> OrFuture<G, B> of(Supplier<? extends Or<? extends G, ? extends B>> task) {
-    return of(DEFAULT_EXECUTOR_SERVICE, task);
+    return of(DEFAULT_EXECUTOR, task);
   }
 
   /**
