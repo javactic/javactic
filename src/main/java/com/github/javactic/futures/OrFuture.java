@@ -43,7 +43,6 @@ import javaslang.control.Option;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -63,7 +62,7 @@ import static com.github.javactic.futures.Helper.*;
  * </p>
  * <p>
  * OrFutures created with the factory methods on this interface will not handle
- * exceptions thrown by the provided suppliers. Depending on the {@link ExecutorService}
+ * exceptions thrown by the provided suppliers. Depending on the {@link Executor}
  * used these exceptions might be handled by the {@link java.lang.Thread.UncaughtExceptionHandler}
  * or printed to the standard error output by the {@link ThreadGroup#uncaughtException(Thread, Throwable)}
  * method. To avoid problems with uncaught exceptions, use a {@link FutureFactory} to create
@@ -81,7 +80,7 @@ public interface OrFuture<G, B> {
 
   /**
    * Creates an OrFuture that will execute the supplied task with the given executor. Handling of
-   * uncaught exceptions will be specific to the provided {@link ExecutorService}.
+   * uncaught exceptions will be specific to the provided {@link Executor}.
    *
    * @param executor the executor to run the given supplier with
    * @param task     asynchronous computation to execute
