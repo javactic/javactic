@@ -91,6 +91,4 @@ public final class One<T> implements Every<T>, Serializable {
   public Vector<T> toVector() {
     return elements;
   }
-
-
 }

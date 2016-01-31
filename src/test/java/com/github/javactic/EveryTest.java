@@ -550,6 +550,7 @@ public class EveryTest {
     One<String> one2 = One.of("one2");
     Object o = new Object();
     Assert.assertFalse(one1.equals(o));
+    Assert.assertFalse(one1.equals(null));
     Assert.assertFalse(one1.equals(one2));
     Assert.assertTrue(one1.equals(one1));
   }
