@@ -69,14 +69,17 @@ public final class One<T> implements Every<T>, Serializable {
     elements = Vector.of(onlyElement);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public boolean equals(Object obj) {
-    return obj instanceof One && elements.equals(((One<T>) obj).elements);
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    One<?> one = (One<?>) o;
+    return elements.equals(one.elements);
   }
 
+  @Override
   public int hashCode() {
-    return toVector().hashCode();
+    return elements.hashCode();
   }
 
   @Override

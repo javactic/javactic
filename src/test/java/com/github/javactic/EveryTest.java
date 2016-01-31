@@ -544,4 +544,14 @@ public class EveryTest {
     assertEquals(8, e.find(i -> i > 4).get().intValue());
   }
 
+  @Test
+  public void equals() {
+    One<String> one1 = One.of("one1");
+    One<String> one2 = One.of("one2");
+    Object o = new Object();
+    Assert.assertFalse(one1.equals(o));
+    Assert.assertFalse(one1.equals(one2));
+    Assert.assertTrue(one1.equals(one1));
+  }
+
 }
