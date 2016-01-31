@@ -325,7 +325,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @param length
    *            the maximum number of elements to copy
    */
-  default void copyToArray(T[] target, int start, int length) {
+  default void copyToJavaArray(T[] target, int start, int length) {
     int i = start;
     int end = Math.min((start + length), target.length);
     Iterator<T> it = iterator();
@@ -350,8 +350,8 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @param start
    *            the starting index
    */
-  default void copyToArray(T[] target, int start) {
-    copyToArray(target, start, length());
+  default void copyToJavaArray(T[] target, int start) {
+    copyToJavaArray(target, start, length());
   }
 
   /**
@@ -366,8 +366,8 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @param target
    *            the array to fill
    */
-  default void copyToArray(T[] target) {
-    copyToArray(target, 0);
+  default void copyToJavaArray(T[] target) {
+    copyToJavaArray(target, 0);
   }
 
   /**

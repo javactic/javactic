@@ -180,19 +180,19 @@ public class EveryTest {
   public void copyToArray() {
     Every<String> e = Every.of("a", "b", "c");
     String[] target = new String[2]; // target < this
-    e.copyToArray(target);
+    e.copyToJavaArray(target);
     assertEquals(List.of("a", "b"), List.of(target));
 
     target = new String[4]; // target > this
-    e.copyToArray(target);
+    e.copyToJavaArray(target);
     assertEquals(List.of("a", "b", "c", null), List.of(target));
 
     target = new String[1];
-    e.copyToArray(target, 4, 10);
+    e.copyToJavaArray(target, 4, 10);
     assertEquals(null, target[0]);
 
     target = new String[5];
-    e.copyToArray(target, 0, 10);
+    e.copyToJavaArray(target, 0, 10);
     assertEquals(List.of("a", "b", "c", null, null), List.of(target));
   }
 

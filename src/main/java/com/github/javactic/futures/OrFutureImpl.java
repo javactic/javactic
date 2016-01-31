@@ -26,9 +26,9 @@ import javaslang.control.Option;
 import javaslang.control.Try;
 
 import java.time.Duration;
+import java.util.ArrayDeque;
 import java.util.Objects;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
@@ -44,7 +44,7 @@ class OrFutureImpl<G, B> implements OrFuture<G, B> {
   private final AtomicReference<Or<G, B>> value = new AtomicReference<>();
   private final AtomicBoolean started = new AtomicBoolean(false);
   private final CountDownLatch finished = new CountDownLatch(1);
-  private final Queue<Consumer<? super Or<G, B>>> actions = new ConcurrentLinkedQueue<>();
+  private final Queue<Consumer<? super Or<G, B>>> actions = new ArrayDeque<>();
 
   public OrFutureImpl(Executor executor) {
     this.executor = executor;
@@ -52,7 +52,6 @@ class OrFutureImpl<G, B> implements OrFuture<G, B> {
 
   @SuppressWarnings("unchecked")
   boolean tryComplete(Or<? extends G, ? extends B> value) {
-    Objects.requireNonNull(value, "value is null");
     return complete((Or<G, B>) value) != null;
   }
 

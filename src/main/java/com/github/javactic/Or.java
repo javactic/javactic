@@ -67,7 +67,6 @@ public interface Or<G, B> {
    * @return an Or
    */
   static <G, B> Or<G, B> from(Option<G> option, Supplier<B> bad) {
-    Objects.requireNonNull(option, "option cannot be null");
     return option.map(Or::<G, B>good).getOrElse(() -> Bad.of(bad.get()));
   }
 
@@ -81,7 +80,6 @@ public interface Or<G, B> {
    * @return an Or
    */
   static <G, B> Or<G, B> from(Option<G> option, B bad) {
-    Objects.requireNonNull(option, "option cannot be null");
     return option.map(Or::<G, B>good).getOrElse(Bad.of(bad));
   }
 
@@ -94,7 +92,6 @@ public interface Or<G, B> {
    * @return an Or
    */
   static <B, G> Or<G, B> from(Either<B, G> either) {
-    Objects.requireNonNull(either, "either cannot be null");
     if (either.isRight()) return Good.of(either.right().get());
     else return Bad.of(either.left().get());
   }
@@ -107,7 +104,6 @@ public interface Or<G, B> {
    * @return an Or
    */
   static <G> Or<G, Throwable> from(Try<G> theTry) {
-    Objects.requireNonNull(theTry, "try cannot be null");
     return theTry.map(Or::<G, Throwable>good).recover(Bad::of).get();
   }
 
@@ -198,17 +194,6 @@ public interface Or<G, B> {
    *         wrapped in a {@link One} if this {@link Or} is a {@link Bad}.
    */
   Or<G, One<B>> accumulating();
-
-  /**
-   * Returns this Good or Bad with the type widened to Or.
-   *
-   * <pre class="stHighlighted"> Scalactic: def asOr: Or[G, B] </pre>
-   *
-   * @return this Good or Bad with the type widened to Or
-   */
-  default Or<G, B> asOr() {
-    return this;
-  }
 
   /**
    * Maps the given function to this {@link Or}'s value if it is a {@link Good} or returns <code>this</code>

@@ -64,9 +64,9 @@ public final class One<T> implements Every<T>, Serializable {
     return One.of(Helper.parse(msg, args));
   }
 
-  private One(T loneElement) {
-    Objects.requireNonNull(loneElement, "lone element of One cannot be null");
-    elements = Vector.of(loneElement);
+  private One(T onlyElement) {
+    Objects.requireNonNull(onlyElement, "only element of One cannot be null");
+    elements = Vector.of(onlyElement);
   }
 
   @SuppressWarnings("unchecked")

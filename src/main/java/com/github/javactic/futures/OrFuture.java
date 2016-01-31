@@ -41,7 +41,6 @@ import javaslang.collection.Vector;
 import javaslang.control.Option;
 
 import java.time.Duration;
-import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
@@ -91,7 +90,6 @@ public interface OrFuture<G, B> {
    */
   static <G, B> OrFuture<G, B> of(Executor executor,
                                   Supplier<? extends Or<? extends G, ? extends B>> task) {
-    Objects.requireNonNull(task, "task is null");
     final OrFutureImpl<G, B> future = new OrFutureImpl<>(executor);
     future.run(task);
     return future;
@@ -211,7 +209,6 @@ public interface OrFuture<G, B> {
    * @return a filtered future
    */
   default OrFuture<G, B> filter(Function<? super G, ? extends Validation<? extends B>> validator) {
-    Objects.requireNonNull(validator, "validator is null");
     OrPromise<G, B> promise = OrPromise.create();
     onComplete(or -> promise.complete(or.filter(validator)));
     return promise.future();
@@ -226,7 +223,6 @@ public interface OrFuture<G, B> {
    * @return a new future whose success result is mapped
    */
   default <H> OrFuture<H, B> map(Function<? super G, ? extends H> mapper) {
-    Objects.requireNonNull(mapper, "mapper is null");
     OrPromise<H, B> promise = OrPromise.create();
     onComplete(or -> promise.complete(or.map(mapper)));
     return promise.future();
@@ -242,7 +238,6 @@ public interface OrFuture<G, B> {
    * @return a new future whose success result is flatMapped
    */
   default <H> OrFuture<H, B> flatMap(Function<? super G, ? extends OrFuture<? extends H, ? extends B>> mapper) {
-    Objects.requireNonNull(mapper, "mapper is null");
     OrPromise<H, B> promise = OrPromise.create();
     onComplete(or -> or.forEach(
       g -> promise.completeWith(mapper.apply(g)),
@@ -259,7 +254,6 @@ public interface OrFuture<G, B> {
    * possibly as a result of a recovery
    */
   default OrFuture<G, B> recover(Function<? super B, ? extends G> fn) {
-    Objects.requireNonNull(fn, "fn is null");
     OrPromise<G, B> promise = OrPromise.create();
     onComplete(or -> promise.complete(or.recover(fn)));
     return promise.future();
@@ -273,7 +267,6 @@ public interface OrFuture<G, B> {
    * @return a new future whose value is the result of a recovery if this future completes with a Bad
    */
   default <C> OrFuture<G, C> recoverWith(Function<? super B, ? extends OrFuture<? extends G, ? extends C>> fn) {
-    Objects.requireNonNull(fn, "fn is null");
     OrPromise<G, C> promise = OrPromise.create();
     onComplete(or -> or.forEach(
       promise::success,
@@ -293,8 +286,6 @@ public interface OrFuture<G, B> {
    * @return a new future with a transformed value
    */
   default <H, C> OrFuture<H, C> transform(Function<? super G, ? extends H> s, Function<? super B, ? extends C> f) {
-    Objects.requireNonNull(s, "s is null");
-    Objects.requireNonNull(f, "f is null");
     OrPromise<H, C> promise = OrPromise.create();
     onComplete(or -> promise.complete(or.transform(s, f)));
     return promise.future();

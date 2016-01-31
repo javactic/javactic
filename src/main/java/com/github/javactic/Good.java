@@ -65,6 +65,17 @@ public class Good<G, B> implements Or<G, B>, Serializable {
     return (Or<G, One<B>>) this;
   }
 
+  /**
+   * Returns this Good with the type widened to Or.
+   *
+   * <pre class="stHighlighted"> Scalactic: def asOr: Or[G, B] </pre>
+   *
+   * @return this Good with the type widened to Or
+   */
+  public Or<G, B> asOr() {
+    return this;
+  }
+
   @Override
   public <H> Or<H, B> map(Function<? super G, ? extends H> mapper) {
     return Good.of(mapper.apply(value));
