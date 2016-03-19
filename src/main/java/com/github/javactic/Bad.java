@@ -157,7 +157,7 @@ public final class Bad<G, B> implements Or<G, B>, Serializable {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <H> Or<H, B> flatMap(Function<? super G, Or<H, ? extends B>> func) {
+  public <H> Or<H, B> flatMap(Function<? super G, ? extends Or<? extends H, ? extends B>> func) {
     return (Or<H, B>) this;
   }
 

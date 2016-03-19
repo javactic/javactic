@@ -145,8 +145,9 @@ public interface Or<G, B> {
    * @param converter the converter to use to make an {@link Good} from <code>source</code>
    * @return an instance of {@link Or}
    */
-  static <S, G, B> Or<G, B> fromAny(S source, Function<? super S, ? extends Or<G, B>> converter) {
-    return converter.apply(source);
+  @SuppressWarnings("unchecked")
+  static <S, G, B> Or<G, B> fromAny(S source, Function<? super S, ? extends Or<? extends G, ? extends B>> converter) {
+    return (Or<G, B>) converter.apply(source);
   }
 
   /**
@@ -284,7 +285,7 @@ public interface Or<G, B> {
    * @return if this is a {@link Good}, the result of applying the given function to the contained value wrapped
    *         in a {@link Good}, else this {@link Bad} is returned
    */
-  <H> Or<H, B> flatMap(Function<? super G, Or<H, ? extends B>> func);
+  <H> Or<H, B> flatMap(Function<? super G, ? extends Or<? extends H, ? extends B>> func);
 
   /**
    * Folds this {@link Or} into a value of type <code>V</code> by applying the given <code>gf</code> function if

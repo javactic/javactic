@@ -391,7 +391,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         predicate(x, y) is true for all corresponding elements x of this
    *         Every and y of that, otherwise false.
    */
-  default <B> boolean corresponds(Iterable<B> that, BiPredicate<T, B> predicate) {
+  default <B> boolean corresponds(Iterable<? extends B> that, BiPredicate<? super T, ? super B> predicate) {
     return toVector().corresponds(that, predicate);
   }
 
@@ -406,7 +406,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *            the predicate used to test elements.
    * @return the number of elements satisfying the predicate p.
    */
-  default long count(Predicate<T> predicate) {
+  default long count(Predicate<? super T> predicate) {
     return toVector().filter(predicate).length();
   }
 
@@ -1316,7 +1316,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         element of this Every and collecting the results in reverse
    *         order.
    */
-  default <U> Every<U> reverseMap(Function<T, U> f) {
+  default <U> Every<U> reverseMap(Function<? super T, ? extends U> f) {
     Vector<U> v = reverseIterator().map(f).toVector();
     return fromNonEmptySeq(v);
   }
@@ -1592,7 +1592,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return an Every consisting of the elements of this Every sorted
    *         according to the comparison function lt.
    */
-  default Every<T> sortWith(BiPredicate<T, T> lt) {
+  default Every<T> sortWith(BiPredicate<? super T, ? super T> lt) {
     return sortBy((T left, T right) -> {
       if (lt.test(left, right))
         return -1;
@@ -1958,8 +1958,9 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         If that is shorter than this Every, thatElem values are used to
    *         pad the result.
    */
-  default <B> Every<Tuple2<T, B>> zipAll(Iterable<B> other, T thisElem, B otherElem) {
-    return fromNonEmptySeq(toVector().zipAll(other, thisElem, otherElem));
+  @SuppressWarnings("unchecked")
+  default <B> Every<Tuple2<T, B>> zipAll(Iterable<? extends B> other, T thisElem, B otherElem) {
+    return fromNonEmptySeq(toVector().zipAll((Iterable<B>)other, thisElem, otherElem));
   }
 
   /**

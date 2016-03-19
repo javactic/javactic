@@ -46,7 +46,7 @@ public class OrTest {
     bad = Or.fromJavaOptional(Optional.empty(), () -> "failure");
     assertEquals("failure", bad.getBad());
 
-    Or<String, String> any = Or.fromAny(Optional.of("success"), toOr("failure"));
+    Or<Object, Object> any = Or.fromAny(Optional.of("success"), toOr("failure"));
     assertEquals("success", any.get());
     assertEquals("failure", bad.toAny(Or::getBad));
 
@@ -125,7 +125,8 @@ public class OrTest {
   @Test
   public void flatMap() {
     Or<String, String> good = Good.of("1");
-    Or<Integer, String> goodI = good.flatMap(s -> Good.of(Integer.parseInt(s)));
+    Function<String, Good<Integer, String>> f = s -> Good.of(Integer.parseInt(s));
+    Or<Integer, String> goodI = good.flatMap(f);
     assertEquals(1, goodI.get().intValue());
     Or<String, String> bad = Bad.of("");
     Or<Integer, String> badI = bad.flatMap(s -> Bad.of(""));
