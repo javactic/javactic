@@ -160,7 +160,7 @@ public final class Good<G, B> implements Or<G, B>, Serializable {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <C> Or<G, C> recoverWith(Function<? super B, ? extends Or<? extends G, C>> func) {
+  public <C> Or<G, C> recoverWith(Function<? super B, ? extends Or<? extends G, ? extends C>> func) {
     return (Or<G, C>) this;
   }
 

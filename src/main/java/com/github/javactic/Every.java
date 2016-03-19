@@ -1747,7 +1747,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *            represented by Tuple2
    * @return a new {@link java.util.Map}.
    */
-  default <K, V> java.util.Map<K, V> toJavaMap(Function<? super T, ? extends Tuple2<? extends K, ? extends V>> f) {
+  default <K, V> java.util.Map<K, V> toJavaMap(Function<? super T, Tuple2<? extends K, ? extends V>> f) {
     return toVector().toJavaMap(f);
   }
 
@@ -1767,7 +1767,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *            represented by Tuple2
    * @return a new {@link Map}.
    */
-  default <K, V> Map<K, V> toMap(Function<? super T, ? extends Tuple2<? extends K, ? extends V>> f) {
+  default <K, V> Map<K, V> toMap(Function<? super T, Tuple2<? extends K, ? extends V>> f) {
     return toVector().toMap(f);
   }
 

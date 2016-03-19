@@ -420,7 +420,7 @@ public interface Or<G, B> {
    * @return if this is a {@link Bad}, the result of applying the given function to the contained value, else
    *         this {@link Good} is returned
    */
-  <C> Or<G, C> recoverWith(Function<? super B, ? extends Or<? extends G, C>> func);
+  <C> Or<G, C> recoverWith(Function<? super B, ? extends Or<? extends G, ? extends C>> func);
 
   /**
    * Returns an {@link Or} with the {@link Good} and {@link Bad} types swapped: {@link Bad}
