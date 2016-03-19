@@ -514,8 +514,8 @@ public class EveryTest {
   @Test
   public void productSum() {
     Every<Integer> e = Every.of(4, 4);
-    assertEquals(16, e.product());
-    assertEquals(8, e.sum());
+    assertEquals(16L, e.product());
+    assertEquals(8L, e.sum());
   }
 
   @Test
