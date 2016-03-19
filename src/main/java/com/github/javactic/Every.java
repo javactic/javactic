@@ -527,7 +527,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *            a function from A to Int
    * @return a new function f such that f(x) == apply(g(x))
    */
-  default <A> Function<A, T> compose(ToIntFunction<A> g) {
+  default <A> Function<A, T> compose(ToIntFunction<? super A> g) {
     return (A a) -> apply(g.applyAsInt(a));
   }
 
@@ -590,9 +590,9 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @param every the Every to flatten
    * @return a new Every resulting from concatenating all nested Everys.
    */
-  static <B> Every<B> flatten(Every<? extends Every<B>> every) {
+  static <B> Every<B> flatten(Every<? extends Every<? extends B>> every) {
     Vector<B> acc = Vector.empty();
-    for (Every<B> nested : every) {
+    for (Every<? extends B> nested : every) {
       acc = acc.appendAll(nested.toVector());
     }
     return fromNonEmptySeq(acc);
@@ -775,7 +775,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         that index match the elements of Iterable that, or -1 of no such
    *         subsequence exists.
    */
-  default int indexOfSlice(Iterable<T> that) {
+  default int indexOfSlice(Iterable<? extends T> that) {
     return toVector().indexOfSlice(that);
   }
 
@@ -796,7 +796,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         starting at that index match the elements of Iterable that, or -1
    *         of no such subsequence exists.
    */
-  default int indexOfSlice(Iterable<T> that, int from) {
+  default int indexOfSlice(Iterable<? extends T> that, int from) {
     return toVector().indexOfSlice(that, from);
   }
 
@@ -911,7 +911,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         that index match the elements of Iterable that, or -1 of no such
    *         subsequence exists.
    */
-  default int lastIndexOfSlice(Iterable<T> that) {
+  default int lastIndexOfSlice(Iterable<? extends T> that) {
     return toVector().lastIndexOfSlice(that);
   }
 
@@ -932,7 +932,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         starting at that index match the elements of Iterable that, or -1
    *         of no such subsequence exists.
    */
-  default int lastIndexOfSlice(Iterable<T> that, int end) {
+  default int lastIndexOfSlice(Iterable<? extends T> that, int end) {
     return toVector().lastIndexOfSlice(that, end);
   }
 
@@ -1371,7 +1371,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         function f to each element of this Every and concatenating the
    *         elements of resulting Everys.
    */
-  default <U> Every<U> flatMap(Function<? super T, Every<U>> function) {
+  default <U> Every<U> flatMap(Function<? super T, Every<? extends U>> function) {
     Vector<U> buf = Vector.empty();
     for (T t : toVector()) {
       buf = buf.appendAll(function.apply(t).toVector());
@@ -1650,7 +1650,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *            the Iterable to test
    * @return true if this collection has that as a prefix, false otherwise.
    */
-  default <B extends T> boolean startsWith(Iterable<B> that) {
+  default <B extends T> boolean startsWith(Iterable<? extends B> that) {
     return toVector().startsWith(that);
   }
 
@@ -1672,7 +1672,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return true if this Every has that as a slice at the index offset, false
    *         otherwise.
    */
-  default <B extends T> boolean startsWith(Iterable<B> that, int offset) {
+  default <B extends T> boolean startsWith(Iterable<? extends B> that, int offset) {
     return toVector().startsWith(that, offset);
   }
 
@@ -1862,7 +1862,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return a new Every that contains all elements of this Every and all
    *         elements of that Iterable.
    */
-  default Every<T> union(Iterable<T> that) {
+  default Every<T> union(Iterable<? extends T> that) {
     return fromNonEmptySeq(toVector().appendAll(that));
   }
 
@@ -2112,7 +2112,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         takes x to this(x) where this is defined, and to that(x) where it
    *         is not.
    */
-  default IntFunction<T> orElse(IntFunction<T> that) {
+  default IntFunction<T> orElse(IntFunction<? extends T> that) {
     return (index) -> {
       if (isDefinedAt(index)) {
         return this.apply(index);
@@ -2136,7 +2136,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return a function which maps arguments x to isDefinedAt(x). The
    *         resulting function runs action(this(x)) where this is defined.
    */
-  default IntPredicate runWith(Consumer<T> action) {
+  default IntPredicate runWith(Consumer<? super T> action) {
     return (int a) -> {
       if (isDefinedAt(a)) {
         action.accept(apply(a));

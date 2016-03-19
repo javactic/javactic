@@ -66,7 +66,7 @@ public interface Or<G, B> {
    * @param bad a Supplier used to get the failure value if the given Option is None
    * @return an Or
    */
-  static <G, B> Or<G, B> from(Option<G> option, Supplier<B> bad) {
+  static <G, B> Or<G, B> from(Option<? extends G> option, Supplier<? extends B> bad) {
     return option.map(Or::<G, B>good).getOrElse(() -> Bad.of(bad.get()));
   }
 
@@ -79,7 +79,7 @@ public interface Or<G, B> {
    * @param bad the value to use for the Bad if the given option is None
    * @return an Or
    */
-  static <G, B> Or<G, B> from(Option<G> option, B bad) {
+  static <G, B> Or<G, B> from(Option<? extends G> option, B bad) {
     return option.map(Or::<G, B>good).getOrElse(Bad.of(bad));
   }
 
@@ -91,7 +91,7 @@ public interface Or<G, B> {
    * @param either the Either to transform
    * @return an Or
    */
-  static <B, G> Or<G, B> from(Either<B, G> either) {
+  static <B, G> Or<G, B> from(Either<? extends B, ? extends G> either) {
     if (either.isRight()) return Good.of(either.right().get());
     else return Bad.of(either.left().get());
   }
@@ -103,7 +103,7 @@ public interface Or<G, B> {
    * @param theTry the Try to transform into an Or
    * @return an Or
    */
-  static <G> Or<G, Throwable> from(Try<G> theTry) {
+  static <G> Or<G, Throwable> from(Try<? extends G> theTry) {
     return theTry.map(Or::<G, Throwable>good).recover(Bad::of).get();
   }
 
@@ -117,7 +117,7 @@ public interface Or<G, B> {
    * @param bad the value to use for a {@link Bad} if the given {@link Optional} is not defined
    * @return an instance of {@link Or}
    */
-  static <G, B> Or<G, B> fromJavaOptional(Optional<G> optional, B bad) {
+  static <G, B> Or<G, B> fromJavaOptional(Optional<? extends G> optional, B bad) {
     return optional.map(Or::<G, B>good).orElse(Bad.of(bad));
   }
 
@@ -131,7 +131,7 @@ public interface Or<G, B> {
    * @param bad the supplier to use to get the value for a {@link Bad} if the given {@link Optional} is not defined
    * @return an instance of {@link Or}
    */
-  static <G, B> Or<G, B> fromJavaOptional(Optional<G> optional, Supplier<B> bad) {
+  static <G, B> Or<G, B> fromJavaOptional(Optional<? extends G> optional, Supplier<? extends B> bad) {
     return optional.map(Or::<G, B>good).orElseGet(() -> Bad.of(bad.get()));
   }
 
