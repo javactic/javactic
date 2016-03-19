@@ -79,9 +79,6 @@
                     <splitindex>true</splitindex>
                     <use>true</use>
                     <version>true</version>
-                    <detectJavaApiLink>true</detectJavaApiLink>
-                    <detectLinks>false</detectLinks>
-                    <detectOfflineLinks>false</detectOfflineLinks>
                     <links>
                         <link>https://docs.oracle.com/javase/8/docs/api/</link>
                     </links>
