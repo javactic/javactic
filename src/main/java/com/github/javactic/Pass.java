@@ -30,7 +30,7 @@ import java.util.NoSuchElementException;
  *
  * @param <T> the type of a failed validation.
  */
-public class Pass<T> implements Validation<T>, Serializable {
+public final class Pass<T> implements Validation<T>, Serializable {
 
   private static final long serialVersionUID = 1L;
 

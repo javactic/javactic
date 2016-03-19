@@ -29,7 +29,7 @@ import java.io.Serializable;
  *
  * @param <T> the type of value describing a validation failure for this Fail
  */
-public class Fail<T> implements Validation<T>, Serializable {
+public final class Fail<T> implements Validation<T>, Serializable {
 
   private static final long serialVersionUID = 1L;
 

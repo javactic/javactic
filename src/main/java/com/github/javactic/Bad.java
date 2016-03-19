@@ -45,7 +45,7 @@ import java.util.function.Supplier;
  * @param <G> the success type of the Or
  * @param <B> the failure type of the Or
  */
-public class Bad<G, B> implements Or<G, B>, Serializable {
+public final class Bad<G, B> implements Or<G, B>, Serializable {
 
   private static final long serialVersionUID = 1L;
 

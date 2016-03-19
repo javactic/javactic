@@ -44,7 +44,7 @@ import java.util.function.Supplier;
  * @param <G> the success type of the Or
  * @param <B> the failure type of the Or
  */
-public class Good<G, B> implements Or<G, B>, Serializable {
+public final class Good<G, B> implements Or<G, B>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -61,7 +61,7 @@ public class Good<G, B> implements Or<G, B>, Serializable {
   @SuppressWarnings("unchecked")
   @Override
   public Or<G, One<B>> accumulating() {
-    // not a failure, so we can cast the failure side to anything.
+    // not a Bad, so we can cast the Bad side to anything.
     return (Or<G, One<B>>) this;
   }
 
