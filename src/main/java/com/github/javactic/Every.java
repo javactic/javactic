@@ -1617,7 +1617,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *             if this elements are not Comparable
    */
   default Every<T> sorted() throws ClassCastException {
-    return fromNonEmptySeq(toVector().sort());
+    return fromNonEmptySeq(toVector().sorted());
   }
 
   /**
@@ -1633,7 +1633,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         according to the comparator
    */
   default Every<T> sorted(Comparator<? super T> c) {
-    return fromNonEmptySeq(toVector().sort(c));
+    return fromNonEmptySeq(toVector().sorted(c));
   }
 
   /**
@@ -1850,8 +1850,8 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
   }
 
   /**
-   * Produces a new Every that contains all elements of this Every and also
-   * all elements of a given Iterable but no duplicates.
+   * Produces a new Every that contains all elements of this Every and
+   * all elements of a given Iterable.
    *
    * <pre class="stHighlighted">
    * Scalactic: def union[U &gt;: T](that: Every[U]): Every[U]
@@ -1860,8 +1860,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @param that
    *            the Iterable to add.
    * @return a new Every that contains all elements of this Every and all
-   *         elements of that Iterable. TODO test if scala version behaves the
-   *         same
+   *         elements of that Iterable.
    */
   default Every<T> union(Iterable<T> that) {
     return fromNonEmptySeq(toVector().appendAll(that));
