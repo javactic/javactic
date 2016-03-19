@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.javactic</groupId>
     <artifactId>javactic</artifactId>
-    <version>1.0.0-RC2-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>Javactic</name>
     <description>
         A Java port of Scalactic
@@ -26,7 +26,7 @@
         <connection>scm:git:git@github.com:javactic/javactic.git</connection>
         <developerConnection>scm:git:git@github.com:javactic/javactic.git</developerConnection>
         <url>git@github.com:javactic/javactic.git</url>
-        <tag>javactic-1.0.0-RC1</tag>
+        <tag>javactic-1.0.0</tag>
     </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
