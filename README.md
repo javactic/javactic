@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/javactic/javactic.svg?branch=master)](https://travis-ci.org/javactic/javactic)
 
 # Javactic
-Java port of [Scalactic](http://www.scalactic.org/) (2.2.6) based on [Javaslang](http://javaslang.io/)(2.0.0). See [documentation](http://javactic.github.io/javactic/) and [Javadoc](http://javactic.github.io/javactic/) for more info.
+Java port of [Scalactic](http://www.scalactic.org/) (2.2.6) based on [Javaslang](http://javaslang.io/)(2.0.0). See [documentation](http://javactic.github.io/javactic/) and [Javadoc](http://javactic.github.io/javactic/javadoc/1.0.0/) for more info.
 
 ## 1.0.0 is out:
 
