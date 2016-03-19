@@ -79,10 +79,18 @@
                     <splitindex>true</splitindex>
                     <use>true</use>
                     <version>true</version>
+                    <detectJavaApiLink>true</detectJavaApiLink>
+                    <detectLinks>false</detectLinks>
+                    <detectOfflineLinks>false</detectOfflineLinks>
                     <links>
-                        <link>http://www.javadoc.io/doc/io.javaslang/javaslang/2.0.0</link>
                         <link>https://docs.oracle.com/javase/8/docs/api/</link>
                     </links>
+                    <offlineLinks>
+                        <offlineLink>
+                            <url>http://static.javadoc.io/io.javaslang/javaslang/2.0.0/</url>
+                            <location>../javaslang</location>
+                        </offlineLink>
+                    </offlineLinks>
                 </configuration>
             </plugin>
             <plugin>
