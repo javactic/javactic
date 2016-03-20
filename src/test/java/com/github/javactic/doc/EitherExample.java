@@ -6,22 +6,22 @@ public class EitherExample {
 
     Either<String, String> parseName(String input) {
         String trimmed = input.trim();
-        return (!trimmed.isEmpty()) ? Either.right(trimmed) : Either.left(input + "is not a valid name");
+        return (!trimmed.isEmpty()) ? Either.right(trimmed) : Either.left("'" + input + "' is not a valid name");
     }
     
     Either<String, Integer> parseAge(String input) {
         try {
             int age = Integer.parseInt(input.trim());
-            return (age >= 0) ? Either.right(age) : Either.left(age + "is not a valid age"); 
+            return (age >= 0) ? Either.right(age) : Either.left("'" + age + "' is not a valid age");
         } catch (NumberFormatException e) {
-            return Either.left(input + "is not a valid integer");
+            return Either.left("'" + input + "' is not a valid integer");
         }
     }
     
     Either<String, Person> parsePersonEither(String inputName, String inputAge) {
-        return parseName(inputName).right()
-                .flatMap(name -> parseAge(inputAge).right()
-                        .map(age -> new Person(name, age))).toEither();
+        return parseName(inputName)
+                .flatMap(name -> parseAge(inputAge)
+                        .map(age -> new Person(name, age)));
     }
     
     void print() {
