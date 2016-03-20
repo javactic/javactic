@@ -1,0 +1,6 @@
+1.0.1:
+    - Made Good, Bad, Fail & Pass final. Backwards compatible since they had package private constructors
+    - Changed a lot of method arguments to take proper wildcard types
+    - Updated Javadoc for OrFuture firstCompletedOf and sequence
+
+1.0.0: First release
