@@ -521,6 +521,15 @@ public interface OrFuture<G, B> {
   // FIRST COMPLETED OF
   // ----------------------------------------------------------------------------------------------
 
+  /**
+   * Returns an OrFuture that will complete as soon as the first OrFuture from the given Iterable
+   * completes.
+   *
+   * @param input an Iterable of OrFutures
+   * @param <G> the good type of the future
+   * @param <ERR> the bad type of the future
+   * @return the first future to complete
+   */
   static <G, ERR> OrFuture<G, ERR>
   firstCompletedOf(Iterable<? extends OrFuture<? extends G, ? extends ERR>> input) {
     OrPromise<G, ERR> promise = OrPromise.create();
@@ -532,11 +541,31 @@ public interface OrFuture<G, B> {
   // SEQUENCE
   // ----------------------------------------------------------------------------------------------
 
+  /**
+   * Transforms an Iterable of OrFutures&lt;G, ERR&gt; into an OrFuture&lt;Vector&lt;G, ERR&gt;&gt;.
+   *
+   * @param input iterable of OrFutures
+   * @param <G> the good type of the future
+   * @param <ERR> the bad type of the future
+   * @return a single OrFuture
+   */
   static <G, ERR> OrFuture<Vector<G>, Every<ERR>>
   sequence(Iterable<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> input) {
     return sequence(input, Vector.collector());
   }
 
+  /**
+   * Transforms an Iterable of OrFutures&lt;G, ERR&gt; into an OrFuture&lt;COLL&lt;G, ERR&gt;&gt;
+   * where COLL is a collection created with the collector given as argument.
+   *
+   * @param input iterable of OrFutures
+   * @param collector a collector to collect the results of the transformation
+   * @param <G> the good type of the future
+   * @param <ERR> the bad type of the future
+   * @param <A> the mutable accumulation type of the reduction operation
+   * @param <I> the result type of the reduction operation
+   * @return a single OrFuture
+   */
   @SuppressWarnings("unchecked")
   static <G, ERR, A, I extends Iterable<? extends G>> OrFuture<I, Every<ERR>>
   sequence(Iterable<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> input,
