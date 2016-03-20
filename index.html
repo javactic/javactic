@@ -54,15 +54,10 @@
         </p>
         <h3>The motivation for Or</h3>
         <p>
-          <code>Or</code> differs from Javaslang's (and Scala's) <code>Either</code> type in that <code>Either</code>
-          treats
-          both its <code>Left</code> and <code>Right</code> alternatives in an identical manner, whereas <code>Or</code>
-          treats its two alternatives differently: it favors <code>Good</code> over <code>Bad</code> . Because of this,
-          it
-          is more convenient to work with <code>Or</code> s when you prefer one alternative over the other; for example,
-          if
-          one alternative represents a valid result and another represents an error. To illustrate, imagine you want to
-          create instances this <code>Person</code> class from user input strings:
+          <code>Or</code> is very similar to Javaslang's <code>Either</code> type (which is right biased), but allows for additional
+          accumulation of bad values. Scala's <code>Either</code> is somewhat different in that it treats both its <code>Left</code>
+          and <code>Right</code> alternatives in an identical manner and requires the use of explicit projections when manipulated.
+          To illustrate all this, imagine you want to create instances of this <code>Person</code> class from user input strings:
         </p>
      <pre>
 <code class="java">
@@ -158,7 +153,7 @@ Either&lt;String,String&gt; parseName(String input) {
     String trimmed = input.trim();
     return (!trimmed.isEmpty())
     	? Either.right(trimmed)
-    	: Either.left(input + &quot;is not a valid name&quot;);
+    	: Either.left("'" + input + &quot;' is not a valid name&quot;);
 }
 </code>
 		</pre>
@@ -170,9 +165,9 @@ Either&lt;String,String&gt; parseName(String input) {
 Either&lt;String, Integer&gt; parseAge(String input) {
     try {
         int age = Integer.parseInt(input.trim());
-        return (age &gt;= 0) ? Either.right(age) : Either.left(age + &quot;is not a valid age&quot;);
+        return (age &gt;= 0) ? Either.right(age) : Either.left("'" + age + &quot;' is not a valid age&quot;);
     } catch (NumberFormatException e) {
-        return Either.left(input + &quot;is not a valid integer&quot;);
+        return Either.left("'" + input + &quot;' is not a valid integer&quot;);
     }
 }
 </code>
@@ -183,19 +178,14 @@ Either&lt;String, Integer&gt; parseAge(String input) {
      <pre>
 <code class="java">
 Either&lt;String, Person&gt; parsePerson(String inputName, String inputAge) {
-    return parseName(inputName).right()
-            .flatMap(name -&gt; parseAge(inputAge).right().map(age -&gt; new Person(name, age)))
-            .toEither();
+    return parseName(inputName)
+        .flatMap(name -&gt; parseAge(inputAge)
+            .map(age -&gt; new Person(name, age)));
 }
 </code>
 		</pre>
         <p>
-          Note that <code>Either</code> requires you to add <code>.right()</code> at the end of each generator in the
-          for
-          expression. Although the convention is to place the valid result on the right, you must explicitly (and
-          repetitively) indicate that you've done so by transforming the <code>Either</code> to a
-          <code>RightProjection</code>
-          by invoking <code>.right()</code> at each step. Given this implementation, the <code>parsePerson</code> method
+          Given this implementation, the <code>parsePerson</code> method
           will now short-circuit at the first sign of trouble (as it did when we used an <code>Option</code> ), but you
           now
           get the first error message returned in a <code>Left</code> . Here are some examples:
@@ -206,27 +196,24 @@ parsePerson("Tyler Durden", "29")
 // Right(Person(Tyler Durden,29))
 
 parsePerson("Tyler Durden", "")
-// Left("" is not a valid integer)
+// Left('' is not a valid integer)
 
 parsePerson("Tyler Durden", "-29")
-// Left("-29" is not a valid age)
+// Left('-29' is not a valid age)
 
 parsePerson("", "")
-// Left("" is not a valid name)
+// Left('' is not a valid name)
 </code>
 		</pre>
-        <h3>An Either with attitude</h3>
+        <h3>An alternative to Either</h3>
         <p>
-          Because <code>Or</code> declares one alternative to be "good" and the other "bad," it is more convenient than
-          <code>Either</code>
-          in this kind of situation. One difference to note with <code>Or</code> is that the <code>Good</code>
-          alternative
-          is on the left, <code>Bad</code> on the right.
+          As explained above, at first glance <code>Or</code> is very similar to Javaslang's <code>Either</code>.
+          One difference to note with <code>Or</code> is that the <code>Good</code>
+          alternative is on the left, <code>Bad</code> on the right.
         </p>
         <p>
           Here's how the <code>parseName</code> method might be written using an <code>Or</code> , where the error type
-          is
-          also a <code>String</code> :
+          is also a <code>String</code>:
         </p>
      <pre>
 <code class="java">
@@ -267,42 +254,23 @@ Or&lt;Person, String&gt; parsePerson(String inputName, String inputAge) {
 </code>
 		</pre>
         <p>
-          Because of <code>Or</code> 's attitude, you need not write <code>.good()</code> at the end of each generator.
-          <code>Or</code>
-          will keep going so long as each step produces a <code>Good</code> , short circuiting at the first sign of a
-          <code>Bad</code>
-          . Here are a few invocations of this <code>parsePerson</code> method:
+          This is pretty much the same code as for <code>Either</code>, including the short circuiting at the first sign of a
+          <code>Bad</code>. The invocations of <code>parsePerson</code> produce the exact same results.
         </p>
-     <pre>
-<code class="java">
-parsePerson("Tyler Durden", "29")
-// Good(Person(Tyler Durden,29))
 
-parsePerson("Tyler Durden", "")
-// Bad("" is not a valid integer)
-
-parsePerson("Tyler Durden", "-29")
-// Bad("-29" is not a valid age)
-
-parsePerson("", "")
-// Bad("" is not a valid name)
-</code>
-		</pre>
         <h3>Accumulating errors with Or</h3>
         <p>
-          Another difference between <code>Or</code> and <code>Either</code> is that <code>Or</code> enables you to
-          accumulate errors if the <code>Bad</code> type is an <code>Every</code> . An <code>Every</code> is similar to
-          a <code>Seq</code>
-          in that it contains ordered elements, but different from <code>Seq</code> in that it cannot be empty. An
+          The main difference between <code>Or</code> and <code>Either</code> is that <code>Or</code> enables you to
+          accumulate errors very naturally if the <code>Bad</code> type is an <code>Every</code>. An <code>Every</code>
+          is similar to a <code>Seq</code>
+          in that it contains ordered elements, but different in that it cannot be empty. An
           <code>Every</code>
-          is either a <code>One</code> , which contains one and only one element, or a <code>Many</code> , which
-          contains
-          two or more elements.
+          is either a <code>One</code> (containing one and only one element), or a <code>Many</code> (containing two
+          or more elements).
         </p>
         <p>
-          Note: an <code>Or</code> whose <code>Bad</code> type is an <code>Every</code> , or one of its subtypes, is
-          called
-          an "accumulating Or."
+          Note: an <code>Or</code> whose <code>Bad</code> type is an <code>Every</code>, or one of its subtypes, is
+          called an "accumulating Or."
         </p>
         <p>
           To rewrite the previous example so that errors can be accumulated, you need first to return an
@@ -322,7 +290,7 @@ Or&lt;String, One&lt;String&gt;&gt; parseName(String input) {
         <p>
           Because <code>parseName</code> will either return a valid name <code>String</code> wrapped in a
           <code>Good</code>
-          , or one error message, wrapped in a <code>Bad</code> , you would write the <code>Bad</code> type as <code>One&lt;ErrorMessage&gt;</code>
+          , or one error message, wrapped in a <code>Bad</code> , you would write the <code>Bad</code> type as <code>One&lt;String&gt;</code>
           . The same is true for <code>parseAge</code> :
         </p>
      <pre>
@@ -340,8 +308,8 @@ Or&lt;Integer, One&lt;String&gt;&gt; parseAge(String input) {
         <p>
           Because a for expression short-circuits on the first <code>Bad</code> encountered, you'll need to use a
           different
-          approach to write the <code>parsePerson</code> method. In this example, the <code>withGood</code> method from
-          class <code>Accumulation</code> will do the trick:
+          approach to write the <code>parsePerson</code> method. This can be done with the <code>withGood</code> method from
+          class <code>Accumulation</code>:
         </p>
      <pre>
 <code class="java">
@@ -369,7 +337,7 @@ Or&lt;Person, Every&lt;String&gt;&gt; parsePerson(String inputName, String input
           The result of <code>parsePerson</code> , if <code>Bad</code> , will therefore contain either one or two error
           messages, i.e., the result will either be a <code>One</code> or a <code>Many</code> . As a result, the result
           type
-          of <code>parsePerson</code> must be <code>Or&lt;Person,&lt;Every&lt;String&gt;&gt;&gt;</code> . Regardless of
+          of <code>parsePerson</code> must be <code>Or&lt;Person, Every&lt;String&gt;&gt;</code> . Regardless of
           whether a <code>Bad</code> result contains one or two error messages, it will contain every error message.
           Here's
           some invocations of this accumulating version of <code>parsePerson:</code>
@@ -380,13 +348,13 @@ parsePerson("Tyler Durden", "29")
 // Good(Person(Tyler Durden,29))
 
 parsePerson("Tyler Durden", "")
-// Bad(One("" is not a valid integer))
+// Bad(One('' is not a valid integer))
 
 parsePerson("Tyler Durden", "-29")
-// Bad(One("-29" is not a valid age))
+// Bad(One('-29' is not a valid age))
 
 parsePerson("", "")
-// Bad(Many("" is not a valid name, "" is not a valid integer))
+// Bad(Many('' is not a valid name, '' is not a valid integer))
 </code>
 		</pre>
         <p>
@@ -494,8 +462,8 @@ Every.of(-1, -2, 3, 4, 5).minBy(i -&gt; Math.abs(i));  // -1
 		</pre>
         <p>
           <code>Every</code> does not currently define any methods corresponding to <code>Seq</code> methods that could
-          result in an empty <code>Seq</code> . However, you can convert an empty to a <code>Seq</code> and get hold of
-          these methods:
+          result in an empty <code>Seq</code> . However, you can convert an <code>Every</code> to a <code>Seq</code> and
+          get hold of these methods:
         </p>
      <pre>
 <code class="java">
@@ -511,7 +479,7 @@ Every.of(1, 2, 3).toSeq().filter(i -&gt; i &gt; 10); // Vector()
         <h3>Using combined</h3>
         <p>
           If you have a collection of accumulating <code>Or</code> s, for example, you can combine them into one <code>Or</code>
-          using combined, like this:
+          using combined:
         </p>
      <pre>
 <code class="java">
@@ -528,10 +496,8 @@ Accumulation.combined(list3, List.collector());
 		</pre>
         <h3>Using validatedBy</h3>
         <p>
-          <code>Or</code> if you have a collection of values and a function that transforms that type of value into an
-          accumulating <code>Or</code> s, you can validate the values using the function using <code>validatedBy</code>
-          ,
-          like this:
+          If you have a collection of values and a function that transforms that type of value into an
+          accumulating <code>Or</code>, you can validate the values using the function using <code>validatedBy</code>:
         </p>
      <pre>
 <code class="java">
@@ -603,7 +569,7 @@ Or&lt;Integer, Every&lt;String&gt;&gt; when = Accumulation.when(parseAge(&quot;-
         <p>
           If the <code>Or</code> on which you call when is <code>Good</code> , and also passes all the validation
           functions
-          (i.e., the all return <code>None</code> ), you again get the same <code>Or</code> back, but this time, a
+          (i.e., they all return <code>Pass</code> ), you again get the same <code>Or</code> back, but this time, a
           <code>Good</code>
           one:
         </p>
@@ -614,8 +580,8 @@ Accumulation.when(parseAge(&quot;30&quot;), this::isRound, this::isDivBy3);
 </code>
 		</pre>
         <p>
-          If one or more of the validation functions fails, however, you'll get a <code>Bad</code> back continuing every
-          error. Here are some examples:
+          If one or more of the validation functions fails, however, you'll get a <code>Bad</code> back containing every
+          error:
         </p>
      <pre>
 <code class="java">
