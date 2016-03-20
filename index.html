@@ -34,19 +34,18 @@
     <div class="col-md-9">
       <section class="main-content">
         <p>
-          Javactic is a Java port of <a href="http://www.scalactic.org/">Scalactic</a>'s <a
-            href="http://www.scalactic.org/user_guide/OrAndEvery">Or and Every</a> mechanism. Javactic is based on the
-          <a
-              href="http://javaslang.com/">Javaslang</a> functional library for Java 8+. This documentation is mostly
+          Javactic is a Java port of <a href="http://www.scalactic.org/">Scalactic</a>'s
+          <a href="http://doc.scalatest.org/2.2.6/index.html#org.scalactic.Or">Or</a> and
+          <a href="http://doc.scalatest.org/2.2.6/index.html#org.scalactic.Every">Every</a> mechanism. Javactic is based on the
+          <a href="http://javaslang.io/">Javaslang</a> functional library for Java 8+. This documentation is mostly
           ported
           from <a href="http://www.scalactic.org/user_guide/OrAndEvery">here</a>.
         </p>
 
         <h2>Or and Every</h2>
         <p>
-          The <a href="javadoc/com/github/javactic/Or.html">Or</a> and <a href="javadoc/com/github/javactic/Every.html">Every</a>
-          types of Javactic allow you to represent errors as an "alternate return value" (like <a
-            href="http://javaslang.com/javadoc/2.0.0-RC1/javaslang/control/Either.html">Either</a>) and to optionally
+          The <code>Or</code> and <code>Every</code>
+          types of Javactic allow you to represent errors as an "alternate return value" (like <code>Either</code>) and to optionally
           accumulate errors. <code>Or</code> represents a value that is one of two possible types, with one type being
           "good" (a value wrapped in an instance of <code>Good</code> ) and the other "bad" (a value wrapped in an
           instance
