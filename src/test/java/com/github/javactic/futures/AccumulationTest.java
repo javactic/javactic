@@ -10,9 +10,11 @@ import com.github.javactic.Pass;
 import com.github.javactic.Validation;
 import javaslang.Tuple;
 import javaslang.Tuple2;
+import javaslang.collection.Iterator;
 import javaslang.collection.List;
 import javaslang.collection.Seq;
 import javaslang.collection.Vector;
+import javaslang.concurrent.Future;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.theories.DataPoints;
@@ -32,6 +34,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
+import static com.github.javactic.futures.OrFuture.ofOneBad;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -47,7 +50,7 @@ public class AccumulationTest {
   @Test
   public void withGoodFail() throws Exception {
     OrFuture<String, One<String>> success = OrFuture.ofGood("success");
-    OrFuture<String, One<String>> fail = OrFuture.ofOneBad("failure");
+    OrFuture<String, One<String>> fail = ofOneBad("failure");
     OrFuture<String, Every<String>> result = OrFuture.withGood(success, fail, (a1, a2) -> "doesn't matter");
     Or<String, Every<String>> or = result.get(Duration.ofSeconds(10));
     assertEquals("failure", or.getBad().head());
@@ -118,7 +121,7 @@ public class AccumulationTest {
   @Test
   public void combinedSecondFinishesLast() throws Exception {
     CountDownLatch latch = new CountDownLatch(1);
-    OrFuture<String, One<String>> f1 = OrFuture.<String,String>of(() -> Good.of("1")).accumulating();
+    OrFuture<String, One<String>> f1 = OrFuture.<String,String>of(() -> Good.<String,String>of("1")).accumulating();
     OrFuture<String, One<String>> f2 = ff.newFuture(() -> Good.of("2")).accumulating();
     OrFuture<String, One<String>> f3 = ff.newFuture(() -> Good.of("3")).accumulating();
     OrFuture<String, One<String>> f4 = ff.newFuture(() -> {
@@ -174,7 +177,7 @@ public class AccumulationTest {
         return Good.of("waiting");
       }).accumulating();
     } else {
-      return OrFuture.<String, String>of(es, () -> Good.of("direct")).accumulating();
+      return OrFuture.<String, String>of(es, () -> Good.<String,String>of("direct")).accumulating();
     }
   }
 
@@ -354,6 +357,18 @@ public class AccumulationTest {
     assertTrue(Modifier.isPrivate(constructor.getModifiers()));
     constructor.setAccessible(true);
     constructor.newInstance();
+  }
+
+  @Test
+  public void collect() {
+    CountDownLatch first = new CountDownLatch(1);
+    Iterator<OrFuture<String, Every<String>>> orFutures =
+      Iterator.of(OrFuture.narrow(getGood(first, "good").accumulating()), OrFuture.ofBad(Every.of("bad")));
+    Future<Vector<Or<String, Every<String>>>> collect = OrFuture.collect(orFutures);
+    first.countDown();
+    Vector<Or<String, Every<String>>> ors = collect.get();
+    Assert.assertTrue(ors.get(0).isGood());
+    Assert.assertTrue(ors.get(1).isBad());
   }
 
 }

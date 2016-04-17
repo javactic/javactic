@@ -51,6 +51,8 @@ public final class Many<T> implements Every<T>, Serializable {
     elements = Vector.of(first).appendAll(rest);
   }
 
+  public Every<T> asEvery() {return this;}
+
   @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object obj) {

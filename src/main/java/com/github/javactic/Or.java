@@ -174,6 +174,16 @@ public interface Or<G, B> {
     return Bad.of(value);
   }
 
+  @SuppressWarnings("unchecked")
+  static <G, B> Or<G, Every<B>> narrow(Or<? extends G, ? extends Every<? extends B>> or) {
+    return (Or<G, Every<B>>) or;
+  }
+
+  @SuppressWarnings("unchecked")
+  static <G, B> Or<G, B> narrow(Or<? extends G, ? extends B> or) {
+    return (Or<G, B>) or;
+  }
+
   /**
    * Converts this {@link Or} to an {@link Or} with the same {@link Good} type and a {@link Bad}
    * type consisting of {@link One} parameterized by this {@link Or}'s {@link Bad} type.

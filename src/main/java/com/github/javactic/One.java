@@ -69,6 +69,8 @@ public final class One<T> implements Every<T>, Serializable {
     elements = Vector.of(onlyElement);
   }
 
+  public Every<T> asEvery() {return this;}
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;

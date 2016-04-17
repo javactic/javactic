@@ -38,7 +38,10 @@ import javaslang.Tuple2;
 import javaslang.Tuple3;
 import javaslang.collection.Iterator;
 import javaslang.collection.Vector;
+import javaslang.concurrent.Future;
+import javaslang.concurrent.Promise;
 import javaslang.control.Option;
+import javaslang.control.Try;
 
 import java.time.Duration;
 import java.util.concurrent.Executor;
@@ -46,13 +49,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
+import java.util.stream.Stream;
 
 import static com.github.javactic.futures.Helper.*;
+import static javafx.scene.input.KeyCode.H;
 
 /**
  * <p>
@@ -146,6 +152,16 @@ public interface OrFuture<G, B> {
     return OrPromise.<G, B>create().success(good).future();
   }
 
+  @SuppressWarnings("unchecked")
+  static <G, B> OrFuture<G, Every<B>> narrow(OrFuture<? extends G, ? extends Every<? extends B>> or) {
+    return (OrFuture<G, Every<B>>) or;
+  }
+
+  @SuppressWarnings("unchecked")
+  static <G, B> OrFuture<G, B> narrow(OrFuture<? extends G, ? extends B> or) {
+    return (OrFuture<G, B>) or;
+  }
+
   // ----------------------------------------------------------------------------------------------
   // INSTANCE METHODS
   // ----------------------------------------------------------------------------------------------
@@ -225,6 +241,12 @@ public interface OrFuture<G, B> {
   default <H> OrFuture<H, B> map(Function<? super G, ? extends H> mapper) {
     OrPromise<H, B> promise = OrPromise.create();
     onComplete(or -> promise.complete(or.map(mapper)));
+    return promise.future();
+  }
+
+  default <C> OrFuture<G, C> badMap(Function<? super B, ? extends C> mapper) {
+    OrPromise<G, C> promise = OrPromise.create();
+    onComplete(or -> promise.complete(or.badMap(mapper)));
     return promise.future();
   }
 
@@ -642,6 +664,43 @@ public interface OrFuture<G, B> {
         }
       });
     }
+    return promise.future();
+  }
+
+  // ----------------------------------------------------------------------------------------------
+  // COLLECT
+  // ----------------------------------------------------------------------------------------------
+
+  static <G, ERR> Future<Vector<Or<G, Every<ERR>>>>
+  collect(Iterable<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> input) {
+    return collect(input, Vector.collector());
+  }
+
+  @SuppressWarnings("unchecked")
+  static <G, ERR, A, I extends Iterable<? extends Or<? extends G, ? extends Every<? extends ERR>>>> Future<I>
+  collect(Iterable<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> input,
+          Collector<? super Or<G, Every<ERR>>, A, I> collector) {
+
+    Promise<I> promise = Promise.make();
+    AtomicInteger count = new AtomicInteger(0);
+    AtomicBoolean finished = new AtomicBoolean(false);
+    java.util.Iterator<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> iterator = input.iterator();
+    Stream.Builder<AtomicReference<Or<G, Every<ERR>>>> builder = Stream.builder();
+    while(iterator.hasNext()) {
+      count.incrementAndGet();
+      AtomicReference<Or<G, Every<ERR>>> container = new AtomicReference<>();
+      builder.add(container);
+      OrFuture<? extends G, ? extends Every<? extends ERR>> future = iterator.next();
+      if(!iterator.hasNext()) finished.set(true);
+      future.onComplete(or -> {
+        container.set((Or<G, Every<ERR>>) or);
+        if(count.decrementAndGet() == 0 && finished.get()) {
+          I collected = builder.build().map(AtomicReference::get).collect(collector);
+          promise.complete(Try.success(collected));
+        }
+      });
+    }
+
     return promise.future();
   }
 

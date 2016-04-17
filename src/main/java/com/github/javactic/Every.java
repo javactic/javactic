@@ -1615,7 +1615,9 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         according to their natural order.
    * @throws ClassCastException
    *             if this elements are not Comparable
+   * @deprecated use sorted(Comparator.naturalOrder()) as it is type safe
    */
+  @Deprecated
   default Every<T> sorted() throws ClassCastException {
     return fromNonEmptySeq(toVector().sorted());
   }
