@@ -5,7 +5,6 @@ import com.github.javactic.Bad;
 import com.github.javactic.Every;
 import com.github.javactic.Fail;
 import com.github.javactic.Good;
-import com.github.javactic.One;
 import com.github.javactic.Or;
 import com.github.javactic.Pass;
 import com.github.javactic.Validation;
@@ -15,12 +14,12 @@ import javaslang.collection.List;
 
 public class AccumulatingOrExample {
 
-    Or<String, One<String>> parseName(String input) {
+    Or<String, Every<String>> parseName(String input) {
         String trimmed = input.trim();
         return (!trimmed.isEmpty()) ? Good.of(trimmed) : Bad.ofOneString("'{}' is not a valid name", input);
     }
 
-    Or<Integer, One<String>> parseAge(String input) {
+    Or<Integer, Every<String>> parseAge(String input) {
         try {
             int age = Integer.parseInt(input.trim());
             return (age >= 0) ? Good.of(age) : Bad.ofOneString("'{}' is not a valid age", age);
@@ -30,8 +29,8 @@ public class AccumulatingOrExample {
     }
 
     Or<Person, Every<String>> parsePerson(String inputName, String inputAge) {
-        Or<String, One<String>> name = parseName(inputName);
-        Or<Integer, One<String>> age = parseAge(inputAge);
+        Or<String, Every<String>> name = parseName(inputName);
+        Or<Integer, Every<String>> age = parseAge(inputAge);
         return Accumulation.withGood(name, age, (n, a) -> new Person(n, a));
     }
 
@@ -54,13 +53,13 @@ public class AccumulatingOrExample {
     }
     
     void combined() {
-        List<Or<Integer, One<String>>> list = List.of(parseAge("29"), parseAge("30"), parseAge("31"));
+        List<Or<Integer, Every<String>>> list = List.of(parseAge("29"), parseAge("30"), parseAge("31"));
         Accumulation.combined(list, List.collector());  // Result: Good(List(29, 30, 31))
 
-        List<Or<Integer, One<String>>> list2 = List.of(parseAge("29"), parseAge("-30"), parseAge("31"));
+        List<Or<Integer, Every<String>>> list2 = List.of(parseAge("29"), parseAge("-30"), parseAge("31"));
         Accumulation.combined(list2, List.collector()); // Result: Bad(One("-30" is not a valid age))
 
-        List<Or<Integer, One<String>>> list3 = List.of(parseAge("29"), parseAge("-30"), parseAge("-31"));
+        List<Or<Integer, Every<String>>> list3 = List.of(parseAge("29"), parseAge("-30"), parseAge("-31"));
         Accumulation.combined(list3, List.collector()); // Result: Bad(Many("-30" is not a valid age, "-31" is not a valid age))
     }
     

@@ -1,8 +1,8 @@
 package com.github.javactic.doc;
 
 import com.github.javactic.Bad;
+import com.github.javactic.Every;
 import com.github.javactic.Good;
-import com.github.javactic.One;
 import com.github.javactic.Or;
 
 public class OrExample {
@@ -60,9 +60,9 @@ public class OrExample {
         
         Bad.of("failure").asOr(); // Or<Object, String>
         
-        Or<String, One<String>> acc = Bad.<String,String>of("failure").accumulating(); // Or<String, One<String>>
-        Bad<String, One<String>> ofOne = Bad.ofOne("failure"); // Bad<String, One<String>>
-        Bad<String, One<String>> ofOneString = Bad.ofOneString("error with value {}", 12); // Bad<String, One<String>>
+        Or<String, Every<String>> acc = Bad.<String,String>of("failure").accumulating(); // Or<String, One<String>>
+        Bad<String, Every<String>> ofOne = Bad.ofOne("failure"); // Bad<String, One<String>>
+        Bad<String, Every<String>> ofOneString = Bad.ofOneString("error with value {}", 12); // Bad<String, One<String>>
         
     }
 

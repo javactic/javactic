@@ -83,7 +83,7 @@ public final class Bad<G, B> implements Or<G, B>, Serializable {
   }
 
   /**
-   * Helper method to get a {@link One} wrapped in a {@link Bad} directly.
+   * Helper method to get an {@link Every} wrapped in a {@link Bad} directly.
    * Equivalent to <code>Bad.of(One.of(value))</code>
    *
    * @param <G> the success type of the Or
@@ -92,8 +92,8 @@ public final class Bad<G, B> implements Or<G, B>, Serializable {
    *            the value to put in the One
    * @return a One inside a Bad
    */
-  public static <G, B> Bad<G, One<B>> ofOne(B value) {
-    return new Bad<>(One.of(value));
+  public static <G, B> Bad<G, Every<B>> ofOne(B value) {
+    return new Bad<>(Every.of(value));
   }
 
   /**
@@ -109,12 +109,12 @@ public final class Bad<G, B> implements Or<G, B>, Serializable {
    *            the values to replace the placeholders with
    * @return a Bad
    */
-  public static <G> Bad<G, One<String>> ofOneString(String msg, Object... args) {
-    return new Bad<>(One.of(Helper.parse(msg, args)));
+  public static <G> Bad<G, Every<String>> ofOneString(String msg, Object... args) {
+    return new Bad<>(Every.of(Helper.parse(msg, args)));
   }
 
   @Override
-  public Or<G, One<B>> accumulating() {
+  public Or<G, Every<B>> accumulating() {
     return Bad.ofOne(value);
   }
 

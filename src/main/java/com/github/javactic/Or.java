@@ -174,19 +174,9 @@ public interface Or<G, B> {
     return Bad.of(value);
   }
 
-  @SuppressWarnings("unchecked")
-  static <G, B> Or<G, Every<B>> narrow(Or<? extends G, ? extends Every<? extends B>> or) {
-    return (Or<G, Every<B>>) or;
-  }
-
-  @SuppressWarnings("unchecked")
-  static <G, B> Or<G, B> narrow(Or<? extends G, ? extends B> or) {
-    return (Or<G, B>) or;
-  }
-
   /**
    * Converts this {@link Or} to an {@link Or} with the same {@link Good} type and a {@link Bad}
-   * type consisting of {@link One} parameterized by this {@link Or}'s {@link Bad} type.
+   * type consisting of {@link Every} parameterized by this {@link Or}'s {@link Bad} type.
    *
    * <p>
    * For example, invoking the <code>accumulating</code> method on an <code>Or&lt;Int,ErrorMessage&gt;</code> would convert
@@ -202,9 +192,9 @@ public interface Or<G, B> {
    * <pre class="stHighlighted"> Scalactic: def accumulating: Or[G, One[B]] </pre>
    *
    * @return this {@link Good}, if this {@link Or} is a {@link Good}; or this {@link Bad} value
-   *         wrapped in a {@link One} if this {@link Or} is a {@link Bad}.
+   *         wrapped in an {@link Every} if this {@link Or} is a {@link Bad}.
    */
-  Or<G, One<B>> accumulating();
+  Or<G, Every<B>> accumulating();
 
   /**
    * Maps the given function to this {@link Or}'s value if it is a {@link Good} or returns <code>this</code>

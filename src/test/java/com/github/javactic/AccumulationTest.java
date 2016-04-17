@@ -54,21 +54,21 @@ public class AccumulationTest {
     Vector<Integer> vec = Vector.of(1, 2, 3);
     Function<Integer, Or<Integer, Every<String>>> f = i -> {
       if (i < 10) return Good.of(i);
-      else return Bad.of(One.of("wasn't under 10"));
+      else return Bad.of(Every.of("wasn't under 10"));
     };
     Or<Vector<Integer>, Every<String>> res = Accumulation.validatedBy(vec, f);
     assertTrue(res.isGood());
     assertEquals(vec, res.get());
     res = Accumulation.validatedBy(Vector.of(11), f, Vector.collector());
     assertTrue(res.isBad());
-    assertTrue(res.getBad() instanceof One);
+    assertTrue(res.getBad() instanceof Every);
   }
 
   @Test
   public void when() {
     Function<String, Validation<String>> f1 = f -> f.startsWith("s") ? Pass.instance() : Fail.of("does not start with s");
     Function<String, Validation<String>> f2 = f -> f.length() > 4 ? Fail.of("too long") : Pass.instance();
-    Or<String, Every<String>> res = Accumulation.when(Bad.of(One.of("failure")), f1, f2);
+    Or<String, Every<String>> res = Accumulation.when(Bad.of(Every.of("failure")), f1, f2);
     assertEquals("failure", res.getBad().get(0));
     res = Accumulation.when(Good.of("sub"), f1, f2);
     assertTrue(res.isGood());

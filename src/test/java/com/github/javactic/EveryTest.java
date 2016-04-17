@@ -35,8 +35,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
-import java.util.function.IntFunction;
-import java.util.function.IntPredicate;
+import java.util.function.Predicate;
 
 import static org.junit.Assert.*;
 
@@ -88,14 +87,14 @@ public class EveryTest {
 
   @Test
   public void hashCodeEqualsToString() {
-    Many<String> pair1 = Many.of("a", "b");
-    Many<String> pair2 = Many.of("a", "b");
+    Every<String> pair1 = Every.of("a", "b");
+    Every<String> pair2 = Every.of("a", "b");
     assertEquals(pair1, pair2);
     assertEquals(pair1.hashCode(), pair2.hashCode());
     assertEquals(pair1.toString(), pair2.toString());
 
-    One<String> single1 = One.ofString("c");
-    One<String> single2 = One.of("c");
+    Every<String> single1 = Every.of("c");
+    Every<String> single2 = Every.of("c");
     assertEquals(single1, single2);
     assertEquals(single1.hashCode(), single2.hashCode());
     assertEquals(single1.toString(), single2.toString());
@@ -107,7 +106,7 @@ public class EveryTest {
   @Test
   public void lift() {
     Every<Integer> e = Every.of(4, 8, 12);
-    IntFunction<Option<Integer>> lift = e.lift();
+    Function<Integer, Option<Integer>> lift = e.lift();
     assertEquals(8, lift.apply(1).get().intValue());
     assertTrue(lift.apply(3).isEmpty());
   }
@@ -115,7 +114,7 @@ public class EveryTest {
   @Test
   public void orElse() {
     Every<Integer> e = Every.of(4, 8, 12);
-    IntFunction<Integer> orElse = e.orElse(i -> 66);
+    Function<Integer, Integer> orElse = e.orElse(i -> 66);
     assertEquals(8, orElse.apply(1).intValue());
     assertEquals(66, orElse.apply(5).intValue());
   }
@@ -124,7 +123,7 @@ public class EveryTest {
   public void runWith() {
     Every<Integer> e = Every.of(4, 8, 12);
     AtomicReference<String> ref = new AtomicReference<>();
-    IntPredicate runWith = e.runWith(i -> ref.set("" + i));
+    Predicate<Integer> runWith = e.runWith(i -> ref.set("" + i));
     assertFalse(runWith.test(6));
     assertNull(ref.get());
     assertTrue(runWith.test(1));
@@ -233,7 +232,7 @@ public class EveryTest {
 
   @Test
   public void flatten() {
-    Every<Every<Integer>> e = Every.of(One.of(1), One.of(2), Many.of(3, 4));
+    Every<Every<Integer>> e = Every.of(Every.of(1), Every.of(2), Every.of(3, 4));
     assertEquals(Every.of(1, 2, 3, 4), Every.flatten(e));
   }
 
@@ -404,7 +403,7 @@ public class EveryTest {
   public void flatMap() {
     Every<Integer> e = Every.of(1, 2, 3, 4);
     Every<Integer> exp = Every.of(1, 1, 2, 2, 3, 3, 4, 4);
-    assertEquals(exp, e.flatMap(i -> Many.of(i, i)));
+    assertEquals(exp, e.flatMap(i -> Every.of(i, i)));
   }
 
   @Test
@@ -471,7 +470,6 @@ public class EveryTest {
     assertEquals(Every.of(7, 7, 6, 3, 1), decreasing);
     assertEquals(Every.of(7, 7, 6, 3, 1), e.sortBy(i -> -i));
 
-    assertEquals(Every.of(1, 3, 6, 7, 7), e.sorted());
     assertEquals(Every.of(1, 3, 6, 7, 7), e.sorted(Comparator.naturalOrder()));
   }
 
@@ -546,8 +544,8 @@ public class EveryTest {
 
   @Test
   public void equals() {
-    One<String> one1 = One.of("one1");
-    One<String> one2 = One.of("one2");
+    Every<String> one1 = Every.of("one1");
+    Every<String> one2 = Every.of("one2");
     Object o = new Object();
     Assert.assertFalse(one1.equals(o));
     Assert.assertFalse(one1.equals(null));

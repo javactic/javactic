@@ -34,23 +34,19 @@ import javaslang.collection.Traversable;
 import javaslang.collection.Vector;
 import javaslang.control.Option;
 
+import java.io.Serializable;
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.IntFunction;
-import java.util.function.IntPredicate;
 import java.util.function.Predicate;
-import java.util.function.ToIntFunction;
 
 import static com.github.javactic.Helper.fromNonEmptySeq;
 
 /**
- * An ordered, immutable, non-empty collection of elements. Class Every has two
- * and only two subtypes: {@link One} and {@link Many}. A One contains exactly
- * one element. A Many contains two or more elements. Thus no way exists for an
- * Every to contain zero elements.
+ * An ordered, immutable, non-empty collection of elements.
  *
  * <h1>Motivation for Everys</h1>
  *
@@ -64,7 +60,13 @@ import static com.github.javactic.Helper.fromNonEmptySeq;
  *
  * @param <T> the type of the Every
  */
-public interface Every<T> extends Iterable<T>, IntFunction<T> {
+public final class Every<T> implements Iterable<T>, Function<Integer, T>, Serializable {
+
+  private final Vector<T> elements;
+
+  private Every(Vector<T> elements) {
+    this.elements = elements;
+  }
 
   /**
    * Converts this value to a {@link Vector}.
@@ -75,7 +77,9 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *
    * @return a {@link Vector}.
    */
-  Vector<T> toVector();
+  public Vector<T> toVector() {
+    return elements;
+  }
 
   /**
    * Tests whether this Every contains given index.
@@ -89,7 +93,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return true if this Every contains an element at position idx, false
    *         otherwise.
    */
-  default boolean isDefinedAt(Integer index) {
+  public boolean isDefinedAt(Integer index) {
     return index >= 0 && index < length();
   }
 
@@ -102,7 +106,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *
    * @return false
    */
-  default boolean isEmpty() {
+  public boolean isEmpty() {
     return false;
   }
 
@@ -117,20 +121,21 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return the new iterator
    */
   @Override
-  default Iterator<T> iterator() {
+  public Iterator<T> iterator() {
     return toVector().iterator();
   }
 
   @SafeVarargs
-  static <T> Every<T> of(T first, T... rest) {
+  public static <T> Every<T> of(T first, T... rest) {
     return of(first, Vector.of(rest));
   }
 
-  static <T> Every<T> of(T first, Seq<? extends T> rest) {
+  public static <T> Every<T> of(T first, Seq<? extends T> rest) {
     if (rest.length() == 0)
-      return One.of(first);
-    else
-      return new Many<>(first, rest);
+      return new Every<>(Vector.of(first));
+    else {
+      return new Every<>(Vector.<T>ofAll(rest).prepend(first));
+    }
   }
 
   /**
@@ -146,7 +151,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return a new Every that contains all the elements of this Every followed
    *         by all elements of other.
    */
-  default Every<T> appendAll(Iterable<? extends T> iterable) {
+  public Every<T> appendAll(Iterable<? extends T> iterable) {
     if (!iterable.iterator().hasNext())
       return this;
     else {
@@ -167,9 +172,9 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return a new Many that contains all the elements of this Every followed
    *         by all elements of other.
    */
-  default Many<T> appendAll(Every<? extends T> other) {
+  public Every<T> appendAll(Every<? extends T> other) {
     Vector<T> all = toVector().appendAll(other.toVector());
-    return new Many<>(all.head(), all.tail());
+    return Every.of(all.head(), all.tail());
   }
 
   /**
@@ -184,9 +189,9 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return a new Every consisting of all elements of this Every followed by
    *         element.
    */
-  default Many<T> append(T element) {
+  public Every<T> append(T element) {
     Vector<T> all = toVector().append(element);
-    return new Many<>(all.head(), all.tail());
+    return Every.of(all.head(), all.tail());
   }
 
   /**
@@ -201,9 +206,9 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return a new Every consisting of element followed by all elements of
    *         this Every.
    */
-  default Many<T> prepend(T element) {
+  public Every<T> prepend(T element) {
     Vector<T> all = toVector().prepend(element);
-    return new Many<>(all.head(), all.tail());
+    return Every.of(all.head(), all.tail());
   }
 
   /**
@@ -226,7 +231,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *            the ending string
    * @return the string builder, sb, to which elements were appended.
    */
-  default StringBuilder addString(StringBuilder sb, String start, String sep, String end) {
+  public StringBuilder addString(StringBuilder sb, String start, String sep, String end) {
     sb.append(start);
     Iterator<T> it = iterator();
     while (it.hasNext()) {
@@ -254,7 +259,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *            the separator string
    * @return the string builder, sb, to which elements were appended.
    */
-  default StringBuilder addString(StringBuilder sb, String sep) {
+  public StringBuilder addString(StringBuilder sb, String sep) {
     return addString(sb, "", sep, "");
   }
 
@@ -271,7 +276,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *            the string builder to which elements will be appended
    * @return the string builder, sb, to which elements were appended.
    */
-  default StringBuilder addString(StringBuilder sb) {
+  public StringBuilder addString(StringBuilder sb) {
     return addString(sb, "");
   }
 
@@ -287,7 +292,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return true if this Every has an element that is equal (as determined by
    *         ==) to elem, false otherwise.
    */
-  default boolean contains(T elem) {
+  public boolean contains(T elem) {
     return toVector().contains(elem);
   }
 
@@ -304,7 +309,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return true if this Every contains a slice with the same elements as
    *         that, otherwise false.
    */
-  default boolean containsSlice(Iterable<? extends T> that) {
+  public boolean containsSlice(Iterable<? extends T> that) {
     return toVector().containsSlice(that);
   }
 
@@ -325,7 +330,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @param length
    *            the maximum number of elements to copy
    */
-  default void copyToJavaArray(T[] target, int start, int length) {
+  public void copyToJavaArray(T[] target, int start, int length) {
     int i = start;
     int end = Math.min((start + length), target.length);
     Iterator<T> it = iterator();
@@ -350,7 +355,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @param start
    *            the starting index
    */
-  default void copyToJavaArray(T[] target, int start) {
+  public void copyToJavaArray(T[] target, int start) {
     copyToJavaArray(target, start, length());
   }
 
@@ -366,7 +371,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @param target
    *            the array to fill
    */
-  default void copyToJavaArray(T[] target) {
+  public void copyToJavaArray(T[] target) {
     copyToJavaArray(target, 0);
   }
 
@@ -391,7 +396,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         predicate(x, y) is true for all corresponding elements x of this
    *         Every and y of that, otherwise false.
    */
-  default <B> boolean corresponds(Iterable<? extends B> that, BiPredicate<? super T, ? super B> predicate) {
+  public <B> boolean corresponds(Iterable<? extends B> that, BiPredicate<? super T, ? super B> predicate) {
     return toVector().corresponds(that, predicate);
   }
 
@@ -406,7 +411,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *            the predicate used to test elements.
    * @return the number of elements satisfying the predicate p.
    */
-  default long count(Predicate<? super T> predicate) {
+  public long count(Predicate<? super T> predicate) {
     return toVector().filter(predicate).length();
   }
 
@@ -423,7 +428,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return true if the given predicate p holds for some of the elements of
    *         this Every, otherwise false.
    */
-  default boolean exists(Predicate<? super T> predicate) {
+  public boolean exists(Predicate<? super T> predicate) {
     return toVector().exists(predicate);
   }
 
@@ -440,24 +445,24 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return a Some containing the first element in this Every that satisfies
    *         predicate, or None if none exists.
    */
-  default Option<T> find(Predicate<? super T> predicate) {
+  public Option<T> find(Predicate<? super T> predicate) {
     return toVector().find(predicate);
   }
 
   /**
-   * Same as {@link #apply(int)}.
+   * Same as {@link #apply(Integer)}.
    *
    * @param index
    *            the index to select from.
    * @return the element of this Every at index index, where 0 indicates the
    *         first element.
    */
-  default T get(int index) {
+  public T get(int index) {
     return apply(index);
   }
 
   /**
-   * Same as {@link #applyOrElse(int, IntFunction)}.
+   * Same as {@link #applyOrElse(int, Function)}.
    *
    * @param index
    *            the index to select from.
@@ -466,11 +471,11 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return returns the element of this Every at index or result of the
    *         fallback function.
    */
-  default T getOrElse(int index, IntFunction<? extends T> fallback) {
+  public T getOrElse(int index, Function<? super Integer, ? extends T> fallback) {
     return applyOrElse(index, fallback);
   }
 
-  default T getOrElse(int index, T def) {
+  public T getOrElse(int index, T def) {
     return applyOrElse(index, def);
   }
 
@@ -487,7 +492,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         first element.
    */
   @Override
-  default T apply(int index) {
+  public T apply(Integer index) {
     return toVector().get(index);
   }
 
@@ -506,29 +511,12 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return returns the element of this Every at index or result of the
    *         fallback function.
    */
-  default T applyOrElse(int index, IntFunction<? extends T> fallback) {
+  public T applyOrElse(int index, Function<? super Integer, ? extends T> fallback) {
     return isDefinedAt(index) ? apply(index) : fallback.apply(index);
   }
 
-  default T applyOrElse(int index, T def) {
+  public T applyOrElse(int index, T def) {
     return isDefinedAt(index) ? apply(index) : def;
-  }
-
-  /**
-   * Composes an instance of ToIntFunction with this IntFunction.
-   *
-   * <pre class="stHighlighted">
-   * Scalactic: def compose[A](g: (A) =&gt; Int): (A) =&gt; T
-   * </pre>
-   *
-   * @param <A>
-   *            the type to which function g can be applied
-   * @param g
-   *            a function from A to Int
-   * @return a new function f such that f(x) == apply(g(x))
-   */
-  default <A> Function<A, T> compose(ToIntFunction<? super A> g) {
-    return (A a) -> apply(g.applyAsInt(a));
   }
 
   /**
@@ -541,7 +529,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return A new Every that contains the first occurrence of every element
    *         of this Every.
    */
-  default Every<T> distinct() {
+  public Every<T> distinct() {
     return fromNonEmptySeq(toVector().distinct());
   }
 
@@ -557,7 +545,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return true if the given predicate p holds for all elements of this
    *         Every, otherwise false.
    */
-  default boolean forAll(Predicate<? super T> p) {
+  public boolean forAll(Predicate<? super T> p) {
     return toVector().forAll(p);
   }
 
@@ -572,7 +560,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *            the function that is applied for its side-effect to every
    *            element. The result of function f is discarded.
    */
-  default void forEach(Consumer<? super T> action) {
+  public void forEach(Consumer<? super T> action) {
     toVector().forEach(action);
   }
 
@@ -615,7 +603,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return the result of applying fold operator op between all the elements
    *         and z
    */
-  default T fold(T z, BiFunction<? super T, ? super T, ? extends T> op) {
+  public T fold(T z, BiFunction<? super T, ? super T, ? extends T> op) {
     return toVector().fold(z, op);
   }
 
@@ -636,7 +624,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return the result of inserting op between consecutive elements of this
    *         Every, going left to right, with the start value, z, on the left.
    */
-  default <B> B foldLeft(B z, BiFunction<? super B, ? super T, ? extends B> op) {
+  public <B> B foldLeft(B z, BiFunction<? super B, ? super T, ? extends B> op) {
     return toVector().foldLeft(z, op);
   }
 
@@ -658,7 +646,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         Every, going right to left, with the start value, z, on the
    *         right.
    */
-  default <B> B foldRight(B z, BiFunction<? super T, ? super B, ? extends B> op) {
+  public <B> B foldRight(B z, BiFunction<? super T, ? super B, ? extends B> op) {
     return toVector().foldRight(z, op);
   }
 
@@ -676,7 +664,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *            the discriminator function.
    * @return A map from keys to Everys.
    */
-  default <K> Map<K, Every<T>> groupBy(Function<? super T, ? extends K> f) {
+  public <K> Map<K, Every<T>> groupBy(Function<? super T, ? extends K> f) {
     return toVector().groupBy(f).map((k, v) -> Tuple.of(k, fromNonEmptySeq(v)));
   }
 
@@ -692,7 +680,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return An iterator producing Everys of size size, except the last will
    *         be truncated if the elements don't divide evenly.
    */
-  default Iterator<Every<T>> grouped(int size) {
+  public Iterator<Every<T>> grouped(int size) {
     return toVector().grouped(size).map(Helper::fromNonEmptySeq);
   }
 
@@ -705,7 +693,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *
    * @return the first element of this Every.
    */
-  default T head() {
+  public T head() {
     return toVector().head();
   }
 
@@ -718,7 +706,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *
    * @return the first element of this Every, wrapped in a Some.
    */
-  default Option<T> headOption() {
+  public Option<T> headOption() {
     return toVector().headOption();
   }
 
@@ -736,7 +724,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return the index of the first element of this Every that is equal (as
    *         determined by ==) to elem, or -1, if none exists.
    */
-  default <U extends T> int indexOf(U elem) {
+  public <U extends T> int indexOf(U elem) {
     return toVector().indexOf(elem);
   }
 
@@ -757,7 +745,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return the index &gt;= from of the first element of this Every that is
    *         equal (as determined by ==) to elem, or -1, if none exists.
    */
-  default <U extends T> int indexOf(U elem, int from) {
+  public <U extends T> int indexOf(U elem, int from) {
     return toVector().indexOf(elem, from);
   }
 
@@ -775,7 +763,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         that index match the elements of Iterable that, or -1 of no such
    *         subsequence exists.
    */
-  default int indexOfSlice(Iterable<? extends T> that) {
+  public int indexOfSlice(Iterable<? extends T> that) {
     return toVector().indexOfSlice(that);
   }
 
@@ -796,7 +784,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         starting at that index match the elements of Iterable that, or -1
    *         of no such subsequence exists.
    */
-  default int indexOfSlice(Iterable<? extends T> that, int from) {
+  public int indexOfSlice(Iterable<? extends T> that, int from) {
     return toVector().indexOfSlice(that, from);
   }
 
@@ -812,7 +800,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return the index of the first element of this Every that satisfies the
    *         predicate p, or -1, if none exists.
    */
-  default int indexWhere(Predicate<? super T> p) {
+  public int indexWhere(Predicate<? super T> p) {
     return indexWhere(p, 0);
   }
 
@@ -831,7 +819,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return the index &gt;= from of the first element of this Every that
    *         satisfies the predicate p, or -1, if none exists.
    */
-  default int indexWhere(Predicate<? super T> p, int from) {
+  public int indexWhere(Predicate<? super T> p, int from) {
     return toVector().indexWhere(p, from);
   }
 
@@ -844,7 +832,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *
    * @return the last element of this Every.
    */
-  default T last() {
+  public T last() {
     return toVector().last();
   }
 
@@ -857,7 +845,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *
    * @return the last element, wrapped in a Some.
    */
-  default Option<T> lastOption() {
+  public Option<T> lastOption() {
     return Option.of(last());
   }
 
@@ -873,7 +861,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return the index of the last element of this Every that is equal (as
    *         determined by ==) to elem, or -1, if none exists.
    */
-  default int lastIndexOf(T elem) {
+  public int lastIndexOf(T elem) {
     return toVector().lastIndexOf(elem);
   }
 
@@ -892,7 +880,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return the index &gt;= end of the last element of this Every that is
    *         equal (as determined by ==) to elem, or -1, if none exists.
    */
-  default int lastIndexOf(T elem, int end) {
+  public int lastIndexOf(T elem, int end) {
     return toVector().lastIndexOf(elem, end);
   }
 
@@ -911,7 +899,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         that index match the elements of Iterable that, or -1 of no such
    *         subsequence exists.
    */
-  default int lastIndexOfSlice(Iterable<? extends T> that) {
+  public int lastIndexOfSlice(Iterable<? extends T> that) {
     return toVector().lastIndexOfSlice(that);
   }
 
@@ -932,7 +920,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         starting at that index match the elements of Iterable that, or -1
    *         of no such subsequence exists.
    */
-  default int lastIndexOfSlice(Iterable<? extends T> that, int end) {
+  public int lastIndexOfSlice(Iterable<? extends T> that, int end) {
     return toVector().lastIndexOfSlice(that, end);
   }
 
@@ -948,7 +936,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return the index of the last element of this Every that satisfies the
    *         predicate p, or -1, if none exists.
    */
-  default int lastIndexWhere(Predicate<? super T> p) {
+  public int lastIndexWhere(Predicate<? super T> p) {
     return toVector().lastIndexWhere(p);
   }
 
@@ -967,7 +955,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return the index &gt;= end of the last element of this Every that
    *         satisfies the predicate p, or -1, if none exists.
    */
-  default int lastIndexWhere(Predicate<? super T> p, int end) {
+  public int lastIndexWhere(Predicate<? super T> p, int end) {
     return toVector().lastIndexWhere(p, end);
   }
 
@@ -981,7 +969,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *
    * @return the number of elements in this Every.
    */
-  default int size() {
+  public int size() {
     return length();
   }
 
@@ -995,7 +983,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *
    * @return the number of elements in this Every.
    */
-  default int length() {
+  public int length() {
     return toVector().length();
   }
 
@@ -1013,7 +1001,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         x == 0 if this.length == len <br>
    *         x &gt; 0 if this.length &gt; len
    */
-  default int lengthCompare(int len) {
+  public int lengthCompare(int len) {
     return length() - len;
   }
 
@@ -1031,7 +1019,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return a new Every resulting from applying the given function f to each
    *         element of this Every and collecting the results.
    */
-  default <U> Every<U> map(Function<? super T, U> f) {
+  public <U> Every<U> map(Function<? super T, U> f) {
     return fromNonEmptySeq(toVector().map(f));
   }
 
@@ -1045,7 +1033,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return {@code Some(maximum)} of this elements or {@code None} if this
    *         elements are not comparable.
    */
-  default Option<T> max() {
+  public Option<T> max() {
     return toVector().max();
   }
 
@@ -1060,7 +1048,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *            the comparator to use.
    * @return the largest result according to the supplied {@link Comparator}.
    */
-  default T maxBy(Comparator<? super T> c) {
+  public T maxBy(Comparator<? super T> c) {
     return toVector().maxBy(c).get();
   }
 
@@ -1079,7 +1067,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return the largest result of applying the given function to every
    *         element of this Every.
    */
-  default <U extends Comparable<? super U>> T maxBy(Function<? super T, ? extends U> f) {
+  public <U extends Comparable<? super U>> T maxBy(Function<? super T, ? extends U> f) {
     return toVector().maxBy(f).get();
   }
 
@@ -1093,7 +1081,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return {@code Some(minimum)} of this elements or {@code None} if this
    *         elements are not comparable.
    */
-  default Option<T> min() {
+  public Option<T> min() {
     return toVector().min();
   }
 
@@ -1108,7 +1096,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *            the comparator to use.
    * @return the smallest result according to the supplied {@link Comparator}.
    */
-  default T minBy(Comparator<? super T> c) {
+  public T minBy(Comparator<? super T> c) {
     return toVector().minBy(c).get();
   }
 
@@ -1127,7 +1115,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return the smallest result of applying the given function to every
    *         element of this Every.
    */
-  default <U extends Comparable<? super U>> T minBy(Function<? super T, ? extends U> f) {
+  public <U extends Comparable<? super U>> T minBy(Function<? super T, ? extends U> f) {
     return toVector().minBy(f).get();
   }
 
@@ -1147,7 +1135,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         the minimal number of occurrences of elem so that the resulting
    *         Every has a length of at least len.
    */
-  default Every<T> padTo(int len, T elem) {
+  public Every<T> padTo(int len, T elem) {
     return fromNonEmptySeq(toVector().padTo(len, elem));
   }
 
@@ -1168,7 +1156,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return a new Every where a slice of elements in this Every is replaced
    *         by another Every
    */
-  default Every<T> patch(int from, Every<? extends T> that, int replaced) {
+  public Every<T> patch(int from, Every<? extends T> that, int replaced) {
     return fromNonEmptySeq(toVector().patch(from, that.toVector(), replaced));
   }
 
@@ -1186,7 +1174,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return the result of applying reduce operator op between all the
    *         elements of this Every.
    */
-  default T reduce(BiFunction<? super T, ? super T, ? extends T> op) {
+  public T reduce(BiFunction<? super T, ? super T, ? extends T> op) {
     return toVector().reduce(op);
   }
 
@@ -1204,7 +1192,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return the result of applying reduce operator op between all the
    *         elements of this Every.
    */
-  default Option<T> reduceOption(BiFunction<? super T, ? super T, ? extends T> op) {
+  public Option<T> reduceOption(BiFunction<? super T, ? super T, ? extends T> op) {
     return Option.of(toVector().reduce(op));
   }
 
@@ -1221,7 +1209,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return the result of inserting op between consecutive elements of this
    *         Every, going left to right.
    */
-  default T reduceLeft(BiFunction<? super T, ? super T, ? extends T> op) {
+  public T reduceLeft(BiFunction<? super T, ? super T, ? extends T> op) {
     return toVector().reduceLeft(op);
   }
 
@@ -1237,7 +1225,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *            the binary operator.
    * @return a Some containing the result of reduceLeft(op)
    */
-  default Option<T> reduceLeftOption(BiFunction<? super T, ? super T, ? extends T> op) {
+  public Option<T> reduceLeftOption(BiFunction<? super T, ? super T, ? extends T> op) {
     return Option.of(toVector().reduceLeft(op));
   }
 
@@ -1254,7 +1242,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return the result of inserting op between consecutive elements of this
    *         Every, going right to left.
    */
-  default T reduceRight(BiFunction<? super T, ? super T, ? extends T> op) {
+  public T reduceRight(BiFunction<? super T, ? super T, ? extends T> op) {
     return toVector().reduceRight(op);
   }
 
@@ -1270,7 +1258,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *            the binary operator
    * @return a Some containing the result of reduceRight(op)
    */
-  default Option<T> reduceRightOption(BiFunction<? super T, ? super T, ? extends T> op) {
+  public Option<T> reduceRightOption(BiFunction<? super T, ? super T, ? extends T> op) {
     return Option.of(toVector().reduceRight(op));
   }
 
@@ -1283,7 +1271,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *
    * @return a new Every with all elements of this Every in reversed order.
    */
-  default Every<T> reverse() {
+  public Every<T> reverse() {
     return fromNonEmptySeq(toVector().reverse());
   }
 
@@ -1296,7 +1284,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *
    * @return an iterator yielding the elements of this Every in reversed order
    */
-  default Iterator<T> reverseIterator() {
+  public Iterator<T> reverseIterator() {
     return toVector().reverseIterator();
   }
 
@@ -1316,9 +1304,8 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         element of this Every and collecting the results in reverse
    *         order.
    */
-  default <U> Every<U> reverseMap(Function<? super T, ? extends U> f) {
-    Vector<U> v = reverseIterator().map(f).toVector();
-    return fromNonEmptySeq(v);
+  public <U> Every<U> reverseMap(Function<? super T, ? extends U> f) {
+    return fromNonEmptySeq(reverseIterator().map(f).toVector());
   }
 
   /**
@@ -1335,7 +1322,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return true, if both this and the given Iterable contain the same
    *         elements in the same order, false otherwise.
    */
-  default boolean sameElements(Iterable<? super T> that) {
+  public boolean sameElements(Iterable<? super T> that) {
     return toVector().eq(that);
   }
 
@@ -1351,7 +1338,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *            the Seq to match.
    * @return true if this Every has that as a suffix, false otherwise.
    */
-  default boolean endsWith(Seq<? extends T> that) {
+  public boolean endsWith(Seq<? extends T> that) {
     return toVector().endsWith(that);
   }
 
@@ -1371,7 +1358,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         function f to each element of this Every and concatenating the
    *         elements of resulting Everys.
    */
-  default <U> Every<U> flatMap(Function<? super T, Every<? extends U>> function) {
+  public <U> Every<U> flatMap(Function<? super T, Every<? extends U>> function) {
     Vector<U> buf = Vector.empty();
     for (T t : toVector()) {
       buf = buf.appendAll(function.apply(t).toVector());
@@ -1389,7 +1376,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return an iterator which traverses the distinct permutations of this
    *         Every.
    */
-  default Iterator<Every<T>> permutations() {
+  public Iterator<Every<T>> permutations() {
     Vector<Vector<T>> vv = toVector().permutations();
     return vv.map(Helper::fromNonEmptySeq).iterator();
   }
@@ -1407,7 +1394,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return the length of the longest prefix of this Every such that every
    *         element of the segment satisfies the predicate p.
    */
-  default int prefixLength(Predicate<? super T> p) {
+  public int prefixLength(Predicate<? super T> p) {
     return toVector().prefixLength(p);
   }
 
@@ -1428,7 +1415,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return a new Every containing the prefix scan of the elements in this
    *         Every
    */
-  default Every<T> scan(T z, BiFunction<? super T, ? super T, ? extends T> op) {
+  public Every<T> scan(T z, BiFunction<? super T, ? super T, ? extends T> op) {
     return fromNonEmptySeq(toVector().scan(z, op));
   }
 
@@ -1451,7 +1438,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         between consecutive elements of this Every, going left to right,
    *         with the start value, z, on the left.
    */
-  default <B> Every<B> scanLeft(B z, BiFunction<? super B, ? super T, ? extends B> op) {
+  public <B> Every<B> scanLeft(B z, BiFunction<? super B, ? super T, ? extends B> op) {
     return fromNonEmptySeq(toVector().scanLeft(z, op));
   }
 
@@ -1474,7 +1461,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         between consecutive elements of this Every, going right to left,
    *         with the start value, z, on the right.
    */
-  default <B> Every<B> scanRight(B z, BiFunction<? super T, ? super B, ? extends B> op) {
+  public <B> Every<B> scanRight(B z, BiFunction<? super T, ? super B, ? extends B> op) {
     return fromNonEmptySeq(toVector().scanRight(z, op));
   }
 
@@ -1493,7 +1480,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return the length of longest segment whose elements all satisfy some
    *         predicate.
    */
-  default int segmentLength(Predicate<? super T> p, int from) {
+  public int segmentLength(Predicate<? super T> p, int from) {
     return toVector().segmentLength(p, from);
   }
 
@@ -1511,7 +1498,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         the only element will be truncated if there are fewer elements
    *         than size.
    */
-  default Iterator<Every<T>> sliding(int size) {
+  public Iterator<Every<T>> sliding(int size) {
     return toVector().sliding(size).map(Helper::fromNonEmptySeq);
   }
 
@@ -1532,7 +1519,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         the only element will be truncated if there are fewer elements
    *         than size.
    */
-  default Iterator<Every<T>> sliding(int size, int step) {
+  public Iterator<Every<T>> sliding(int size, int step) {
     return toVector().sliding(size, step).map(Helper::fromNonEmptySeq);
   }
 
@@ -1552,7 +1539,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *            domain U.
    * @return a Every consisting of the elements of this Every sorted
    */
-  default <U extends Comparable<? super U>> Every<T> sortBy(Function<? super T, ? extends U> f) {
+  public <U extends Comparable<? super U>> Every<T> sortBy(Function<? super T, ? extends U> f) {
     return fromNonEmptySeq(toVector().sortBy(f));
   }
 
@@ -1574,7 +1561,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *            domain U.
    * @return a Every consisting of the elements of this Every sorted
    */
-  default <U> Every<T> sortBy(Comparator<? super U> c, Function<? super T, ? extends U> f) {
+  public <U> Every<T> sortBy(Comparator<? super U> c, Function<? super T, ? extends U> f) {
     return fromNonEmptySeq(toVector().sortBy(c, f));
   }
 
@@ -1592,7 +1579,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return an Every consisting of the elements of this Every sorted
    *         according to the comparison function lt.
    */
-  default Every<T> sortWith(BiPredicate<? super T, ? super T> lt) {
+  public Every<T> sortWith(BiPredicate<? super T, ? super T> lt) {
     return sortBy((T left, T right) -> {
       if (lt.test(left, right))
         return -1;
@@ -1601,25 +1588,6 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
       else
         return 0;
     }, Function.identity());
-  }
-
-  /**
-   * Sorts this Every according to their natural order. If this elements are
-   * not Comparable, a java.lang.ClassCastException may be thrown.
-   *
-   * <pre class="stHighlighted">
-   * Scalactic: def sorted[U &gt;: T](implicit ord: Ordering[U]): Every[U]
-   * </pre>
-   *
-   * @return an Every consisting of the elements of this Every sorted
-   *         according to their natural order.
-   * @throws ClassCastException
-   *             if this elements are not Comparable
-   * @deprecated use sorted(Comparator.naturalOrder()) as it is type safe
-   */
-  @Deprecated
-  default Every<T> sorted() throws ClassCastException {
-    return fromNonEmptySeq(toVector().sorted());
   }
 
   /**
@@ -1634,7 +1602,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return an Every consisting of the elements of this Every sorted
    *         according to the comparator
    */
-  default Every<T> sorted(Comparator<? super T> c) {
+  public Every<T> sorted(Comparator<? super T> c) {
     return fromNonEmptySeq(toVector().sorted(c));
   }
 
@@ -1652,7 +1620,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *            the Iterable to test
    * @return true if this collection has that as a prefix, false otherwise.
    */
-  default <B extends T> boolean startsWith(Iterable<? extends B> that) {
+  public <B extends T> boolean startsWith(Iterable<? extends B> that) {
     return toVector().startsWith(that);
   }
 
@@ -1674,7 +1642,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return true if this Every has that as a slice at the index offset, false
    *         otherwise.
    */
-  default <B extends T> boolean startsWith(Iterable<? extends B> that, int offset) {
+  public <B extends T> boolean startsWith(Iterable<? extends B> that, int offset) {
     return toVector().startsWith(that, offset);
   }
 
@@ -1689,7 +1657,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *            component type of the array.
    * @return a new Java array.
    */
-  default T[] toJavaArray(Class<T> componentType) {
+  public T[] toJavaArray(Class<T> componentType) {
     return toVector().toJavaArray(componentType);
   }
 
@@ -1703,7 +1671,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return an array containing all elements of this Every. A ClassTag must
    *         be available for the element type of this Every.
    */
-  default Array<T> toArray() {
+  public Array<T> toArray() {
     return toVector().toArray();
   }
 
@@ -1716,7 +1684,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *
    * @return a {@link java.util.List}
    */
-  default java.util.List<T> toJavaList() {
+  public java.util.List<T> toJavaList() {
     return toVector().toJavaList();
   }
 
@@ -1729,7 +1697,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *
    * @return a new {@link List}.
    */
-  default List<T> toList() {
+  public List<T> toList() {
     return toVector().toList();
   }
 
@@ -1749,7 +1717,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *            represented by Tuple2
    * @return a new {@link java.util.Map}.
    */
-  default <K, V> java.util.Map<K, V> toJavaMap(Function<? super T, Tuple2<? extends K, ? extends V>> f) {
+  public <K, V> java.util.Map<K, V> toJavaMap(Function<? super T, Tuple2<? extends K, ? extends V>> f) {
     return toVector().toJavaMap(f);
   }
 
@@ -1769,7 +1737,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *            represented by Tuple2
    * @return a new {@link Map}.
    */
-  default <K, V> Map<K, V> toMap(Function<? super T, Tuple2<? extends K, ? extends V>> f) {
+  public <K, V> Map<K, V> toMap(Function<? super T, Tuple2<? extends K, ? extends V>> f) {
     return toVector().toMap(f);
   }
 
@@ -1782,7 +1750,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *
    * @return a new {@link java.util.Set}.
    */
-  default java.util.Set<T> toJavaSet() {
+  public java.util.Set<T> toJavaSet() {
     return toVector().toJavaSet();
   }
 
@@ -1795,7 +1763,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *
    * @return a new {@link Set}.
    */
-  default Set<T> toSet() {
+  public Set<T> toSet() {
     return toVector().toSet();
   }
 
@@ -1808,7 +1776,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *
    * @return a new {@link java.util.stream.Stream}.
    */
-  default java.util.stream.Stream<T> toJavaStream() {
+  public java.util.stream.Stream<T> toJavaStream() {
     return toVector().toJavaStream();
   }
 
@@ -1821,7 +1789,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *
    * @return a new {@link Stream}.
    */
-  default Stream<T> toStream() {
+  public Stream<T> toStream() {
     return toVector().toStream();
   }
 
@@ -1834,7 +1802,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *
    * @return a new {@link Seq}.
    */
-  default Seq<T> toSeq() {
+  public Seq<T> toSeq() {
     return toVector();
   }
 
@@ -1847,7 +1815,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *
    * @return a new {@link Traversable}.
    */
-  default Traversable<T> toTraversable() {
+  public Traversable<T> toTraversable() {
     return toVector();
   }
 
@@ -1864,7 +1832,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return a new Every that contains all elements of this Every and all
    *         elements of that Iterable.
    */
-  default Every<T> union(Iterable<? extends T> that) {
+  public Every<T> union(Iterable<? extends T> that) {
     return fromNonEmptySeq(toVector().appendAll(that));
   }
 
@@ -1887,7 +1855,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return a triple of Everys, containing the first, second, and third
    *         member, respectively, of each element triple of this Every.
    */
-  default <L, M, R> Tuple3<Every<L>, Every<M>, Every<R>> unzip3(
+  public <L, M, R> Tuple3<Every<L>, Every<M>, Every<R>> unzip3(
     Function<? super T, Tuple3<? extends L, ? extends M, ? extends R>> unzipper) {
     Tuple3<Vector<L>, Vector<M>, Vector<R>> unzipped = toVector().unzip3(unzipper);
     return Tuple.of(fromNonEmptySeq(unzipped._1), fromNonEmptySeq(unzipped._2), fromNonEmptySeq(unzipped._3));
@@ -1910,7 +1878,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return a pair of Everys, containing the first and second half,
    *         respectively, of each element pair of this Every.
    */
-  default <L, R> Tuple2<Every<L>, Every<R>> unzip(Function<? super T, Tuple2<? extends L, ? extends R>> unzipper) {
+  public <L, R> Tuple2<Every<L>, Every<R>> unzip(Function<? super T, Tuple2<? extends L, ? extends R>> unzipper) {
     Tuple2<Vector<L>, Vector<R>> unzipped = toVector().unzip(unzipper);
     return Tuple.of(fromNonEmptySeq(unzipped._1), fromNonEmptySeq(unzipped._2));
   }
@@ -1929,7 +1897,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return a copy of this Every with the element at position index replaced
    *         by elem.
    */
-  default Every<T> updated(int index, T elem) {
+  public Every<T> updated(int index, T elem) {
     return fromNonEmptySeq(toVector().update(index, elem));
   }
 
@@ -1961,7 +1929,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         pad the result.
    */
   @SuppressWarnings("unchecked")
-  default <B> Every<Tuple2<T, B>> zipAll(Iterable<? extends B> other, T thisElem, B otherElem) {
+  public <B> Every<Tuple2<T, B>> zipAll(Iterable<? extends B> other, T thisElem, B otherElem) {
     return fromNonEmptySeq(toVector().zipAll((Iterable<B>)other, thisElem, otherElem));
   }
 
@@ -1975,7 +1943,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return A new Every containing pairs consisting of all elements of this
    *         Every paired with their index. Indices start at 0.
    */
-  default Every<Tuple2<T, Long>> zipWithIndex() {
+  public Every<Tuple2<T, Long>> zipWithIndex() {
     return fromNonEmptySeq(toVector().zipWithIndex());
   }
 
@@ -1990,7 +1958,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @throws UnsupportedOperationException
    *             if this elements are not numeric
    */
-  default Number product() {
+  public Number product() {
     return toVector().product();
   }
 
@@ -2007,7 +1975,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @throws UnsupportedOperationException
    *             if this elements are not numeric
    */
-  default Number sum() {
+  public Number sum() {
     return toVector().sum();
   }
 
@@ -2022,7 +1990,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         the result of invoking toString on all elements of this Every
    *         follow each other without any separator string.
    */
-  default String mkString() {
+  public String mkString() {
     return toVector().mkString();
   }
 
@@ -2039,7 +2007,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         the result of invoking toString on all elements of this Every are
    *         separated by the string sep.
    */
-  default String mkString(CharSequence separator) {
+  public String mkString(CharSequence separator) {
     return toVector().mkString(separator);
   }
 
@@ -2062,7 +2030,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         Inside, In the resulting string, the result of invoking toString
    *         on all elements of this Every are separated by the string sep.
    */
-  default String mkString(CharSequence prefix, CharSequence sep, CharSequence suffix) {
+  public String mkString(CharSequence prefix, CharSequence sep, CharSequence suffix) {
     return toVector().mkString(prefix, sep, suffix);
   }
 
@@ -2075,7 +2043,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *
    * @return true
    */
-  default boolean nonEmpty() {
+  public boolean nonEmpty() {
     return true;
   }
 
@@ -2084,6 +2052,23 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
      * union[U >: T](that: GenSeq[U])(implicit cbf: CanBuildFrom[Vector[T], U,
      * Vector[U]]):
      */
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof Every && elements.eq(((Every<T>) obj).elements);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(elements);
+  }
+
+  @Override
+  public String toString() {
+    return String.format("Every(%s)", toVector().mkString(", "));
+  }
+
 
   // ----------------------------------------------------------------------------------
   // Partial Function methods
@@ -2096,8 +2081,8 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return a function that takes an argument x to Some(this(x)) if this is
    *         defined for x, and to None otherwise.
    */
-  default IntFunction<Option<T>> lift() {
-    return (int a) -> isDefinedAt(a) ? Option.of(apply(a)) : Option.none();
+  public Function<Integer, Option<T>> lift() {
+    return a -> isDefinedAt(a) ? Option.of(apply(a)) : Option.none();
   }
 
   /**
@@ -2115,7 +2100,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         takes x to this(x) where this is defined, and to that(x) where it
    *         is not.
    */
-  default IntFunction<T> orElse(IntFunction<? extends T> that) {
+  public Function<Integer, T> orElse(Function<? super Integer, ? extends T> that) {
     return (index) -> {
       if (isDefinedAt(index)) {
         return this.apply(index);
@@ -2139,8 +2124,8 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return a function which maps arguments x to isDefinedAt(x). The
    *         resulting function runs action(this(x)) where this is defined.
    */
-  default IntPredicate runWith(Consumer<? super T> action) {
-    return (int a) -> {
+  public Predicate<Integer> runWith(Consumer<? super T> action) {
+    return a -> {
       if (isDefinedAt(a)) {
         action.accept(apply(a));
         return true;

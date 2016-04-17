@@ -60,9 +60,9 @@ public final class Good<G, B> implements Or<G, B>, Serializable {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Or<G, One<B>> accumulating() {
+  public Or<G, Every<B>> accumulating() {
     // not a Bad, so we can cast the Bad side to anything.
-    return (Or<G, One<B>>) this;
+    return (Or<G, Every<B>>) this;
   }
 
   /**

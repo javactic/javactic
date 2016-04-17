@@ -4,7 +4,6 @@ import com.github.javactic.Bad;
 import com.github.javactic.Every;
 import com.github.javactic.Fail;
 import com.github.javactic.Good;
-import com.github.javactic.One;
 import com.github.javactic.Or;
 import com.github.javactic.Pass;
 import com.github.javactic.Validation;
@@ -17,12 +16,12 @@ import java.util.function.Function;
 
 public class AccumulatingOrFutureExample {
 
-  Or<String, One<String>> parseName(String input) {
+  Or<String, Every<String>> parseName(String input) {
     String trimmed = input.trim();
     return (!trimmed.isEmpty()) ? Good.of(trimmed) : Bad.ofOneString("'{}' is not a valid name", input);
   }
 
-  Or<Integer, One<String>> parseAge(String input) {
+  Or<Integer, Every<String>> parseAge(String input) {
     try {
       int age = Integer.parseInt(input.trim());
       return (age >= 0) ? Good.of(age) : Bad.ofOneString("'{}' is not a valid age", age);
@@ -33,20 +32,20 @@ public class AccumulatingOrFutureExample {
 
   // ---
 
-  Function<Throwable, One<String>> converter = throwable -> One.of(throwable.getMessage());
-  FutureFactory<One<String>> ff = FutureFactory.of(converter);
+  Function<Throwable, Every<String>> converter = throwable -> Every.of(throwable.getMessage());
+  FutureFactory<Every<String>> ff = FutureFactory.of(converter);
 
-  OrFuture<String, One<String>> parseNameAsync(String input) {
+  OrFuture<String, Every<String>> parseNameAsync(String input) {
     return ff.newFuture(() -> parseName(input));
   }
 
-  OrFuture<Integer, One<String>> parseAgeAsync(String input) {
+  OrFuture<Integer, Every<String>> parseAgeAsync(String input) {
     return ff.newFuture(() -> parseAge(input));
   }
 
   OrFuture<Person, Every<String>> parsePersonAsync(String inputName, String inputAge) {
-    OrFuture<String, One<String>> name = parseNameAsync(inputName);
-    OrFuture<Integer, One<String>> age = parseAgeAsync(inputAge);
+    OrFuture<String, Every<String>> name = parseNameAsync(inputName);
+    OrFuture<Integer, Every<String>> age = parseAgeAsync(inputAge);
     return OrFuture.withGood(name, age, Person::new);
   }
 
@@ -57,11 +56,11 @@ public class AccumulatingOrFutureExample {
 
     orFuture = parsePersonAsync("Bridget Jones", "");
     orFuture.onComplete(System.out::println);
-    // Result: Bad(One('' is not a valid integer))
+    // Result: Bad(Every('' is not a valid integer))
 
     orFuture = parsePersonAsync("Bridget Jones", "-29");
     orFuture.onComplete(System.out::println);
-    // Result: Bad(One('-29' is not a valid age))
+    // Result: Bad(Every('-29' is not a valid age))
 
     orFuture = parsePersonAsync("", "");
     orFuture.onComplete(System.out::println);
@@ -69,15 +68,15 @@ public class AccumulatingOrFutureExample {
   }
 
   void combined() {
-    List<OrFuture<Integer, One<String>>> list = List.of(parseAgeAsync("29"), parseAgeAsync("30"), parseAgeAsync("31"));
+    List<OrFuture<Integer, Every<String>>> list = List.of(parseAgeAsync("29"), parseAgeAsync("30"), parseAgeAsync("31"));
     OrFuture.combined(list, List.collector());
     // Result: Good(List(29, 30, 31))
 
-    List<OrFuture<Integer, One<String>>> list2 = List.of(parseAgeAsync("29"), parseAgeAsync("-30"), parseAgeAsync("31"));
+    List<OrFuture<Integer, Every<String>>> list2 = List.of(parseAgeAsync("29"), parseAgeAsync("-30"), parseAgeAsync("31"));
     OrFuture.combined(list2, List.collector());
-    // Result: Bad(One("-30" is not a valid age))
+    // Result: Bad(Every("-30" is not a valid age))
 
-    List<OrFuture<Integer, One<String>>> list3 = List.of(parseAgeAsync("29"), parseAgeAsync("-30"), parseAgeAsync("-31"));
+    List<OrFuture<Integer, Every<String>>> list3 = List.of(parseAgeAsync("29"), parseAgeAsync("-30"), parseAgeAsync("-31"));
     OrFuture.combined(list3, List.collector());
     // Result: Bad(Many("-30" is not a valid age, "-31" is not a valid age))
   }
@@ -99,7 +98,7 @@ public class AccumulatingOrFutureExample {
     // Result: Good((Dude,21))
 
     OrFuture.zip(parseNameAsync("Dude"), parseAgeAsync("-21"));
-    // Result: Bad(One("-21" is not a valid age))
+    // Result: Bad(Every("-21" is not a valid age))
 
     OrFuture.zip(parseNameAsync(""), parseAgeAsync("-21"));
     // Result: Bad(Many("" is not a valid name, "-21" is not a valid age))
@@ -115,16 +114,16 @@ public class AccumulatingOrFutureExample {
 
   void when() {
     OrFuture<Integer, Every<String>> when = OrFuture.when(parseAgeAsync("-30"), this::isRound, this::isDivBy3);
-    //Result: Bad(One("-30" is not a valid age))
+    //Result: Bad(Every("-30" is not a valid age))
 
     OrFuture.when(parseAgeAsync("30"), this::isRound, this::isDivBy3);
     //Result: Good(30)
 
     OrFuture.when(parseAgeAsync("33"), this::isRound, this::isDivBy3);
-    //Result: Bad(One(33 was not a round number))
+    //Result: Bad(Every(33 was not a round number))
 
     OrFuture.when(parseAgeAsync("20"), this::isRound, this::isDivBy3);
-    //Result: Bad(One(20 was not divisible by 3))
+    //Result: Bad(Every(20 was not divisible by 3))
 
     OrFuture.when(parseAgeAsync("31"), this::isRound, this::isDivBy3);
     //Result: Bad(Many(31 was not a round number, 31 was not divisible by 3))

@@ -21,7 +21,7 @@ package com.github.javactic.futures;
  */
 
 import com.github.javactic.Bad;
-import com.github.javactic.One;
+import com.github.javactic.Every;
 import com.github.javactic.Or;
 import javaslang.Lazy;
 
@@ -42,12 +42,12 @@ public class FutureFactory<B> {
 
   private final Function<? super Throwable, ? extends B> converter;
   private final Executor executor;
-  private final Lazy<FutureFactory<One<B>>> accumulating;
+  private final Lazy<FutureFactory<Every<B>>> accumulating;
 
   private FutureFactory(Executor executor, Function<? super Throwable, ? extends B> exceptionConverter) {
     this.executor = executor;
     this.converter = exceptionConverter;
-    this.accumulating = Lazy.of(() -> new FutureFactory<>(executor, exceptionConverter.andThen(One::of)));
+    this.accumulating = Lazy.of(() -> new FutureFactory<>(executor, exceptionConverter.andThen(Every::of)));
   }
 
   /**
@@ -114,7 +114,7 @@ public class FutureFactory<B> {
    *
    * @return an accumulating version of this factory
    */
-  public FutureFactory<One<B>> accumulating() {
+  public FutureFactory<Every<B>> accumulating() {
     return accumulating.get();
   }
 

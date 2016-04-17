@@ -24,7 +24,6 @@ import com.github.javactic.Accumulation;
 import com.github.javactic.Bad;
 import com.github.javactic.Every;
 import com.github.javactic.Good;
-import com.github.javactic.One;
 import com.github.javactic.Or;
 import com.github.javactic.Validation;
 import javaslang.Function3;
@@ -58,7 +57,6 @@ import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 import static com.github.javactic.futures.Helper.*;
-import static javafx.scene.input.KeyCode.H;
 
 /**
  * <p>
@@ -136,8 +134,8 @@ public interface OrFuture<G, B> {
    * @param <B> the failure type
    * @return an instance of accumulating OrFuture
    */
-  static <G, B> OrFuture<G, One<B>> ofOneBad(B bad) {
-    return OrPromise.<G, One<B>>create().failure(One.of(bad)).future();
+  static <G, B> OrFuture<G, Every<B>> ofOneBad(B bad) {
+    return OrPromise.<G, Every<B>>create().failure(Every.of(bad)).future();
   }
 
   /**
@@ -150,16 +148,6 @@ public interface OrFuture<G, B> {
    */
   static <G, B> OrFuture<G, B> ofGood(G good) {
     return OrPromise.<G, B>create().success(good).future();
-  }
-
-  @SuppressWarnings("unchecked")
-  static <G, B> OrFuture<G, Every<B>> narrow(OrFuture<? extends G, ? extends Every<? extends B>> or) {
-    return (OrFuture<G, Every<B>>) or;
-  }
-
-  @SuppressWarnings("unchecked")
-  static <G, B> OrFuture<G, B> narrow(OrFuture<? extends G, ? extends B> or) {
-    return (OrFuture<G, B>) or;
   }
 
   // ----------------------------------------------------------------------------------------------
@@ -213,8 +201,8 @@ public interface OrFuture<G, B> {
    *
    * @return an accumulating version of this future
    */
-  default OrFuture<G, One<B>> accumulating() {
-    return transform(Function.identity(), One::of);
+  default OrFuture<G, Every<B>> accumulating() {
+    return transform(Function.identity(), Every::of);
   }
 
   /**
