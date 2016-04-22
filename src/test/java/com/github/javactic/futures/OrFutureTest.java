@@ -1,5 +1,6 @@
 package com.github.javactic.futures;
 
+import com.github.javactic.Bad;
 import com.github.javactic.Fail;
 import com.github.javactic.Good;
 import com.github.javactic.Or;
@@ -16,8 +17,10 @@ import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(Theories.class)
 public class OrFutureTest {
@@ -64,6 +67,13 @@ public class OrFutureTest {
   }
 
   @Theory
+  public void badMap(Executor es) throws Exception {
+    OrFuture<String, String> orFuture = ff.newFuture(es, () -> Bad.<String, String>of("bad"))
+      .badMap(s -> new StringBuilder(s).reverse().toString());
+    Assert.assertEquals("dab", orFuture.get(Duration.ofSeconds(10)).getBad());
+  }
+
+  @Theory
   public void flatMap(Executor es) throws Exception {
     OrFuture<String, String> orFuture = getF(es, 5)
       .flatMap(i -> ff.newFuture(es, () -> Good.of(i + "")));
@@ -74,6 +84,20 @@ public class OrFutureTest {
 
     orFuture = OrFuture.<String, String>ofBad(FAIL).flatMap(i -> OrFuture.ofGood("5"));
     assertEquals(FAIL, orFuture.get(Duration.ofSeconds(10)).getBad());
+  }
+
+  @Test
+  public void andThen() throws Exception {
+    OrFuture<String, String> future = OrFuture.ofGood("good");
+    AtomicBoolean visited = new AtomicBoolean();
+    Or<String, String> result = future
+      .andThen(or -> {
+        throw new RuntimeException();
+      })
+      .andThen(or -> visited.set(true))
+      .get(Duration.ofSeconds(10));
+    assertTrue(visited.get());
+    assertEquals("good", result.get());
   }
 
   @Test

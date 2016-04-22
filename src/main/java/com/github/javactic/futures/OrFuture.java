@@ -201,6 +201,20 @@ public interface OrFuture<G, B> {
     return transform(Function.identity(), One::of);
   }
 
+  default OrFuture<G, B> andThen(Consumer<? super Or<G, B>> consumer) {
+    OrPromise<G, B> p = OrPromise.create();
+    onComplete(or -> {
+      try {
+        consumer.accept(or);
+      } catch (Exception e) {
+        // ignore
+      } finally {
+        p.complete(or);
+      }
+    });
+    return p.future();
+  }
+
   /**
    * Creates a new future by filtering this future's result according to
    * the {@link Or#filter(Function)} method.
@@ -225,6 +239,12 @@ public interface OrFuture<G, B> {
   default <H> OrFuture<H, B> map(Function<? super G, ? extends H> mapper) {
     OrPromise<H, B> promise = OrPromise.create();
     onComplete(or -> promise.complete(or.map(mapper)));
+    return promise.future();
+  }
+
+  default <C> OrFuture<G, C> badMap(Function<? super B, ? extends C> mapper) {
+    OrPromise<G, C> promise = OrPromise.create();
+    onComplete(or -> promise.complete(or.badMap(mapper)));
     return promise.future();
   }
 

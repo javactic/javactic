@@ -1317,8 +1317,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    *         order.
    */
   default <U> Every<U> reverseMap(Function<? super T, ? extends U> f) {
-    Vector<U> v = reverseIterator().map(f).toVector();
-    return fromNonEmptySeq(v);
+    return fromNonEmptySeq(reverseIterator().map(f).toVector());
   }
 
   /**
