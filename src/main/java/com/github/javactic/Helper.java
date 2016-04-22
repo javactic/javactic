@@ -28,7 +28,7 @@ class Helper {
 
   private static final String REPLACE = Pattern.quote("{}");
 
-  static <E> Every<E> fromNonEmptySeq(IndexedSeq<E> seq) {
+  static <E> Every<E> fromNonEmptySeq(IndexedSeq<? extends E> seq) {
     return Every.of(seq.head(), seq.tail());
   }
 
