@@ -41,6 +41,7 @@ import javaslang.collection.Vector;
 import javaslang.control.Option;
 
 import java.time.Duration;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
@@ -173,24 +174,48 @@ public interface OrFuture<G, B> {
 
   /**
    * Returns the result of this future, waiting at most the given duration.
+   * <p>
+   * While occasionally useful, e.g. for testing, it is recommended that you avoid this method when possible in favor
+   * of callbacks and combinators like onComplete. This method will block the thread on which it runs, and could
+   * cause performance and deadlock issues.
    *
    * @param timeout the duration to wait for the result
    * @return the result of this future
    * @throws TimeoutException     if the result was not available within the given timeout
    * @throws InterruptedException if the current thread was interrupted while waiting
+   * @throws ArithmeticException if arithmetic overflow occurs when converting the given duration to milliseconds
    */
-  Or<G, B> get(Duration timeout) throws TimeoutException, InterruptedException;
+  Or<G, B> get(Duration timeout) throws TimeoutException, InterruptedException, ArithmeticException;
 
   /**
    * Returns the result of this future, waiting at most the given duration, or returns
    * the a Bad containing the given timeoutBad.
+   * <p>
+   * While occasionally useful, e.g. for testing, it is recommended that you avoid this method when possible in favor
+   * of callbacks and combinators like onComplete. This method will block the thread on which it runs, and could
+   * cause performance and deadlock issues.
    *
    * @param timeout    the duration to wait for the result
    * @param timeoutBad the failure to return if the timeout expired
    * @return the result of this future or a Bad containing the given value
    * @throws InterruptedException if the current thread was interrupted while waiting
+   * @throws ArithmeticException if arithmetic overflow occurs when converting the given duration to milliseconds
    */
-  Or<G, B> get(Duration timeout, B timeoutBad) throws InterruptedException;
+  Or<G, B> get(Duration timeout, B timeoutBad) throws InterruptedException, ArithmeticException;
+
+  /**
+   * Returns the result of this future, waiting forever. This method is meant to be used in test cases only or
+   * in the rare cases when there are other means of knowing that the future has already completed. This method will
+   * wrap any thrown exception in a {@link CompletionException}.
+   * <p>
+   * It is recommended that you avoid this method when possible in favor
+   * of callbacks and combinators like onComplete. This method will block the thread on which it runs, and could
+   * cause performance and deadlock issues.
+   *
+   * @return the result of this future
+   * @throws CompletionException containing the real cause of failure
+   */
+  Or<G, B> getUnsafe() throws CompletionException;
 
   /**
    * Returns an accumulating version of this future.
@@ -201,6 +226,19 @@ public interface OrFuture<G, B> {
     return transform(Function.identity(), One::of);
   }
 
+  /**
+   * Applies the side-effecting function to the result of this future, and returns a new future with the result of
+   * this future. The returned future will complete only once the given consumer has completed.
+   * <p>
+   * This method allows one to enforce that the callbacks are executed in a specified order.
+   * <p>
+   * Note that if one of the chained andThen callbacks throws an exception, that exception is not propagated to
+   * the subsequent andThen callbacks. Instead, the subsequent andThen callbacks are given the original value
+   * of this future.
+   *
+   * @param consumer the side-effecting function to execute
+   * @return a new future with the result of this future
+   */
   default OrFuture<G, B> andThen(Consumer<? super Or<G, B>> consumer) {
     OrPromise<G, B> p = OrPromise.create();
     onComplete(or -> {
@@ -563,6 +601,9 @@ public interface OrFuture<G, B> {
 
   /**
    * Transforms an Iterable of OrFutures&lt;G, ERR&gt; into an OrFuture&lt;Vector&lt;G, ERR&gt;&gt;.
+   * <p>
+   * This method differs from combined in that the returned future will fail fast and complete as soon
+   * as one of the given futures fails.
    *
    * @param input iterable of OrFutures
    * @param <G> the good type of the future
@@ -577,6 +618,9 @@ public interface OrFuture<G, B> {
   /**
    * Transforms an Iterable of OrFutures&lt;G, ERR&gt; into an OrFuture&lt;COLL&lt;G, ERR&gt;&gt;
    * where COLL is a collection created with the collector given as argument.
+   * <p>
+   * This method differs from combined in that the returned future will fail fast and complete as soon
+   * as one of the given futures fails.
    *
    * @param input iterable of OrFutures
    * @param collector a collector to collect the results of the transformation
@@ -590,21 +634,22 @@ public interface OrFuture<G, B> {
   static <G, ERR, A, I extends Iterable<? extends G>> OrFuture<I, Every<ERR>>
   sequence(Iterable<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> input,
            Collector<? super G, A, I> collector) {
-
+    // defensive copy of the iterable in case it always returns the same iterator (see javaslang Iterator that is also Iterable)
+    Iterable<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> copy =
+      (input instanceof Iterator) ? Vector.ofAll(input) : input;
     OrPromise<I, Every<ERR>> promise = OrPromise.create();
     AtomicInteger count = new AtomicInteger(0);
     AtomicBoolean finished = new AtomicBoolean(false);
-    AtomicBoolean failed = new AtomicBoolean(false);
-    java.util.Iterator<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> iterator = input.iterator();
+    java.util.Iterator<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> iterator = copy.iterator();
     while (iterator.hasNext()) {
       count.incrementAndGet();
       OrFuture<? extends G, ? extends Every<? extends ERR>> future = iterator.next();
       if (!iterator.hasNext()) finished.set(true);
       future.onComplete(or -> {
-        if (or.isBad() && !failed.getAndSet(true)) {
-          promise.failure((Every<ERR>) or.getBad());
-        } else if (!failed.get() && count.decrementAndGet() == 0 && finished.get()) {
-          promise.complete(accumulate(input, collector));
+        if (or.isBad()) {
+          promise.tryFailure((Every<ERR>) or.getBad());
+        } else if (count.decrementAndGet() == 0 && finished.get()) {
+          promise.complete(accumulate(copy, collector));
         }
       });
     }
@@ -619,6 +664,9 @@ public interface OrFuture<G, B> {
    * Combines an Iterable of OrFutures of type OrFuture&lt;G, EVERY&lt;ERR&gt;&gt; (where
    * EVERY is some subtype of Every) into a single OrFuture of type
    * OrFuture&lt;Vector&lt;G&gt;, Every&lt;ERR&gt;&gt;.
+   * <p>
+   * This method differs from sequence in that it will accumulate every error in the returned
+   * future before completing.
    *
    * @param <G>   the success type
    * @param <ERR> the failure type
@@ -635,6 +683,9 @@ public interface OrFuture<G, B> {
    * EVERY is some subtype of Every) into a single OrFuture of type
    * OrFuture&lt;COLL&lt;G&gt;, Every&lt;ERR&gt;&gt; using a Collector to determine
    * the wanted collection type COLL.
+   * <p>
+   * This method differs from sequence in that it will accumulate every error in the returned
+   * future before completing.
    *
    * @param <G>       the success type
    * @param <A>       the mutable accumulation type of the reduction operation of the collector
@@ -647,18 +698,20 @@ public interface OrFuture<G, B> {
   static <G, ERR, A, I extends Iterable<? extends G>> OrFuture<I, Every<ERR>>
   combined(Iterable<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> input,
            Collector<? super G, A, I> collector) {
-
+    // defensive copy of the iterable in case it always returns the same iterator (see javaslang Iterator that is also Iterable)
+    Iterable<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> copy =
+      (input instanceof Iterator) ? Vector.ofAll(input) : input;
     OrPromise<I, Every<ERR>> promise = OrPromise.create();
     AtomicInteger count = new AtomicInteger(0);
     AtomicBoolean finished = new AtomicBoolean(false);
-    java.util.Iterator<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> iterator = input.iterator();
+    java.util.Iterator<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> iterator = copy.iterator();
     while (iterator.hasNext()) {
       count.incrementAndGet();
       OrFuture<? extends G, ? extends Every<? extends ERR>> future = iterator.next();
       if (!iterator.hasNext()) finished.set(true);
       future.onComplete(or -> {
         if (count.decrementAndGet() == 0 && finished.get()) {
-          promise.complete(accumulate(input, collector));
+          promise.complete(accumulate(copy, collector));
         }
       });
     }

@@ -14,6 +14,7 @@ import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
 
 import java.time.Duration;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -83,7 +84,7 @@ public class OrFutureTest {
     Assert.assertEquals(FAIL, orFuture.get(Duration.ofSeconds(10)).getBad());
 
     orFuture = OrFuture.<String, String>ofBad(FAIL).flatMap(i -> OrFuture.ofGood("5"));
-    assertEquals(FAIL, orFuture.get(Duration.ofSeconds(10)).getBad());
+    assertEquals(FAIL, orFuture.getUnsafe().getBad());
   }
 
   @Test
@@ -117,6 +118,35 @@ public class OrFutureTest {
     OrFuture<String, String> or = OrFuture.ofBad(FAIL);
     OrFuture<Integer, Integer> transform = or.transform(s -> 5, f -> -5);
     assertEquals(-5, transform.get(Duration.ofSeconds(10)).getBad().intValue());
+  }
+
+  @Test
+  public void getUnsafe() {
+    CountDownLatch latch = new CountDownLatch(1);
+    OrFuture<String, String> or = OrFuture.of(() -> {
+      try {
+        latch.await();
+        return Or.good("good");
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+    });
+    Assert.assertEquals("OrFuture(N/A)", or.toString());
+    Thread thread = Thread.currentThread();
+    Helper.DEFAULT_EXECUTOR.execute(() -> {
+      try {
+        Thread.sleep(100);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+      thread.interrupt();
+    });
+    try {
+      or.getUnsafe();
+      Assert.fail("should throw");
+    } catch(CompletionException ce) {
+      // expected
+    }
   }
 
   private <G> OrFuture<G, String> getF(Executor es, G g) {

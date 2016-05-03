@@ -29,6 +29,7 @@ import java.time.Duration;
 import java.util.ArrayDeque;
 import java.util.Objects;
 import java.util.Queue;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
@@ -122,6 +123,20 @@ class OrFutureImpl<G, B> implements OrFuture<G, B> {
   public Or<G, B> get(Duration timeout, B timeoutBad) throws InterruptedException {
     if (finished.await(timeout.toMillis(), TimeUnit.MILLISECONDS)) return value.get();
     else return Bad.of(timeoutBad);
+  }
+
+  @Override
+  public Or<G, B> getUnsafe() throws CompletionException {
+    try {
+      return get(Duration.ofMillis(Long.MAX_VALUE));
+    } catch (InterruptedException | TimeoutException e) {
+      throw new CompletionException(e);
+    }
+  }
+
+  @Override
+  public String toString() {
+    return "OrFuture(" + getOption().map(Object::toString).getOrElse("N/A") + ")";
   }
 
 }

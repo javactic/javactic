@@ -10,6 +10,7 @@ import com.github.javactic.Pass;
 import com.github.javactic.Validation;
 import javaslang.Tuple;
 import javaslang.Tuple2;
+import javaslang.collection.Iterator;
 import javaslang.collection.List;
 import javaslang.collection.Seq;
 import javaslang.collection.Vector;
@@ -62,6 +63,16 @@ public class AccumulationTest {
     assertEquals("A1", or.get());
   }
 
+  @Test
+  public void sequenceIterator() {
+    OrFuture<String, One<String>> f1 = ff.newFuture(() -> Good.of("1")).accumulating();
+    OrFuture<String, One<String>> f2 = ff.newFuture(() -> Bad.<String,String>of("2")).accumulating();
+    OrFuture<Vector<String>, Every<String>> sequence = OrFuture.sequence(Iterator.of(f1, f2));
+    Or<Vector<String>, Every<String>> or = sequence.getUnsafe();
+    String fold = or.getBad().foldLeft("", (s, i) -> s + i);
+    assertEquals("2", fold);
+  }
+
   @Theory
   public void sequenceSuccess(Executor es) throws Exception {
     Seq<OrFuture<Integer, One<String>>> seq = Vector.empty();
@@ -69,7 +80,7 @@ public class AccumulationTest {
       final int fi = i;
       seq = seq.append(ff.newFuture(es, () -> Good.of(fi)).accumulating());
     }
-    OrFuture<Vector<Integer>, Every<String>> sequence = OrFuture.combined(seq);
+    OrFuture<Vector<Integer>, Every<String>> sequence = OrFuture.sequence(seq);
     Or<Vector<Integer>, Every<String>> or = sequence.get(Duration.ofSeconds(10));
     Assert.assertTrue(or.isGood());
     String fold = or.get().foldLeft("", (s, i) -> s + i);
@@ -86,11 +97,21 @@ public class AccumulationTest {
       else
         seq = seq.append(ffAcc.newFuture(es, () -> Bad.ofOne(fi+ "")));
     }
-    OrFuture<Vector<Integer>, Every<String>> sequence = OrFuture.combined(seq);
+    OrFuture<Vector<Integer>, Every<String>> sequence = OrFuture.sequence(seq);
     Or<Vector<Integer>, Every<String>> or = sequence.get(Duration.ofSeconds(10));
     Assert.assertTrue(or.isBad());
     String fold = or.getBad().foldLeft("", (s, i) -> s + i);
-    assertEquals("13579", fold);
+    assertEquals(1, fold.length());
+  }
+
+  @Test
+  public void combinedIterator() {
+    OrFuture<String, One<String>> f1 = ff.newFuture(() -> Good.of("1")).accumulating();
+    OrFuture<String, One<String>> f2 = ff.newFuture(() -> Good.of("2")).accumulating();
+    OrFuture<Vector<String>, Every<String>> combined = OrFuture.combined(Iterator.of(f1, f2));
+    Or<Vector<String>, Every<String>> or = combined.getUnsafe();
+    String fold = or.get().foldLeft("", (s, i) -> s + i);
+    assertEquals("12", fold);
   }
 
   @Test
@@ -118,7 +139,7 @@ public class AccumulationTest {
   @Test
   public void combinedSecondFinishesLast() throws Exception {
     CountDownLatch latch = new CountDownLatch(1);
-    OrFuture<String, One<String>> f1 = OrFuture.<String,String>of(() -> Good.of("1")).accumulating();
+    OrFuture<String, One<String>> f1 = OrFuture.of(() -> Good.<String,String>of("1")).accumulating();
     OrFuture<String, One<String>> f2 = ff.newFuture(() -> Good.of("2")).accumulating();
     OrFuture<String, One<String>> f3 = ff.newFuture(() -> Good.of("3")).accumulating();
     OrFuture<String, One<String>> f4 = ff.newFuture(() -> {
@@ -174,7 +195,7 @@ public class AccumulationTest {
         return Good.of("waiting");
       }).accumulating();
     } else {
-      return OrFuture.<String, String>of(es, () -> Good.of("direct")).accumulating();
+      return OrFuture.<String, String>of(es, () -> Good.<String, String>of("direct")).accumulating();
     }
   }
 

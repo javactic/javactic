@@ -122,5 +122,6 @@ public class FutureFactory<B> {
    * A default FutureFactory that will execute its tasks with the common {@link Executors#newCachedThreadPool()}
    * and that will transform any potential exceptions into Strings using {@link Throwable#getMessage()}
    */
-  public static final FutureFactory<String> OF_EXCEPTION_MESSAGE = of(Throwable::getMessage);
+  public static final FutureFactory<String> OF_EXCEPTION_MESSAGE =
+    of(throwable -> String.valueOf(throwable.getMessage())); // null -> "null"
 }
