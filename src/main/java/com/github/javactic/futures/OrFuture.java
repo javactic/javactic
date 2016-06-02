@@ -41,7 +41,9 @@ import javaslang.collection.Vector;
 import javaslang.control.Option;
 
 import java.time.Duration;
+import java.util.Queue;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
@@ -634,16 +636,16 @@ public interface OrFuture<G, B> {
   static <G, ERR, A, I extends Iterable<? extends G>> OrFuture<I, Every<ERR>>
   sequence(Iterable<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> input,
            Collector<? super G, A, I> collector) {
-    // defensive copy of the iterable in case it always returns the same iterator (see javaslang Iterator that is also Iterable)
-    Iterable<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> copy =
-      (input instanceof Iterator) ? Vector.ofAll(input) : input;
     OrPromise<I, Every<ERR>> promise = OrPromise.create();
     AtomicInteger count = new AtomicInteger(0);
     AtomicBoolean finished = new AtomicBoolean(false);
-    java.util.Iterator<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> iterator = copy.iterator();
+    // this is necessary as nothing guarantees the iterable can be iterated multiple times
+    Queue<OrFuture<? extends G, ? extends Every<? extends ERR>>> copy = new ConcurrentLinkedQueue<>();
+    java.util.Iterator<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> iterator = input.iterator();
     while (iterator.hasNext()) {
       count.incrementAndGet();
       OrFuture<? extends G, ? extends Every<? extends ERR>> future = iterator.next();
+      copy.add(future);
       if (!iterator.hasNext()) finished.set(true);
       future.onComplete(or -> {
         if (or.isBad()) {
@@ -698,16 +700,16 @@ public interface OrFuture<G, B> {
   static <G, ERR, A, I extends Iterable<? extends G>> OrFuture<I, Every<ERR>>
   combined(Iterable<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> input,
            Collector<? super G, A, I> collector) {
-    // defensive copy of the iterable in case it always returns the same iterator (see javaslang Iterator that is also Iterable)
-    Iterable<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> copy =
-      (input instanceof Iterator) ? Vector.ofAll(input) : input;
     OrPromise<I, Every<ERR>> promise = OrPromise.create();
     AtomicInteger count = new AtomicInteger(0);
     AtomicBoolean finished = new AtomicBoolean(false);
-    java.util.Iterator<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> iterator = copy.iterator();
+    // this is necessary as nothing guarantees the iterable can be iterated multiple times
+    Queue<OrFuture<? extends G, ? extends Every<? extends ERR>>> copy = new ConcurrentLinkedQueue<>();
+    java.util.Iterator<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> iterator = input.iterator();
     while (iterator.hasNext()) {
       count.incrementAndGet();
       OrFuture<? extends G, ? extends Every<? extends ERR>> future = iterator.next();
+      copy.add(future);
       if (!iterator.hasNext()) finished.set(true);
       future.onComplete(or -> {
         if (count.decrementAndGet() == 0 && finished.get()) {

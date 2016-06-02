@@ -96,7 +96,7 @@ public class OrFutureTest {
         throw new RuntimeException();
       })
       .andThen(or -> visited.set(true))
-      .get(Duration.ofSeconds(10));
+      .getUnsafe();
     assertTrue(visited.get());
     assertEquals("good", result.get());
   }
