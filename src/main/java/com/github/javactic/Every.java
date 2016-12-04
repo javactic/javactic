@@ -1972,7 +1972,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return A new Every containing pairs consisting of all elements of this
    *         Every paired with their index. Indices start at 0.
    */
-  default Every<Tuple2<T, Long>> zipWithIndex() {
+  default Every<Tuple2<T, Integer>> zipWithIndex() {
     return fromNonEmptySeq(toVector().zipWithIndex());
   }
 

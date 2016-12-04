@@ -508,7 +508,7 @@ public class EveryTest {
     assertEquals(Every.of(Tuple.of(1, 5), Tuple.of(2, 9)), e.zipAll(List.of(5), 0, 9));
     assertEquals(Every.of(Tuple.of(1, 5), Tuple.of(2, 6), Tuple.of(0, 7)), e.zipAll(List.of(5, 6, 7), 0, 19));
     Every<String> e2 = Every.of("A", "B");
-    assertEquals(Every.of(Tuple.of("A", 0L), Tuple.of("B", 1L)), e2.zipWithIndex());
+    assertEquals(Every.of(Tuple.of("A", 0), Tuple.of("B", 1)), e2.zipWithIndex());
   }
 
   @Test
