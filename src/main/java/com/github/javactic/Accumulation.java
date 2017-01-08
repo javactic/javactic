@@ -175,8 +175,18 @@ public final class Accumulation {
   @SafeVarargs
   public static <G, ERR> Or<G, Every<ERR>>
   when(Or<? extends G, ? extends Every<? extends ERR>> or, Function<? super G, ? extends Validation<ERR>>... validations) {
+    return when(or, Stream.of(validations));
+  }
+
+  public static <G, ERR> Or<G, Every<ERR>>
+  when(Or<? extends G, ? extends Every<? extends ERR>> or, Iterable<? extends Function<? super G, ? extends Validation<ERR>>> validations) {
+    return when(or, Stream.ofAll(validations));
+  }
+
+  private static <G, ERR> Or<G, Every<ERR>>
+  when(Or<? extends G, ? extends Every<? extends ERR>> or, Stream<? extends Function<? super G, ? extends Validation<ERR>>> validations) {
     if (or.isGood()) {
-      Vector<ERR> result = Stream.of(validations)
+      Vector<ERR> result = validations
         .foldLeft(Vector.empty(), (vec, f) -> {
           Validation<ERR> v = f.apply(or.get());
           if (v.isPass()) return vec;
@@ -186,6 +196,8 @@ public final class Accumulation {
       else return Bad.of(Every.of(result.head(), result.tail()));
     } else return (Or<G, Every<ERR>>) or;
   }
+
+
 
   // ------------------------------------------------------------------------
   // ZIP

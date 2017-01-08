@@ -24,8 +24,6 @@ import com.github.javactic.Bad;
 import com.github.javactic.Good;
 import com.github.javactic.Or;
 
-import static com.github.javactic.futures.Helper.DEFAULT_EXECUTOR;
-
 /**
  * A write-once wrapper that can complete an underlying OrFuture.
  *
@@ -33,17 +31,6 @@ import static com.github.javactic.futures.Helper.DEFAULT_EXECUTOR;
  * @param <B> the failure type
  */
 public interface OrPromise<G, B> {
-
-  /**
-   * Creates a new promise that can be fulfilled later.
-   *
-   * @param <G> the success type
-   * @param <B> the failure type
-   * @return an instance of OrPromise
-   */
-  static <G, B> OrPromise<G, B> create() {
-    return new OrPromiseImpl<>(new OrFutureImpl<>(DEFAULT_EXECUTOR));
-  }
 
   /**
    * @return a future that will complete when the promise is fulfilled
@@ -92,7 +79,8 @@ public interface OrPromise<G, B> {
    * @return this promise
    */
   default OrPromise<G, B> tryCompleteWith(OrFuture<? extends G, ? extends B> other) {
-    other.onComplete(this::tryComplete);
+    if(other != this)
+      other.onComplete(this::tryComplete);
     return this;
   }
 
@@ -139,6 +127,7 @@ public interface OrPromise<G, B> {
   default boolean trySuccess(G success) {
     return tryComplete(Good.of(success));
   }
+
 }
 
 final class OrPromiseImpl<G, B> implements OrPromise<G, B> {

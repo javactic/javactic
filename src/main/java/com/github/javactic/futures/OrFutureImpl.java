@@ -22,38 +22,35 @@ package com.github.javactic.futures;
 
 import com.github.javactic.Bad;
 import com.github.javactic.Or;
+import com.github.javactic.Validation;
 import javaslang.control.Option;
-import javaslang.control.Try;
 
 import java.time.Duration;
-import java.util.ArrayDeque;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 class OrFutureImpl<G, B> implements OrFuture<G, B> {
 
-  private final Executor executor;
+  private final ExecutionContext<?> executionContext;
   private final AtomicReference<Or<G, B>> value = new AtomicReference<>();
-  private final AtomicBoolean started = new AtomicBoolean(false);
   private final CountDownLatch finished = new CountDownLatch(1);
-  private final Queue<Consumer<? super Or<G, B>>> actions = new ArrayDeque<>();
+  private final Queue<Consumer<? super Or<G, B>>> actions = new ConcurrentLinkedQueue<>();
 
-  public OrFutureImpl(Executor executor) {
-    this.executor = executor;
+  OrFutureImpl(ExecutionContext<?> executionContext) {
+    this.executionContext = executionContext;
   }
 
   @SuppressWarnings("unchecked")
   boolean tryComplete(Or<? extends G, ? extends B> value) {
-    return complete((Or<G, B>) value) != null;
+    return complete((Or<G, B>) value);
   }
 
   @Override
@@ -61,19 +58,7 @@ class OrFutureImpl<G, B> implements OrFuture<G, B> {
     return value.get() != null;
   }
 
-  @SuppressWarnings("unchecked")
-  void run(Supplier<? extends Or<? extends G, ? extends B>> orSupplier) {
-    if (isCompleted()) {
-      throw new IllegalStateException("the future is already completed.");
-    } else if (started.compareAndSet(false, true)) {
-      // we got the right to start the job
-      executor.execute(() -> complete((Or<G,B>) orSupplier.get()));
-    } else {
-      throw new IllegalStateException("the future is already running.");
-    }
-  }
-
-  Or<G, B> complete(Or<G, B> result) {
+  boolean complete(Or<G, B> result) {
     Objects.requireNonNull(result, "cannot complete with null");
     if (value.compareAndSet(null, result)) {
       finished.countDown();
@@ -81,9 +66,9 @@ class OrFutureImpl<G, B> implements OrFuture<G, B> {
       synchronized (actions) {
         actions.forEach(this::perform);
       }
-      return result;
+      return true;
     } else {
-      return null;
+      return false;
     }
   }
 
@@ -105,12 +90,18 @@ class OrFutureImpl<G, B> implements OrFuture<G, B> {
   }
 
   private void perform(Consumer<? super Or<G, B>> action) {
-    Try.run(() -> executor.execute(() -> action.accept(value.get())));
+    executionContext.getExecutor().execute(() -> {
+      try {
+        action.accept(value.get());
+      } catch (Throwable t) {
+        System.err.println("error executing onComplete consumers: " + t.toString());
+      }
+    });
   }
 
   @Override
   public Option<Or<G, B>> getOption() {
-    return isCompleted() ? Option.some(value.get()) : Option.none();
+    return Option.of(value.get());
   }
 
   @Override
@@ -137,6 +128,71 @@ class OrFutureImpl<G, B> implements OrFuture<G, B> {
   @Override
   public String toString() {
     return "OrFuture(" + getOption().map(Object::toString).getOrElse("N/A") + ")";
+  }
+
+
+  public OrFuture<G, B> andThen(Consumer<? super Or<G, B>> consumer) {
+    OrPromise<G, B> p = executionContext.promise();
+    onComplete(or -> {
+      try {
+        consumer.accept(or);
+      } catch (Exception e) {
+        // ignored
+      } finally {
+        p.complete(or);
+      }
+    });
+    return p.future();
+  }
+
+  public OrFuture<G, B> filter(Function<? super G, ? extends Validation<? extends B>> validator) {
+    OrPromise<G, B> promise = executionContext.promise();
+    onComplete(or -> promise.complete(or.filter(validator)));
+    return promise.future();
+  }
+
+  public <H> OrFuture<H, B> map(Function<? super G, ? extends H> mapper) {
+    OrPromise<H, B> promise = executionContext.promise();
+    onComplete(or -> promise.complete(or.map(mapper)));
+    return promise.future();
+  }
+
+  public <C> OrFuture<G, C> badMap(Function<? super B, ? extends C> mapper) {
+    OrPromise<G, C> promise = executionContext.promise();
+    onComplete(or -> promise.complete(or.badMap(mapper)));
+    return promise.future();
+  }
+
+  public <H> OrFuture<H, B> flatMap(Function<? super G, ? extends OrFuture<? extends H, ? extends B>> mapper) {
+    OrPromise<H, B> promise = executionContext.promise();
+    onComplete(or ->
+        or.forEach(
+          g -> promise.completeWith(mapper.apply(g)),
+          promise::failure)
+    );
+    return promise.future();
+  }
+
+  public OrFuture<G, B> recover(Function<? super B, ? extends G> fn) {
+    OrPromise<G, B> promise = executionContext.promise();
+    onComplete(or -> promise.complete(or.recover(fn)));
+    return promise.future();
+  }
+
+  public <C> OrFuture<G, C> recoverWith(Function<? super B, ? extends OrFuture<? extends G, ? extends C>> fn) {
+    OrPromise<G, C> promise = executionContext.promise();
+    onComplete(or ->
+        or.forEach(
+          promise::success,
+          b -> promise.completeWith(fn.apply(b)))
+    );
+    return promise.future();
+  }
+
+  public <H, C> OrFuture<H, C> transform(Function<? super G, ? extends H> s, Function<? super B, ? extends C> f) {
+    OrPromise<H, C> promise = executionContext.promise();
+    onComplete(or -> promise.complete(or.transform(s, f)));
+    return promise.future();
   }
 
 }

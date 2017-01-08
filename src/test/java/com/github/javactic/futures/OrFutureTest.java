@@ -18,6 +18,7 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.Assert.assertEquals;
@@ -26,17 +27,18 @@ import static org.junit.Assert.assertTrue;
 @RunWith(Theories.class)
 public class OrFutureTest {
 
-  private FutureFactory<String> ff = FutureFactory.OF_EXCEPTION_MESSAGE;
+  ExecutionContext<String> CTX = ExecutionContext.of(ExecutionContext.OF_EXCEPTION_MESSAGE, Executors.newSingleThreadExecutor());
 
   @DataPoints
-  public static Executor[] configs = {Executors.newSingleThreadExecutor(), Helper.DEFAULT_EXECUTOR};
+  public static Executor[] configs = {Executors.newSingleThreadExecutor(), Executors.newCachedThreadPool()};
 
   private static final String FAIL = "fail";
 
   @Theory
   public void create(Executor es) throws InterruptedException {
+    ExecutionContext<String> ctx = ExecutionContext.of(ExecutionContext.OF_EXCEPTION_MESSAGE, es);
     CountDownLatch latch = new CountDownLatch(1);
-    OrFuture<String, Object> orf = OrFuture.of(es, () -> {
+    OrFuture<String, String> orf = ctx.future(() -> {
       try {
         latch.await();
       } catch (Exception e) {
@@ -54,7 +56,8 @@ public class OrFutureTest {
 
   @Theory
   public void filter(Executor es) throws Exception {
-    OrFuture<Integer, String> orFuture = getF(es, 5)
+    ExecutionContext<String> ctx = ExecutionContext.of(ExecutionContext.OF_EXCEPTION_MESSAGE, es);
+    OrFuture<Integer, String> orFuture = getF(ctx, 5)
       .filter(i -> (i > 10) ? Pass.instance() : Fail.of(FAIL));
     Or<Integer, String> or = orFuture.get(Duration.ofSeconds(10));
     Assert.assertEquals(FAIL, or.getBad());
@@ -62,34 +65,38 @@ public class OrFutureTest {
 
   @Theory
   public void map(Executor es) throws Exception {
-    OrFuture<String, String> orFuture = getF(es, 5)
+    ExecutionContext<String> ctx = ExecutionContext.of(ExecutionContext.OF_EXCEPTION_MESSAGE, es);
+    OrFuture<String, String> orFuture = getF(ctx, 5)
       .map(i -> "" + i);
     Assert.assertEquals("5", orFuture.get(Duration.ofSeconds(10)).get());
   }
 
   @Theory
   public void badMap(Executor es) throws Exception {
-    OrFuture<String, String> orFuture = ff.newFuture(es, () -> Bad.<String, String>of("bad"))
+    ExecutionContext<String> ctx = ExecutionContext.of(ExecutionContext.OF_EXCEPTION_MESSAGE, es);
+    OrFuture<String, String> orFuture = ctx.future(() -> Bad.<String, String>of("bad"))
       .badMap(s -> new StringBuilder(s).reverse().toString());
     Assert.assertEquals("dab", orFuture.get(Duration.ofSeconds(10)).getBad());
   }
 
   @Theory
   public void flatMap(Executor es) throws Exception {
-    OrFuture<String, String> orFuture = getF(es, 5)
-      .flatMap(i -> ff.newFuture(es, () -> Good.of(i + "")));
+    ExecutionContext<String> ctx = ExecutionContext.of(ExecutionContext.OF_EXCEPTION_MESSAGE, es);
+    OrFuture<String, String> orFuture = getF(ctx, 5)
+      .flatMap(i -> ctx.future(() -> Good.of(i + "")));
     Assert.assertEquals("5", orFuture.get(Duration.ofSeconds(10)).get());
 
-    orFuture = getF(es, 5).flatMap(i -> OrFuture.ofBad(FAIL));
+    orFuture = getF(ctx, 5).flatMap(i -> ctx.badFuture(FAIL));
     Assert.assertEquals(FAIL, orFuture.get(Duration.ofSeconds(10)).getBad());
 
-    orFuture = OrFuture.<String, String>ofBad(FAIL).flatMap(i -> OrFuture.ofGood("5"));
+    orFuture = ctx.badFuture(FAIL).flatMap(i -> ctx.goodFuture("5"));
     assertEquals(FAIL, orFuture.getUnsafe().getBad());
   }
 
-  @Test
-  public void andThen() throws Exception {
-    OrFuture<String, String> future = OrFuture.ofGood("good");
+  @Theory
+  public void andThen(Executor es) throws Exception {
+    ExecutionContext<String> ctx = ExecutionContext.of(ExecutionContext.OF_EXCEPTION_MESSAGE, es);
+    OrFuture<String, String> future = ctx.goodFuture("good");
     AtomicBoolean visited = new AtomicBoolean();
     Or<String, String> result = future
       .andThen(or -> {
@@ -103,19 +110,19 @@ public class OrFutureTest {
 
   @Test
   public void recover() throws Exception {
-    OrFuture<String, String> recover = OrFuture.<String, String>ofBad(FAIL).recover(f -> "5");
+    OrFuture<String, String> recover = CTX.<String>badFuture(FAIL).recover(f -> "5");
     assertEquals("5", recover.get(Duration.ofSeconds(10)).get());
   }
 
   @Test
   public void recoverWith() throws Exception {
-    OrFuture<String, String> recover = OrFuture.<String, String>ofBad(FAIL).recoverWith(f -> OrFuture.ofGood("5"));
+    OrFuture<String, String> recover = CTX.<String>badFuture(FAIL).recoverWith(f -> CTX.goodFuture("5"));
     assertEquals("5", recover.get(Duration.ofSeconds(10)).get());
   }
 
   @Test
   public void transform() throws Exception {
-    OrFuture<String, String> or = OrFuture.ofBad(FAIL);
+    OrFuture<String, String> or = CTX.badFuture(FAIL);
     OrFuture<Integer, Integer> transform = or.transform(s -> 5, f -> -5);
     assertEquals(-5, transform.get(Duration.ofSeconds(10)).getBad().intValue());
   }
@@ -123,7 +130,7 @@ public class OrFutureTest {
   @Test
   public void getUnsafe() {
     CountDownLatch latch = new CountDownLatch(1);
-    OrFuture<String, String> or = OrFuture.of(() -> {
+    OrFuture<String, String> or = CTX.future(() -> {
       try {
         latch.await();
         return Or.good("good");
@@ -133,7 +140,7 @@ public class OrFutureTest {
     });
     Assert.assertEquals("OrFuture(N/A)", or.toString());
     Thread thread = Thread.currentThread();
-    Helper.DEFAULT_EXECUTOR.execute(() -> {
+    ForkJoinPool.commonPool().execute(() -> {
       try {
         Thread.sleep(100);
       } catch (InterruptedException e) {
@@ -146,10 +153,11 @@ public class OrFutureTest {
       Assert.fail("should throw");
     } catch(CompletionException ce) {
       // expected
+      latch.countDown();
     }
   }
 
-  private <G> OrFuture<G, String> getF(Executor es, G g) {
-    return ff.newFuture(es, () -> Good.of(g));
+  private <G> OrFuture<G, String> getF(ExecutionContext<String> ctx, G g) {
+    return ctx.future(() -> Good.of(g));
   }
 }
