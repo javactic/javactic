@@ -67,10 +67,6 @@ public class ExecutionContext<BAD> {
   }
 
   /**
-   * Creates a new FutureFactory that will return futures that run their tasks using a common
-   * {@link Executors#newCachedThreadPool()} and transform unhandled exceptions
-   * into instances of Bad using the provided converter.
-   *
    * @param exceptionConverter a function to convert exceptions into instances of Bad
    * @param executor the default executor to use for all operations in this execution context
    * @param <B> the bad type
@@ -89,7 +85,7 @@ public class ExecutionContext<BAD> {
   }
 
   /**
-   * Creates an OrFuture that will execute the given task using the provided executor.
+   * Creates an OrFuture that will execute the given task using this context's executor.
    *
    * @param task asynchronous computation to execute
    * @param <G> the good type
@@ -110,18 +106,14 @@ public class ExecutionContext<BAD> {
   }
 
   /**
-   * Returns an accumulating version of this factory.
+   * Returns an accumulating version of this context.
    *
-   * @return an accumulating version of this factory
+   * @return an accumulating version of this context
    */
   public ExecutionContext<One<BAD>> accumulating() {
     return accumulating.get();
   }
 
-  /**
-   * A default FutureFactory that will execute its tasks with the common {@link Executors#newCachedThreadPool()}
-   * and that will transform any potential exceptions into Strings using {@link Throwable#getMessage()}
-   */
   public static final Function<Throwable, String> OF_EXCEPTION_MESSAGE =
     throwable -> String.valueOf(throwable.getMessage()); // null -> "null"
 
