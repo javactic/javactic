@@ -238,4 +238,17 @@ public interface OrFuture<G, B> {
    */
   <H, C> OrFuture<H, C> transform(Function<? super G, ? extends H> s, Function<? super B, ? extends C> f);
 
+  /**
+   * Switches the context to the one given as argument. The returned future will execute its operation
+   * with the given context. This can be useful when the result of the future has to be executed on a
+   * specific context such as a UI thread.
+   *
+   * @param context the new {@link ExecutionContext} to use
+   * @return a new future whose operations will be executed on the given context
+   */
+  default OrFuture<G, B> with(ExecutionContext<? extends B> context) {
+    OrPromise<G, B> promise = context.promise();
+    onComplete(promise::complete);
+    return promise.future();
+  }
 }

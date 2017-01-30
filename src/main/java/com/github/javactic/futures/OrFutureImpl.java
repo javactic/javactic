@@ -94,7 +94,7 @@ class OrFutureImpl<G, B> implements OrFuture<G, B> {
       try {
         action.accept(value.get());
       } catch (Throwable t) {
-        System.err.println("error executing onComplete consumers: " + t.toString());
+        System.err.println("error executing onComplete action: " + t.toString());
       }
     });
   }
@@ -137,7 +137,7 @@ class OrFutureImpl<G, B> implements OrFuture<G, B> {
       try {
         consumer.accept(or);
       } catch (Exception e) {
-        // ignored
+        System.err.println("error executing andThen action: " + e.toString());
       } finally {
         p.complete(or);
       }

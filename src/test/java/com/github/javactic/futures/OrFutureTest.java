@@ -6,6 +6,7 @@ import com.github.javactic.Good;
 import com.github.javactic.Or;
 import com.github.javactic.Pass;
 import javaslang.control.Option;
+import javaslang.control.Try;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.theories.DataPoints;
@@ -57,7 +58,7 @@ public class OrFutureTest {
   @Theory
   public void filter(Executor es) throws Exception {
     ExecutionContext<String> ctx = ExecutionContext.of(ExecutionContext.OF_EXCEPTION_MESSAGE, es);
-    OrFuture<Integer, String> orFuture = getF(ctx, 5)
+    OrFuture<Integer, String> orFuture = getF(ctx, 4)
       .filter(i -> (i > 10) ? Pass.instance() : Fail.of(FAIL));
     Or<Integer, String> or = orFuture.get(Duration.ofSeconds(10));
     Assert.assertEquals(FAIL, or.getBad());
@@ -82,14 +83,14 @@ public class OrFutureTest {
   @Theory
   public void flatMap(Executor es) throws Exception {
     ExecutionContext<String> ctx = ExecutionContext.of(ExecutionContext.OF_EXCEPTION_MESSAGE, es);
-    OrFuture<String, String> orFuture = getF(ctx, 5)
+    OrFuture<String, String> orFuture = getF(ctx, 6)
       .flatMap(i -> ctx.future(() -> Good.of(i + "")));
-    Assert.assertEquals("5", orFuture.get(Duration.ofSeconds(10)).get());
+    Assert.assertEquals("6", orFuture.get(Duration.ofSeconds(10)).get());
 
-    orFuture = getF(ctx, 5).flatMap(i -> ctx.badFuture(FAIL));
+    orFuture = getF(ctx, 7).flatMap(i -> ctx.badFuture(FAIL));
     Assert.assertEquals(FAIL, orFuture.get(Duration.ofSeconds(10)).getBad());
 
-    orFuture = ctx.badFuture(FAIL).flatMap(i -> ctx.goodFuture("5"));
+    orFuture = ctx.badFuture(FAIL).flatMap(i -> ctx.goodFuture("7"));
     assertEquals(FAIL, orFuture.getUnsafe().getBad());
   }
 
@@ -128,6 +129,26 @@ public class OrFutureTest {
   }
 
   @Test
+  public void withContext() throws InterruptedException {
+    String startThread = "start";
+    String endThread = "end";
+    ExecutionContext<String> start = ExecutionContext.of(ExecutionContext.OF_EXCEPTION_MESSAGE, newExecutor(startThread));
+    ExecutionContext<String> end = ExecutionContext.of(ExecutionContext.OF_EXCEPTION_MESSAGE, newExecutor(endThread));
+
+    OrFuture<String, String> startGood = start.future(() -> Or.good("good"));
+    OrFuture<String, String> endGood = startGood.with(end);
+
+    SimpleSafe<String> startSafe = new SimpleSafe<>();
+    SimpleSafe<String> endSafe = new SimpleSafe<>();
+
+    startGood.onComplete(or -> startSafe.set(Thread.currentThread().getName()));
+    endGood.onComplete(or -> endSafe.set(Thread.currentThread().getName()));
+
+    assertEquals(startThread, startSafe.get());
+    assertEquals(endThread, endSafe.get());
+  }
+
+  @Test
   public void getUnsafe() {
     CountDownLatch latch = new CountDownLatch(1);
     OrFuture<String, String> or = CTX.future(() -> {
@@ -159,5 +180,32 @@ public class OrFutureTest {
 
   private <G> OrFuture<G, String> getF(ExecutionContext<String> ctx, G g) {
     return ctx.future(() -> Good.of(g));
+  }
+
+  private Executor newExecutor(String name) {
+    return Executors.newSingleThreadExecutor(r -> new Thread(r, name));
+  }
+
+  private static class SimpleSafe<T> {
+    private final CountDownLatch latch = new CountDownLatch(1);
+    private T value;
+
+    void set(T value) {
+      this.value = value;
+      latch.countDown();
+    }
+
+    T get() {
+      sneakyRun(latch::await);
+      return value;
+    }
+  }
+
+  public static <T extends Throwable> void sneakyRun(Try.CheckedRunnable r) throws T {
+    try {
+      r.run();
+    } catch (Throwable throwable) {
+      throw (T)throwable;
+    }
   }
 }
