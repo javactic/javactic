@@ -20,9 +20,9 @@
  **/
 package com.github.javactic;
 
-import javaslang.control.Either;
-import javaslang.control.Option;
-import javaslang.control.Try;
+import io.vavr.control.Either;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
 import org.junit.Assert;
 import org.junit.Test;
 

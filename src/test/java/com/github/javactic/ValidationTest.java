@@ -31,7 +31,7 @@ import org.junit.Test;
 import com.github.javactic.Fail;
 import com.github.javactic.Pass;
 
-import javaslang.Tuple0;
+import io.vavr.Tuple0;
 
 public class ValidationTest {
 

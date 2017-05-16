@@ -10,8 +10,8 @@ import com.github.javactic.Or;
 import com.github.javactic.Pass;
 import com.github.javactic.Validation;
 
-import javaslang.Tuple2;
-import javaslang.collection.List;
+import io.vavr.Tuple2;
+import io.vavr.collection.List;
 
 public class AccumulatingOrExample {
 

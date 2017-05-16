@@ -20,18 +20,18 @@ package com.github.javactic;
  * limitations under the License.
  */
 
-import javaslang.Function3;
-import javaslang.Function4;
-import javaslang.Function5;
-import javaslang.Function6;
-import javaslang.Function7;
-import javaslang.Function8;
-import javaslang.Tuple;
-import javaslang.Tuple2;
-import javaslang.Tuple3;
-import javaslang.collection.Iterator;
-import javaslang.collection.Stream;
-import javaslang.collection.Vector;
+import io.vavr.Function3;
+import io.vavr.Function4;
+import io.vavr.Function5;
+import io.vavr.Function6;
+import io.vavr.Function7;
+import io.vavr.Function8;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
+import io.vavr.Tuple3;
+import io.vavr.collection.Iterator;
+import io.vavr.collection.Stream;
+import io.vavr.collection.Vector;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;

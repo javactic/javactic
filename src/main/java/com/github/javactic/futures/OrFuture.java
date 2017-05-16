@@ -23,7 +23,7 @@ package com.github.javactic.futures;
 import com.github.javactic.One;
 import com.github.javactic.Or;
 import com.github.javactic.Validation;
-import javaslang.control.Option;
+import io.vavr.control.Option;
 
 import java.time.Duration;
 import java.util.concurrent.CompletionException;

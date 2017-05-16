@@ -10,9 +10,9 @@
 //import com.github.javactic.Validation;
 //import com.github.javactic.futures.FutureFactory;
 //import com.github.javactic.futures.OrFuture;
-//import javaslang.Tuple2;
-//import javaslang.collection.List;
-//import javaslang.collection.Vector;
+//import io.vavr.Tuple2;
+//import io.vavr.collection.List;
+//import io.vavr.collection.Vector;
 //
 //import java.util.function.Function;
 //

@@ -5,8 +5,9 @@ import com.github.javactic.Fail;
 import com.github.javactic.Good;
 import com.github.javactic.Or;
 import com.github.javactic.Pass;
-import javaslang.control.Option;
-import javaslang.control.Try;
+import io.vavr.CheckedRunnable;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.theories.DataPoints;
@@ -201,7 +202,7 @@ public class OrFutureTest {
     }
   }
 
-  public static <T extends Throwable> void sneakyRun(Try.CheckedRunnable r) throws T {
+  public static <T extends Throwable> void sneakyRun(CheckedRunnable r) throws T {
     try {
       r.run();
     } catch (Throwable throwable) {

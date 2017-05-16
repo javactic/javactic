@@ -20,8 +20,8 @@ package com.github.javactic;
  * limitations under the License.
  */
 
-import javaslang.control.Either;
-import javaslang.control.Option;
+import io.vavr.control.Either;
+import io.vavr.control.Option;
 
 import java.io.Serializable;
 import java.util.NoSuchElementException;

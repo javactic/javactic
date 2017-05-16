@@ -20,7 +20,7 @@ package com.github.javactic;
  * limitations under the License.
  */
 
-import javaslang.collection.Vector;
+import io.vavr.collection.Vector;
 
 import java.io.Serializable;
 import java.util.Objects;

@@ -1,6 +1,6 @@
 package com.github.javactic.doc;
 
-import javaslang.control.Either;
+import io.vavr.control.Either;
 
 public class EitherExample {
 

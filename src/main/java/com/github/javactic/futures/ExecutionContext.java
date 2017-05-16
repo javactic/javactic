@@ -27,24 +27,14 @@ import com.github.javactic.Good;
 import com.github.javactic.One;
 import com.github.javactic.Or;
 import com.github.javactic.Validation;
-import javaslang.Function3;
-import javaslang.Function4;
-import javaslang.Function5;
-import javaslang.Function6;
-import javaslang.Function7;
-import javaslang.Function8;
-import javaslang.Lazy;
-import javaslang.Tuple;
-import javaslang.Tuple2;
-import javaslang.Tuple3;
-import javaslang.collection.Iterator;
-import javaslang.collection.Vector;
-import javaslang.control.Try;
+import io.vavr.*;
+import io.vavr.collection.Iterator;
+import io.vavr.collection.Vector;
+import io.vavr.control.Try;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
@@ -93,11 +83,11 @@ public class ExecutionContext<BAD> {
    * task throws an exception, that exception will be handled with this factory's exception converter.
    */
   @SuppressWarnings("unchecked")
-  public <G> OrFuture<G, BAD> future(Try.CheckedSupplier<? extends Or<? extends G, ? extends BAD>> task) {
+  public <G> OrFuture<G, BAD> future(CheckedFunction0<? extends Or<? extends G, ? extends BAD>> task) {
     OrFutureImpl<G, BAD> future = new OrFutureImpl<>(this);
     executor.execute(() -> {
       try {
-        future.complete((Or<G, BAD>) task.get());
+        future.complete((Or<G, BAD>) task.apply());
       } catch (Throwable t) {
         future.complete(Bad.of(converter.apply(t)));
       }

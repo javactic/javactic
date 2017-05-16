@@ -20,19 +20,19 @@ package com.github.javactic;
  * limitations under the License.
  */
 
-import javaslang.Tuple;
-import javaslang.Tuple2;
-import javaslang.Tuple3;
-import javaslang.collection.Array;
-import javaslang.collection.Iterator;
-import javaslang.collection.List;
-import javaslang.collection.Map;
-import javaslang.collection.Seq;
-import javaslang.collection.Set;
-import javaslang.collection.Stream;
-import javaslang.collection.Traversable;
-import javaslang.collection.Vector;
-import javaslang.control.Option;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
+import io.vavr.Tuple3;
+import io.vavr.collection.Array;
+import io.vavr.collection.Iterator;
+import io.vavr.collection.List;
+import io.vavr.collection.Map;
+import io.vavr.collection.Seq;
+import io.vavr.collection.Set;
+import io.vavr.collection.Stream;
+import io.vavr.collection.Traversable;
+import io.vavr.collection.Vector;
+import io.vavr.control.Option;
 
 import java.util.Comparator;
 import java.util.function.BiFunction;
@@ -1959,7 +1959,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    */
   @SuppressWarnings("unchecked")
   default <B> Every<Tuple2<T, B>> zipAll(Iterable<? extends B> other, T thisElem, B otherElem) {
-    return fromNonEmptySeq(toVector().zipAll((Iterable<B>)other, thisElem, otherElem));
+    return fromNonEmptySeq(toVector().zipAll(other, thisElem, otherElem));
   }
 
   /**
@@ -1972,7 +1972,7 @@ public interface Every<T> extends Iterable<T>, IntFunction<T> {
    * @return A new Every containing pairs consisting of all elements of this
    *         Every paired with their index. Indices start at 0.
    */
-  default Every<Tuple2<T, Long>> zipWithIndex() {
+  default Every<Tuple2<T, Integer>> zipWithIndex() {
     return fromNonEmptySeq(toVector().zipWithIndex());
   }
 

@@ -20,12 +20,12 @@
  **/
 package com.github.javactic;
 
-import javaslang.Tuple;
-import javaslang.collection.List;
-import javaslang.collection.Map;
-import javaslang.collection.Stream;
-import javaslang.collection.Vector;
-import javaslang.control.Option;
+import io.vavr.Tuple;
+import io.vavr.collection.List;
+import io.vavr.collection.Map;
+import io.vavr.collection.Stream;
+import io.vavr.collection.Vector;
+import io.vavr.control.Option;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -508,7 +508,7 @@ public class EveryTest {
     assertEquals(Every.of(Tuple.of(1, 5), Tuple.of(2, 9)), e.zipAll(List.of(5), 0, 9));
     assertEquals(Every.of(Tuple.of(1, 5), Tuple.of(2, 6), Tuple.of(0, 7)), e.zipAll(List.of(5, 6, 7), 0, 19));
     Every<String> e2 = Every.of("A", "B");
-    assertEquals(Every.of(Tuple.of("A", 0L), Tuple.of("B", 1L)), e2.zipWithIndex());
+    assertEquals(Every.of(Tuple.of("A", 0), Tuple.of("B", 1)), e2.zipWithIndex());
   }
 
   @Test

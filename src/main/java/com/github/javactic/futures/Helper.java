@@ -24,7 +24,7 @@ import com.github.javactic.Bad;
 import com.github.javactic.Every;
 import com.github.javactic.Good;
 import com.github.javactic.Or;
-import javaslang.collection.Vector;
+import io.vavr.collection.Vector;
 
 import java.util.function.Consumer;
 import java.util.stream.Collector;

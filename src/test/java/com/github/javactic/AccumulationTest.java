@@ -20,7 +20,7 @@
  **/
 package com.github.javactic;
 
-import javaslang.collection.Vector;
+import io.vavr.collection.Vector;
 import org.junit.Test;
 
 import java.lang.reflect.Constructor;

@@ -1,6 +1,6 @@
 package com.github.javactic.doc;
 
-import javaslang.control.Option;
+import io.vavr.control.Option;
 
 public class OptionExample {
 

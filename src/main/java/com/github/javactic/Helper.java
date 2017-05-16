@@ -20,7 +20,7 @@ package com.github.javactic;
  * limitations under the License.
  */
 
-import javaslang.collection.IndexedSeq;
+import io.vavr.collection.IndexedSeq;
 
 import java.util.regex.Pattern;
 
