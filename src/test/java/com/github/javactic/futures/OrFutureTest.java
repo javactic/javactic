@@ -102,7 +102,7 @@ public class OrFutureTest {
     AtomicBoolean visited = new AtomicBoolean();
     Or<String, String> result = future
       .andThen(or -> {
-        throw new RuntimeException();
+        throw new RuntimeException("Test throwing exception in andThen");
       })
       .andThen(or -> visited.set(true))
       .getUnsafe();

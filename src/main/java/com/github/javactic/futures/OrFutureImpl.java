@@ -94,9 +94,19 @@ class OrFutureImpl<G, B> implements OrFuture<G, B> {
       try {
         action.accept(value.get());
       } catch (Throwable t) {
-        System.err.println("error executing onComplete action: " + t.toString());
+        handleUncaughtThrowable(t);
       }
     });
+  }
+
+  private void handleUncaughtThrowable(Throwable t) {
+    Thread.UncaughtExceptionHandler handler = Thread.currentThread().getUncaughtExceptionHandler();
+    if(handler != null) handler.uncaughtException(Thread.currentThread(), t);
+    else {
+      handler = Thread.getDefaultUncaughtExceptionHandler();
+      if(handler != null) handler.uncaughtException(Thread.currentThread(), t);
+      else System.err.println("no default or other UncaughtExceptionHandler found for Throwable " + t.toString());
+    }
   }
 
   @Override
@@ -136,8 +146,8 @@ class OrFutureImpl<G, B> implements OrFuture<G, B> {
     onComplete(or -> {
       try {
         consumer.accept(or);
-      } catch (Exception e) {
-        System.err.println("error executing andThen action: " + e.toString());
+      } catch (Throwable t) {
+        handleUncaughtThrowable(t);
       } finally {
         p.complete(or);
       }
@@ -148,18 +158,6 @@ class OrFutureImpl<G, B> implements OrFuture<G, B> {
   public OrFuture<G, B> filter(Function<? super G, ? extends Validation<? extends B>> validator) {
     OrPromise<G, B> promise = executionContext.promise();
     onComplete(or -> promise.complete(or.filter(validator)));
-    return promise.future();
-  }
-
-  public <H> OrFuture<H, B> map(Function<? super G, ? extends H> mapper) {
-    OrPromise<H, B> promise = executionContext.promise();
-    onComplete(or -> promise.complete(or.map(mapper)));
-    return promise.future();
-  }
-
-  public <C> OrFuture<G, C> badMap(Function<? super B, ? extends C> mapper) {
-    OrPromise<G, C> promise = executionContext.promise();
-    onComplete(or -> promise.complete(or.badMap(mapper)));
     return promise.future();
   }
 
@@ -179,20 +177,23 @@ class OrFutureImpl<G, B> implements OrFuture<G, B> {
     return promise.future();
   }
 
+  @SuppressWarnings("unchecked")
   public <C> OrFuture<G, C> recoverWith(Function<? super B, ? extends OrFuture<? extends G, ? extends C>> fn) {
-    OrPromise<G, C> promise = executionContext.promise();
-    onComplete(or ->
-        or.forEach(
-          promise::success,
-          b -> promise.completeWith(fn.apply(b)))
-    );
-    return promise.future();
+    return transformWith(or -> {
+      if(or.isGood()) return (OrFuture<G,C>)this;
+      else return fn.apply(or.getBad());
+    });
   }
 
-  public <H, C> OrFuture<H, C> transform(Function<? super G, ? extends H> s, Function<? super B, ? extends C> f) {
+  public <H, C> OrFuture<H, C> transform(Function<? super Or<? extends G, ? extends B>, ? extends Or<? extends H, ? extends C>> f) {
     OrPromise<H, C> promise = executionContext.promise();
-    onComplete(or -> promise.complete(or.transform(s, f)));
+    onComplete(or -> promise.complete(f.apply(or)));
     return promise.future();
   }
 
+  public <H, C> OrFuture<H, C> transformWith(Function<? super Or<? extends G, ? extends B>, ? extends OrFuture<? extends H, ? extends C>> f) {
+    OrPromise<H, C> promise = executionContext.promise();
+    onComplete(or -> promise.completeWith(f.apply(or)));
+    return promise.future();
+  }
 }

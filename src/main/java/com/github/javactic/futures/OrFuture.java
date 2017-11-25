@@ -45,42 +45,6 @@ import java.util.function.Function;
 public interface OrFuture<G, B> {
 
   // ----------------------------------------------------------------------------------------------
-  // FACTORY METHODS
-  // ----------------------------------------------------------------------------------------------
-
-  /**
-   * Creates an OrFuture that will execute the supplied task with the given executor. Handling of
-   * uncaught exceptions will be specific to the provided {@link Executor}.
-   *
-   * @param executor the executor to run the given supplier with
-   * @param task     asynchronous computation to execute
-   * @param <G>      the success type
-   * @param <B>      the failure type
-   * @return an instance of OrFuture
-   * @see FutureFactory
-   */
-//  static <G, B> OrFuture<G, B> of(Supplier<? extends Or<? extends G, ? extends B>> task, Executor... executor) {
-//    final OrFutureImpl<G, B> future = new OrFutureImpl<>(Helper.getExecutor(executor));
-//    future.run(task);
-//    return future;
-//  }
-
-  /**
-   * Creates an OrFuture that will execute the supplied task with the common
-   * {@link Executors#newCachedThreadPool()}. Handling of uncaught exceptions
-   * will be specific to this pool.
-   *
-   * @param task asynchronous computation to execute
-   * @param <G>  the success type
-   * @param <B>  the failure type
-   * @return an instance of OrFuture
-   * @see FutureFactory
-   **/
-//  static <G, B> OrFuture<G, B> of(Supplier<? extends Or<? extends G, ? extends B>> task) {
-//    return of(DEFAULT_EXECUTOR, task);
-//  }
-
-  // ----------------------------------------------------------------------------------------------
   // INSTANCE METHODS
   // ----------------------------------------------------------------------------------------------
 
@@ -191,9 +155,21 @@ public interface OrFuture<G, B> {
    * @param <H>    the type of the mapped Good
    * @return a new future whose success result is mapped
    */
-  <H> OrFuture<H, B> map(Function<? super G, ? extends H> mapper);
+  default <H> OrFuture<H, B> map(Function<? super G, ? extends H> mapper) {
+    return transform(or -> or.map(mapper));
+  }
 
-  <C> OrFuture<G, C> badMap(Function<? super B, ? extends C> mapper);
+  /**
+   * Creates a new future by applying a function to the result of this future if it is a Bad,
+   * otherwise returns a future containing the original Good.
+   *
+   * @param mapper the mapping function
+   * @param <C> the type of the mapped Bad
+   * @return a new future whose failure result is mapped
+   */
+  default <C> OrFuture<G, C> badMap(Function<? super B, ? extends C> mapper) {
+    return transform(or -> or.badMap(mapper));
+  }
 
   /**
    * Creates a new future by applying a function to the result of this future
@@ -236,7 +212,33 @@ public interface OrFuture<G, B> {
    * @param <C> the failure type of the new future
    * @return a new future with a transformed value
    */
-  <H, C> OrFuture<H, C> transform(Function<? super G, ? extends H> s, Function<? super B, ? extends C> f);
+  @SuppressWarnings("unchecked")
+  default <H, C> OrFuture<H, C> transform(Function<? super G, ? extends H> s, Function<? super B, ? extends C> f) {
+    return transform(or -> {
+      if (or.isGood()) return (Or<H, C>) or.map(s);
+      else return (Or<H, C>) or.badMap(f);
+    });
+  }
+
+  /**
+   * Creates a new future by applying the function f to the result of the future.
+   *
+   * @param f the function to apply
+   * @param <H> the success type of the new future
+   * @param <C> the failure type of the new future
+   * @return a new future with a transformed value
+   */
+  <H, C> OrFuture<H, C> transform(Function<? super Or<? extends G, ? extends B>, ? extends Or<? extends H, ? extends C>> f);
+
+  /**
+   * Creates a new future by applying the future returning function f to the result of this future.
+   *
+   * @param f the function to apply
+   * @param <H> the success type of the new future
+   * @param <C> the failure type of the new future
+   * @return a new future with a transformed value
+   */
+  <H, C> OrFuture<H, C> transformWith(Function<? super Or<? extends G, ? extends B>, ? extends OrFuture<? extends H, ? extends C>> f);
 
   /**
    * Switches the context to the one given as argument. The returned future will execute its operation
