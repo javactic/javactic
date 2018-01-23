@@ -20,6 +20,8 @@ package com.github.javactic;
  * limitations under the License.
  */
 
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
 
@@ -27,10 +29,7 @@ import java.io.Serializable;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 /**
  * Contains a "success" value.
@@ -162,6 +161,18 @@ public final class Good<G, B> implements Or<G, B>, Serializable {
   @Override
   public <C> Or<G, C> recoverWith(Function<? super B, ? extends Or<? extends G, ? extends C>> func) {
     return (Or<G, C>) this;
+  }
+
+  @Override
+  public <H> Or<Tuple2<G,H>, Every<B>> zip(Or<? extends H, ? extends B> that) {
+    return zipWith(that, Tuple::of);
+  }
+
+  @Override
+  public <H,X> Or<X, Every<B>> zipWith(Or<? extends H, ? extends B> that, BiFunction<? super G, ? super H, ? extends X> f){
+    return that
+        .map(h -> (X)f.apply(value, h))
+        .recoverWith(b -> Bad.of(Every.of(b)));
   }
 
   @Override

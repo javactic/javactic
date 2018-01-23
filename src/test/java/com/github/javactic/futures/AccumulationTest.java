@@ -46,8 +46,8 @@ public class AccumulationTest {
   @Theory
   public void withGoodFail(Executor ex) throws Exception {
     ExecutionContext<String> ctx = ExecutionContext.of(ExecutionContext.OF_EXCEPTION_MESSAGE, ex);
-    OrFuture<String, One<String>> success = ctx.goodFuture("success").accumulating();
-    OrFuture<String, One<String>> fail = ctx.<String>badFuture("failure").accumulating();
+    OrFuture<String, One<String>> success = ctx.<String, String>goodFuture("success").accumulating();
+    OrFuture<String, One<String>> fail = ctx.<String, String>badFuture("failure").accumulating();
     OrFuture<String, Every<String>> result = ctx.withGood(success, fail, (a1, a2) -> "doesn't matter");
     Or<String, Every<String>> or = result.get(Duration.ofSeconds(10));
     assertEquals("failure", or.getBad().head());
@@ -56,8 +56,8 @@ public class AccumulationTest {
   @Theory
   public void withGoodSuccess(Executor ex) throws Exception {
     ExecutionContext<String> ctx = ExecutionContext.of(ExecutionContext.OF_EXCEPTION_MESSAGE, ex);
-    OrFuture<String, One<String>> s1 = ctx.goodFuture("A").accumulating();
-    OrFuture<Integer, One<String>> s2 = ctx.goodFuture(1).accumulating();
+    OrFuture<String, One<String>> s1 = ctx.<String, String>goodFuture("A").accumulating();
+    OrFuture<Integer, One<String>> s2 = ctx.<Integer, String>goodFuture(1).accumulating();
     OrFuture<String, Every<String>> result = ctx.withGood(s1, s2, (a1, a2) -> a1 + a2);
     Or<String, Every<String>> or = result.get(Duration.ofSeconds(10));
     assertEquals("A1", or.get());

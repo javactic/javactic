@@ -20,6 +20,8 @@ package com.github.javactic;
  * limitations under the License.
  */
 
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
 
@@ -27,10 +29,7 @@ import java.io.Serializable;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 /**
  * Contains a "failure" value.
@@ -217,6 +216,20 @@ public final class Bad<G, B> implements Or<G, B>, Serializable {
   @Override
   public <C> Or<G, C> recoverWith(Function<? super B, ? extends Or<? extends G, ? extends C>> func) {
     return (Or<G, C>) func.apply(value);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <H> Or<Tuple2<G,H>, Every<B>> zip(Or<? extends H, ? extends B> that) {
+    return zipWith(that, Tuple::of);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <H,X> Or<X, Every<B>> zipWith(Or<? extends H, ? extends B> that, BiFunction<? super G, ? super H, ? extends X> f){
+    return ((Or<H, B>) that)
+        .badMap(b -> Every.of(value, b)) // if that is bad, return both
+        .flatMap(h -> Bad.of(Every.of(value))); // else only this is bad
   }
 
   @Override

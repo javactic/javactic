@@ -20,6 +20,7 @@ package com.github.javactic;
  * limitations under the License.
  */
 
+import io.vavr.Tuple2;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
@@ -27,10 +28,7 @@ import io.vavr.control.Try;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 /**
  * Represents a value that is one of two possible types, with one type being
@@ -421,6 +419,31 @@ public interface Or<G, B> {
    *         this {@link Good} is returned
    */
   <C> Or<G, C> recoverWith(Function<? super B, ? extends Or<? extends G, ? extends C>> func);
+
+  /**
+   * Zips this and the given {@link Or} into a {@link Good} containing a {@link Tuple2} if both Ors were {@link Good},
+   * else returns a {@link Bad} containing every bad value.
+   *
+   * @param that the other Or
+   * @param <H> the good type of the other Or
+   * @return a Good containing both values in a {@link Tuple2} if both Ors are Good, else a {@link Bad} with every bad
+   * value.
+   */
+  <H> Or<Tuple2<G,H>, Every<B>> zip(Or<? extends H, ? extends B> that);
+
+  /**
+   * Zips this and the given {@link Or} into a {@link Good} combined using the given function if both Ors were {@link Good},
+   * else returns a {@link Bad} containing every bad value.
+   *
+   * @param that the other Or
+   * @param f the function to use for combining Good values
+   * @param <H> the Good type of the other Or
+   * @param <X> the combined type of both Goods
+   * @return a Good containing both values combined using function f if both Ors are Good, else a {@link Bad} with every bad
+   * value.
+   */
+  <H,X> Or<X, Every<B>> zipWith(Or<? extends H, ? extends B> that, BiFunction<? super G, ? super H, ? extends X> f);
+
 
   /**
    * Returns an {@link Or} with the {@link Good} and {@link Bad} types swapped: {@link Bad}

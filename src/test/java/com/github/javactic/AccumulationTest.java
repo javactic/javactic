@@ -72,7 +72,7 @@ public class AccumulationTest {
     assertEquals("failure", res.getBad().get(0));
     res = Accumulation.when(Good.of("sub"), f1, f2);
     assertTrue(res.isGood());
-    res = Accumulation.when(Good.of("fubiluuri"), f1, f2);
+    res = Accumulation.when(Good.of("fubiluuri"), Vector.of(f1, f2));
     assertTrue(res.isBad());
   }
 

@@ -1,11 +1,9 @@
 package com.github.javactic.futures;
 
-import com.github.javactic.Bad;
-import com.github.javactic.Fail;
-import com.github.javactic.Good;
-import com.github.javactic.Or;
-import com.github.javactic.Pass;
+import com.github.javactic.*;
 import io.vavr.CheckedRunnable;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import org.junit.Assert;
@@ -112,13 +110,13 @@ public class OrFutureTest {
 
   @Test
   public void recover() throws Exception {
-    OrFuture<String, String> recover = CTX.<String>badFuture(FAIL).recover(f -> "5");
+    OrFuture<String, String> recover = CTX.<String, String>badFuture(FAIL).recover(f -> "5");
     assertEquals("5", recover.get(Duration.ofSeconds(10)).get());
   }
 
   @Test
   public void recoverWith() throws Exception {
-    OrFuture<String, String> recover = CTX.<String>badFuture(FAIL).recoverWith(f -> CTX.goodFuture("5"));
+    OrFuture<String, String> recover = CTX.<String, String>badFuture(FAIL).recoverWith(f -> CTX.goodFuture("5"));
     assertEquals("5", recover.get(Duration.ofSeconds(10)).get());
   }
 
@@ -130,7 +128,15 @@ public class OrFutureTest {
   }
 
   @Test
-  public void withContext() throws InterruptedException {
+  public void zip() throws Exception {
+    OrFuture<String, Object> foo = CTX.goodFuture("foo");
+    OrFuture<Integer, Object> num = CTX.goodFuture(123);
+    OrFuture<Tuple2<String, Integer>, Every<Object>> zip = foo.zip(num);
+    assertEquals(Tuple.of("foo", 123), zip.get(Duration.ofSeconds(10)).get());
+  }
+
+  @Test
+  public void withContext() {
     String startThread = "start";
     String endThread = "end";
     ExecutionContext<String> start = ExecutionContext.of(ExecutionContext.OF_EXCEPTION_MESSAGE, newExecutor(startThread));

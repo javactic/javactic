@@ -20,16 +20,17 @@ package com.github.javactic.futures;
  * limitations under the License.
  */
 
+import com.github.javactic.Every;
 import com.github.javactic.One;
 import com.github.javactic.Or;
 import com.github.javactic.Validation;
+import io.vavr.Tuple2;
 import io.vavr.control.Option;
 
 import java.time.Duration;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -239,6 +240,10 @@ public interface OrFuture<G, B> {
    * @return a new future with a transformed value
    */
   <H, C> OrFuture<H, C> transformWith(Function<? super Or<? extends G, ? extends B>, ? extends OrFuture<? extends H, ? extends C>> f);
+
+  <H> OrFuture<Tuple2<G,H>, Every<B>> zip(OrFuture<? extends H, ? extends B> that);
+
+  <H, X> OrFuture<X, Every<B>> zipWith(OrFuture<? extends H, ? extends B> that, BiFunction<? super G, ? super H, ? extends X> f);
 
   /**
    * Switches the context to the one given as argument. The returned future will execute its operation

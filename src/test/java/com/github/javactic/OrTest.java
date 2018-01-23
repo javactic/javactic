@@ -20,6 +20,7 @@
  **/
 package com.github.javactic;
 
+import io.vavr.Tuple2;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
@@ -29,6 +30,7 @@ import org.junit.Test;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import static org.junit.Assert.*;
@@ -250,6 +252,36 @@ public class OrTest {
     or = Bad.of(123);
     tr = or.transform(String::toUpperCase, b -> b - 100);
     assertEquals(23, tr.getBad().intValue());
+  }
+
+  @Test
+  public void zip() {
+    Good<String, Integer> good = Good.of("good");
+    Bad<String, Integer> bad1 = Bad.of(1);
+
+    assertEquals(Good.of(new Tuple2<>("good", "good")), good.zip(good));
+    assertEquals(Bad.of(Every.of(1)), good.zip(bad1));
+    assertEquals(Bad.of(Every.of(1)), bad1.zip(good));
+
+    Bad<String, Integer> bad2 = Bad.of(2);
+
+    assertEquals(Bad.of(Every.of(1, 2)), bad1.zip(bad2));
+    assertEquals(Bad.of(Every.of(2, 1)), bad2.zip(bad1));
+  }
+
+  @Test
+  public void zipWith() {
+    BiFunction<String, String, String> bif = (s1, s2) -> s1 + s2;
+    Good<String, Integer> good = Good.of("good");
+    Bad<String, Integer> bad1 = Bad.of(1);
+
+    assertEquals(Good.of("goodgood"), good.zipWith(good, bif));
+    assertEquals(Bad.of(Every.of(1)), good.zipWith(bad1, bif));
+    assertEquals(Bad.of(Every.of(1)), bad1.zipWith(good, bif));
+
+    Bad<String, Integer> bad2 = Bad.of(2);
+    assertEquals(Bad.of(Every.of(1, 2)), bad1.zipWith(bad2, bif));
+    assertEquals(Bad.of(Every.of(2, 1)), bad2.zipWith(bad1, bif));
   }
 
   @Test

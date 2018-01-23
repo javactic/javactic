@@ -20,15 +20,7 @@ package com.github.javactic;
  * limitations under the License.
  */
 
-import io.vavr.Function3;
-import io.vavr.Function4;
-import io.vavr.Function5;
-import io.vavr.Function6;
-import io.vavr.Function7;
-import io.vavr.Function8;
-import io.vavr.Tuple;
-import io.vavr.Tuple2;
-import io.vavr.Tuple3;
+import io.vavr.*;
 import io.vavr.collection.Iterator;
 import io.vavr.collection.Stream;
 import io.vavr.collection.Vector;
@@ -69,7 +61,7 @@ public final class Accumulation {
    */
   public static <G, ERR> Or<Vector<G>, Every<ERR>>
   combined(Iterable<? extends Or<? extends G, ? extends Every<? extends ERR>>> input) {
-    return combined(input, Vector.<G>collector());
+    return combined(input, Vector.collector());
   }
 
   /**
@@ -92,16 +84,11 @@ public final class Accumulation {
     A goods = collector.supplier().get();
     Vector<ERR> errs = Vector.empty();
     for (Or<? extends G, ? extends Every<? extends ERR>> or : input) {
-      if (or.isGood())
-        collector.accumulator().accept(goods, or.get());
-      else
-        errs = errs.appendAll(or.getBad().toVector());
+      if (or.isGood()) collector.accumulator().accept(goods, or.get());
+      else errs = errs.appendAll(or.getBad().toVector());
     }
-    if (errs.isEmpty()) {
-      I gds = collector.finisher().apply(goods);
-      return Good.of(gds);
-    } else
-      return Bad.of(Every.of(errs.head(), errs.tail()));
+    if (errs.isEmpty()) return Good.of(collector.finisher().apply(goods));
+    else return Bad.of(Every.of(errs.head(), errs.tail()));
   }
 
   /**

@@ -114,8 +114,8 @@ public class ExecutionContext<BAD> {
    * @param <G> the success type
    * @return an instance of OrFuture
    */
-  public <G> OrFuture<G, BAD> badFuture(BAD bad) {
-    return this.<G, BAD>promise().failure(bad).future();
+  public <G, B> OrFuture<G, B> badFuture(B bad) {
+    return this.<G, B>promise().failure(bad).future();
   }
 
   /**
@@ -125,8 +125,8 @@ public class ExecutionContext<BAD> {
    * @param <G>  the success type
    * @return an instance of OrFuture
    */
-  public <G> OrFuture<G, BAD> goodFuture(G good) {
-    return this.<G, BAD>promise().success(good).future();
+  public <G,B> OrFuture<G, B> goodFuture(G good) {
+    return this.<G, B>promise().success(good).future();
   }
 
 
@@ -432,6 +432,13 @@ public class ExecutionContext<BAD> {
     return promise.future();
   }
 
+//  public <G, ERR, A, I extends Iterable<? extends G>> OrFuture<I, Every<ERR>>
+//  sequence2(Iterable<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> input,
+//           Collector<? super G, A, I> collector) {
+//    OrFuture<I, Every<ERR>> result = goodFuture()
+//    Iterator.ofAll(input).fold(goodFuture(collector.))
+//  }
+
   // ----------------------------------------------------------------------------------------------
   // COMBINED
   // ----------------------------------------------------------------------------------------------
@@ -471,27 +478,21 @@ public class ExecutionContext<BAD> {
    * @param collector the collector producing the resulting collection
    * @return an OrFuture that completes with all the success values or with all the errors
    */
+  @SuppressWarnings("unchecked")
   public <G, ERR, A, I extends Iterable<? extends G>> OrFuture<I, Every<ERR>>
   combined(Iterable<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> input,
            Collector<? super G, A, I> collector) {
-    OrPromise<I, Every<ERR>> promise = promise();
-    AtomicInteger count = new AtomicInteger(0);
-    AtomicBoolean finished = new AtomicBoolean(false);
-    // this is necessary as nothing guarantees the iterable can be iterated multiple times
-    Queue<OrFuture<? extends G, ? extends Every<? extends ERR>>> copy = new ConcurrentLinkedQueue<>();
-    java.util.Iterator<? extends OrFuture<? extends G, ? extends Every<? extends ERR>>> iterator = input.iterator();
-    while (iterator.hasNext()) {
-      count.incrementAndGet();
-      OrFuture<? extends G, ? extends Every<? extends ERR>> future = iterator.next();
-      copy.add(future);
-      if (!iterator.hasNext()) finished.set(true);
-      future.onComplete(or -> {
-        if (count.decrementAndGet() == 0 && finished.get()) {
-          promise.complete(accumulate(copy, collector));
-        }
-      });
-    }
-    return promise.future();
+    A goods = collector.supplier().get();
+    BiFunction<OrFuture<Tuple0, Every<ERR>>, OrFuture<G, Every<ERR>>, OrFuture<Tuple0, Every<ERR>>> combiner =
+        (ft0, fg) -> withGood(ft0, fg, (__,g) -> {
+          collector.accumulator().accept(goods, g);
+          return Tuple0.instance();
+        });
+
+    return Iterator
+        .ofAll((Iterable<OrFuture<G, Every<ERR>>>) input)
+        .foldLeft(this.goodFuture(null), combiner)
+        .map(vec -> collector.finisher().apply(goods));
   }
 
   // ----------------------------------------------------------------------------------------------
@@ -517,6 +518,21 @@ public class ExecutionContext<BAD> {
     return withGood(a, b, Tuple::of);
   }
 
+  /**
+   * Zips three accumulating OrFutures together. If all complete with Goods, returns an OrFuture
+   * that completes with a Good tuple containing all original Good values. Otherwise returns an
+   * OrFuture that completes with a Bad containing every error message.
+   *
+   * @param <A>   the success type
+   * @param <B>   the success type
+   * @param <C>   the success type
+   * @param <ERR> the error type of the accumulating OrFutures
+   * @param a     the first OrFuture to zip
+   * @param b     the second OrFuture to zip
+   * @param c     the third OrFuture to zip
+   * @return an OrFuture that completes with a Good of type Tuple3 if all OrFutures completed
+   * with Goods, otherwise returns an OrFuture that completes with a Bad containing every error.
+   */
   public <A, B, C, ERR> OrFuture<Tuple3<A, B, C>, Every<ERR>>
   zip3(OrFuture<? extends A, ? extends Every<? extends ERR>> a,
        OrFuture<? extends B, ? extends Every<? extends ERR>> b,

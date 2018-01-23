@@ -21,8 +21,11 @@ package com.github.javactic.futures;
  */
 
 import com.github.javactic.Bad;
+import com.github.javactic.Every;
 import com.github.javactic.Or;
 import com.github.javactic.Validation;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
 import io.vavr.control.Option;
 
 import java.time.Duration;
@@ -34,6 +37,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -141,6 +145,7 @@ class OrFutureImpl<G, B> implements OrFuture<G, B> {
   }
 
 
+  @Override
   public OrFuture<G, B> andThen(Consumer<? super Or<G, B>> consumer) {
     OrPromise<G, B> p = executionContext.promise();
     onComplete(or -> {
@@ -155,12 +160,14 @@ class OrFutureImpl<G, B> implements OrFuture<G, B> {
     return p.future();
   }
 
+  @Override
   public OrFuture<G, B> filter(Function<? super G, ? extends Validation<? extends B>> validator) {
     OrPromise<G, B> promise = executionContext.promise();
     onComplete(or -> promise.complete(or.filter(validator)));
     return promise.future();
   }
 
+  @Override
   public <H> OrFuture<H, B> flatMap(Function<? super G, ? extends OrFuture<? extends H, ? extends B>> mapper) {
     OrPromise<H, B> promise = executionContext.promise();
     onComplete(or ->
@@ -171,6 +178,7 @@ class OrFutureImpl<G, B> implements OrFuture<G, B> {
     return promise.future();
   }
 
+  @Override
   public OrFuture<G, B> recover(Function<? super B, ? extends G> fn) {
     OrPromise<G, B> promise = executionContext.promise();
     onComplete(or -> promise.complete(or.recover(fn)));
@@ -178,6 +186,7 @@ class OrFutureImpl<G, B> implements OrFuture<G, B> {
   }
 
   @SuppressWarnings("unchecked")
+  @Override
   public <C> OrFuture<G, C> recoverWith(Function<? super B, ? extends OrFuture<? extends G, ? extends C>> fn) {
     return transformWith(or -> {
       if(or.isGood()) return (OrFuture<G,C>)this;
@@ -185,15 +194,29 @@ class OrFutureImpl<G, B> implements OrFuture<G, B> {
     });
   }
 
+  @Override
   public <H, C> OrFuture<H, C> transform(Function<? super Or<? extends G, ? extends B>, ? extends Or<? extends H, ? extends C>> f) {
     OrPromise<H, C> promise = executionContext.promise();
     onComplete(or -> promise.complete(f.apply(or)));
     return promise.future();
   }
 
+  @Override
   public <H, C> OrFuture<H, C> transformWith(Function<? super Or<? extends G, ? extends B>, ? extends OrFuture<? extends H, ? extends C>> f) {
     OrPromise<H, C> promise = executionContext.promise();
     onComplete(or -> promise.completeWith(f.apply(or)));
+    return promise.future();
+  }
+
+  @Override
+  public <H> OrFuture<Tuple2<G, H>, Every<B>> zip(OrFuture<? extends H, ? extends B> that) {
+    return zipWith(that, Tuple::of);
+  }
+
+  @Override
+  public <H, X> OrFuture<X, Every<B>> zipWith(OrFuture<? extends H, ? extends B> that, BiFunction<? super G, ? super H, ? extends X> f) {
+    OrPromise<X, Every<B>> promise = executionContext.promise();
+    onComplete(thisOr -> that.onComplete(thatOr -> promise.complete(thisOr.zipWith(thatOr, f))));
     return promise.future();
   }
 }
