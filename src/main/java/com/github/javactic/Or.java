@@ -325,7 +325,9 @@ public interface Or<G, B> {
    * <pre class="stHighlighted">Scalactic: def foreach(f: (G) =&gt; Unit): Unit </pre>
    *
    * @param action the function to apply
+   * @deprecated use forGood. This will be removed in the next major version.
    */
+  @Deprecated
   void forEach(Consumer<? super G> action);
 
   /**
@@ -544,7 +546,9 @@ public interface Or<G, B> {
    * A terminal operation to handle both success and failure cases.
    * @param gc a function to be executed if this {@link Or} is a {@link Good}
    * @param bc a function to be executed if this {@link Or} is a {@link Bad}
+   * @deprecated use forGood and forBad. This will be removed in the next major version.
    */
+  @Deprecated
   void forEach(Consumer<? super G> gc, Consumer<? super B> bc);
 
   /**
@@ -564,5 +568,21 @@ public interface Or<G, B> {
    * @return true if this {@link Or} is a {@link Bad}, <code>false</code> if it is a {@link Good}.
    */
   boolean isBad();
+
+  /**
+   * Apply the given side effecting action to this Or's value if it is good, returning this Or.
+   *
+   * @param action the action to apply
+   * @return this Or
+   */
+  default Or<G,B> forGood(Consumer<? super G> action){ return this; }
+
+  /**
+   * Apply the given side effecting action to this Or's value if it is bad, returning this Or.
+   *
+   * @param action the action to apply
+   * @return this Or
+   */
+  default Or<G,B> forBad(Consumer<? super B> action){ return this; }
 
 }

@@ -165,8 +165,28 @@ public class OrTest {
     Or<String, String> good = Good.of("foo");
     good.forEach(foo::set);
     assertEquals("foo", foo.get());
-    Or<String, String> bad = Bad.of("baad");
+    Or<String, String> bad = Bad.of("bad");
     bad.forEach(foo::set);
+    assertEquals("foo", foo.get());
+  }
+
+  @Test
+  public void forGood() {
+    AtomicReference<String> foo = new AtomicReference<>("bar");
+    Or<String, String> good = Good.of("foo");
+    good.forBad(foo::set);
+    assertEquals("bar", foo.get());
+    good.forGood(foo::set);
+    assertEquals("foo", foo.get());
+  }
+
+  @Test
+  public void forBad() {
+    AtomicReference<String> foo = new AtomicReference<>("bar");
+    Or<String, String> bad = Bad.of("foo");
+    bad.forGood(foo::set);
+    assertEquals("bar", foo.get());
+    bad.forBad(foo::set);
     assertEquals("foo", foo.get());
   }
 

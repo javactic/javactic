@@ -8,6 +8,11 @@ See [documentation](http://javactic.github.io/javactic/) and [Javadoc](http://ja
 
 ## 2.0.0 is out, based on vavr 0.9.2:
 
+| Version | Dependency    |
+| ------- | ------------- |
+| 1.x     | Javaslang 2.x |
+| 2.x     | Vavr 0.92     |
+
 ```xml
 <dependency>
     <groupId>com.github.javactic</groupId>

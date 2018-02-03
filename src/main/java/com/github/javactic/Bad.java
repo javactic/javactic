@@ -48,11 +48,9 @@ public final class Bad<G, B> implements Or<G, B>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  final B value;
+  private final B value;
 
-  Bad(B bad) {
-    value = bad;
-  }
+  private Bad(B bad) { value = bad; }
 
   /**
    * Creates a Bad of type B.
@@ -301,12 +299,13 @@ public final class Bad<G, B> implements Or<G, B>, Serializable {
       return false;
     Bad other = (Bad) obj;
     if (value == null) {
-      if (other.value != null)
-        return false;
-    } else if (!value.equals(other.value))
-      return false;
-    return true;
+      return other.value == null;
+    } else return value.equals(other.value);
   }
 
-
+  @Override
+  public Or<G, B> forBad(Consumer<? super B> action) {
+    action.accept(value);
+    return this;
+  }
 }

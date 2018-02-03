@@ -49,7 +49,7 @@ public final class Good<G, B> implements Or<G, B>, Serializable {
 
   private final G value;
 
-  Good(G good) {
+  private Good(G good) {
     value = good;
   }
 
@@ -246,11 +246,13 @@ public final class Good<G, B> implements Or<G, B>, Serializable {
       return false;
     Good other = (Good) obj;
     if (value == null) {
-      if (other.value != null)
-        return false;
-    } else if (!value.equals(other.value))
-      return false;
-    return true;
+      return other.value == null;
+    } else return value.equals(other.value);
   }
 
+  @Override
+  public Or<G, B> forGood(Consumer<? super G> action) {
+    action.accept(value);
+    return this;
+  }
 }
