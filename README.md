@@ -4,9 +4,9 @@
 
 # Javactic
 Java port of [Scalactic](http://www.scalactic.org/) based on [VAVR](http://www.vavr.io/)(0.9.2).
-See [documentation](http://javactic.github.io/javactic/) and [Javadoc](http://www.javadoc.io/doc/com.github.javactic/javactic/2.0.0) for more info.
+See [documentation](http://javactic.github.io/javactic/) and [Javadoc](http://www.javadoc.io/doc/com.github.javactic/javactic/2.1.0) for more info.
 
-## 2.0.0 is out, based on vavr 0.9.2:
+## 2.1.0 is out, based on vavr 0.9.2:
 
 | Version | Dependency    |
 | ------- | ------------- |
@@ -17,6 +17,6 @@ See [documentation](http://javactic.github.io/javactic/) and [Javadoc](http://ww
 <dependency>
     <groupId>com.github.javactic</groupId>
     <artifactId>javactic</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.0</version>
 </dependency>
 ```
