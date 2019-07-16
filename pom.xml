@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.javactic</groupId>
     <artifactId>javactic</artifactId>
-    <version>2.1.0</version>
+    <version>3.0.0</version>
     <name>Javactic</name>
     <description>
         A Java port of Scalactic
@@ -48,7 +48,7 @@
         <dependency>
             <groupId>io.vavr</groupId>
             <artifactId>vavr</artifactId>
-            <version>0.9.2</version>
+            <version>0.10.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
